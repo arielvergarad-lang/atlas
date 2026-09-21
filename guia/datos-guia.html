@@ -1,0 +1,1882 @@
+<title>Datos y SQL de Punta a Punta</title>
+<meta name="description" content="Guía de estudio densa de datos y SQL analítico para autodidactas: OLTP vs OLAP, SQL analítico y window functions, modelado dimensional, data warehouse y lakehouse, ETL/ELT, dbt, orquestación, calidad de datos, analítica de producto, pandas/Polars y datos para IA — más un currículo y un laboratorio sin registro.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #23272e;
+    --ink: #e7e5df;
+    --ink-soft: #b9bdc6;
+    --muted: #8b919c;
+    --line: #333842;
+    --line-soft: #2a2f37;
+    --accent: #4bb7a8;
+    --accent-soft: #16302d;
+    --accent-ink: #7fd3c7;
+    --rust: #d98a5f;
+    --rust-soft: #35241b;
+    --code-bg: #10131a;
+    --code-ink: #d9e2ec;
+    --code-comment: #7b8798;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-inner { padding: clamp(2.4rem, 6vw, 4.2rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem) 0 5rem; }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: 244px minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.88rem; border-left: 2px solid var(--line); padding-left: 1rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  nav.toc p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.7rem;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: flex; flex-direction: column; gap: 0.1rem; }
+  nav.toc a {
+    display: block; padding: 0.3rem 0.4rem; color: var(--ink-soft); text-decoration: none;
+    border-radius: 5px; counter-increment: toc; transition: background 0.15s, color 0.15s;
+  }
+  nav.toc a::before {
+    content: counter(toc, decimal-leading-zero); font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--muted); margin-right: 0.55rem;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+  nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 979px) {
+    nav.toc {
+      position: static; border-left: none; border: 1px solid var(--line); border-radius: 10px;
+      padding: 1.1rem 1.2rem; background: var(--surface); max-height: none;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 1rem; }
+  }
+
+  main { min-width: 0; }
+  section.block { scroll-margin-top: 2rem; padding-top: 1rem; }
+  section.block + section.block { margin-top: 3.4rem; border-top: 1px solid var(--line-soft); padding-top: 2.6rem; }
+  .sec-num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--accent-ink); }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.55rem, 4vw, 2.1rem);
+    line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; margin: 0.3rem 0 1rem;
+  }
+  h3 { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 1.16rem; margin: 2rem 0 0.6rem; letter-spacing: -0.005em; }
+  h4 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.86rem;
+    letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-soft); margin: 1.4rem 0 0.5rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  main a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  .lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 66ch; }
+  ul, ol.body-list { max-width: 68ch; padding-left: 1.2rem; margin: 0 0 1rem; }
+  li { margin: 0.35rem 0; }
+
+  code.inline {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.08em 0.36em; color: var(--ink);
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-ink);
+    font-size: 0.82rem; line-height: 1.6; padding: 1rem 1.15rem; border-radius: 9px; overflow-x: auto;
+    margin: 0 0 1.2rem; border: 1px solid rgba(255,255,255,0.06);
+  }
+  pre .c { color: var(--code-comment); }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  .concept { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 1.1rem 1.25rem; margin: 0 0 0.9rem; }
+  .concept .term {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.95rem;
+    color: var(--accent-ink); margin: 0 0 0.35rem;
+  }
+  .concept .term span { color: var(--muted); font-weight: 400; }
+  .concept p { margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .concept p:first-of-type { margin-top: 0; }
+  .concept .why { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.9rem; color: var(--ink-soft); }
+  .concept .why b {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 0.1rem;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.85rem 1.1rem;
+    border-radius: 0 8px 8px 0; margin: 0 0 1.3rem; font-size: 0.94rem;
+  }
+  .note.rust { border-left-color: var(--rust); background: var(--rust-soft); }
+  .note p { margin: 0; max-width: none; }
+  .note p + p { margin-top: 0.5rem; }
+  .note .label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-ink); display: block; margin-bottom: 0.25rem;
+  }
+  .note.rust .label { color: var(--rust); }
+
+  .diagram {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; line-height: 1.5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 1rem 1.15rem;
+    overflow-x: auto; white-space: pre; color: var(--ink-soft); margin: 0 0 1.3rem;
+  }
+
+  .chip {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; white-space: nowrap;
+  }
+  .chip.t1 { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* Reading list */
+  .stage { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 1.15rem 1.3rem; margin: 0 0 1rem; }
+  .stage > h4 { margin: 0 0 0.6rem; color: var(--accent-ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 0.5rem; }
+  .stage > p { font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.7rem; }
+  .book { padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  .book:last-child { border-bottom: none; }
+  .book .t { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 600; }
+  .book .a { color: var(--muted); }
+  .book .d { display: block; color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.1rem; }
+  .rl-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.08rem 0.38rem; border-radius: 3px; margin-left: 0.35rem; white-space: nowrap; vertical-align: 0.08em;
+  }
+  .rl-tag.free { background: var(--accent-soft); color: var(--accent-ink); }
+  .rl-tag.paid { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .rl-tag.lvl { background: var(--rust-soft); color: var(--rust); }
+
+  .project { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 0 0 1.8rem; box-shadow: var(--shadow); }
+  .project-head { padding: 1.2rem 1.4rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .project-head .stack {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 0.3rem;
+  }
+  .project-head h3 { margin: 0 0 0.4rem; font-size: 1.28rem; font-family: "IBM Plex Serif", Georgia, serif; }
+  .project-head p { margin: 0; font-size: 0.95rem; color: var(--ink-soft); max-width: none; }
+  .project-body { padding: 0.6rem 1.4rem 1.4rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line-soft); }
+  .phase:last-of-type { border-bottom: none; }
+  .phase .pn {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 5px; padding: 0.1rem 0.4rem; height: fit-content; white-space: nowrap;
+  }
+  .phase .pt { font-weight: 600; font-size: 0.95rem; grid-column: 2; }
+  .phase .pd { grid-column: 2; font-size: 0.92rem; color: var(--ink-soft); }
+  .phase .pd code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; }
+  .learn { margin-top: 1rem; font-size: 0.9rem; background: var(--accent-soft); color: var(--accent-ink); padding: 0.7rem 0.95rem; border-radius: 8px; }
+  .learn b { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
+
+  footer.foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.5rem 0 3.5rem; font-size: 0.9rem; color: var(--muted); }
+  footer.foot p { max-width: 66ch; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <p class="kicker">Guía de estudio · Datos &amp; SQL analítico · edición densa</p>
+    <h1>Datos y SQL de Punta a Punta</h1>
+    <p class="standfirst">El lado analítico que la guía de Backend no cubre: consultar, modelar, mover y confiar en los datos para tomar decisiones. SQL analítico, modelado dimensional, warehouse, ELT, dbt, calidad de datos y el puente con la IA — más un currículo y un laboratorio para tocar cada concepto.</p>
+    <div class="meta-row">
+      <span class="tag">para autodidactas</span>
+      <span class="tag">conceptos &gt; sintaxis</span>
+      <span class="tag">13 secciones</span>
+      <span class="tag">OLAP · dbt · warehouse</span>
+      <span class="tag">laboratorio sin registro</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p>Índice</p>
+      <ol>
+        <li><a href="#oltp-vs-olap">OLTP vs OLAP</a></li>
+        <li><a href="#sql-analitico">SQL analítico</a></li>
+        <li><a href="#modelado">Modelado dimensional</a></li>
+        <li><a href="#warehouse">El data warehouse</a></li>
+        <li><a href="#etl-elt">ETL, ELT e ingesta</a></li>
+        <li><a href="#dbt">Transformación con dbt</a></li>
+        <li><a href="#orquestacion-datos">Orquestación de datos</a></li>
+        <li><a href="#calidad-datos">Calidad y contratos de datos</a></li>
+        <li><a href="#analitica-producto">Analítica de producto</a></li>
+        <li><a href="#pandas-python">Cuando SQL no alcanza</a></li>
+        <li><a href="#datos-para-ia">Datos para IA</a></li>
+        <li><a href="#curriculo">Currículo: libros y cursos</a></li>
+        <li><a href="#laboratorio">Laboratorio: tocar el concepto en el navegador</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+<section class="block" id="oltp-vs-olap">
+  <span class="sec-num">01</span>
+  <h2>Dos mundos: transaccional y analítico</h2>
+  <p class="lead">
+    La base de datos que sostiene una aplicación y la que responde "¿cuánto vendimos por país
+    el trimestre pasado?" están optimizadas para cosas opuestas. Entender por qué es la puerta
+    de entrada a todo lo demás: el modelado, el almacenamiento columnar y el warehouse existen
+    porque una sola base no puede ser buena en ambas cargas.
+  </p>
+
+  <div class="concept">
+    <p class="term">Carga transaccional <span>· OLTP</span></p>
+    <p>Muchísimas operaciones pequeñas y concurrentes: crear un pedido, marcar un mensaje como
+    leído, descontar stock. Cada una toca pocas filas, tiene que ser rápida (milisegundos) y
+    correcta bajo concurrencia. El diseño se optimiza para <strong>escrituras</strong> y para
+    leer filas concretas por clave. Es lo que cubre la guía de Backend: PostgreSQL o MySQL
+    detrás de una API.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Carga analítica <span>· OLAP</span></p>
+    <p>Pocas consultas, pero cada una lee millones de filas para agregarlas: sumas, promedios,
+    conteos, agrupaciones, ventanas temporales. Casi no hay <code class="inline">UPDATE</code>;
+    los datos entran por lotes y se consultan muchas veces. El diseño se optimiza para
+    <strong>escanear columnas enteras</strong> lo más rápido y barato posible.</p>
+    <p class="why"><b>por qué importa</b>Si corres estas consultas contra la base de la app,
+    compites por CPU y locks con el tráfico de usuarios: un reporte pesado puede degradar el
+    checkout. La separación no es purismo, es aislamiento de fallos.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Normalizar &nbsp;vs&nbsp; desnormalizar</p>
+    <p>OLTP <strong>normaliza</strong>: cada hecho vive en un solo lugar, referenciado por
+    claves, para que una corrección se haga una vez y no haya contradicciones. OLAP
+    <strong>desnormaliza</strong> a propósito: repite el nombre del país y la categoría en cada
+    fila de ventas para que la consulta no tenga que hacer diez <code class="inline">JOIN</code>.
+    El almacenamiento es barato; el tiempo de escaneo y la claridad para quien consulta, no.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Almacén por fila &nbsp;vs&nbsp; por columna</p>
+    <p>Un <strong>row store</strong> guarda todas las columnas de una fila juntas en disco:
+    ideal para "tráeme el pedido 4821 completo". Un <strong>column store</strong> guarda cada
+    columna por separado y contigua: para "suma el monto de 40 millones de filas" solo lee esa
+    columna y salta el resto. Esa es la diferencia de fondo entre una base OLTP y un motor
+    analítico.</p>
+    <div class="diagram">FILA  (row store, OLTP)              COLUMNA  (column store, OLAP)
+
+bloque 1: [ 1 | Ana  | CL | 120 ]    bloque A: [ 1  2  3  4 ... ]      id
+bloque 2: [ 2 | Beto | AR |  90 ]    bloque B: [ Ana Beto Cee ... ]    nombre
+bloque 3: [ 3 | Cee  | CL | 300 ]    bloque C: [ CL AR CL CL ... ]     pais
+                                     bloque D: [ 120 90 300 ... ]      monto
+
+"dame la fila 2 entera"   1 bloque              4 bloques (una por columna)
+"suma monto de todo"      3 bloques (todo)      1 bloque, ya contiguo
+"cuenta por pais"         3 bloques             1 bloque + se comprime:
+                                                 CL,CL,CL  ->  CL x3  (RLE)</div>
+  </div>
+  <div class="concept">
+    <p class="term">Por qué columnar comprime y escanea rápido</p>
+    <p>Datos del mismo tipo y dominio juntos se comprimen muchísimo mejor:
+    <strong>run-length</strong> (CL repetido 900 veces → "CL ×900"), <strong>diccionario</strong>
+    (mapea "Chile" a un entero pequeño), <strong>delta</strong> (guarda diferencias entre
+    valores ordenados). Menos bytes en disco = menos lectura = más rápido. Encima, el motor
+    procesa en <strong>bloques vectorizados</strong> (miles de valores por instrucción) en vez
+    de fila por fila.</p>
+  </div>
+  <div class="concept">
+    <p class="term">MPP <span>· procesamiento masivamente paralelo</span></p>
+    <p>Los warehouses reparten una consulta entre decenas o cientos de nodos que escanean
+    trozos distintos de la tabla a la vez y combinan resultados. Por eso una agregación sobre
+    mil millones de filas termina en segundos: no es una máquina más rápida, son muchas
+    trabajando en paralelo sobre datos particionados.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Índices en un motor analítico <span>· zone maps, no B-tree</span></p>
+    <p>Un índice B-tree ayuda a encontrar una fila entre millones; en OLAP casi siempre se
+    escanean millones de filas de todos modos, así que mantenerlo cuesta más de lo que ahorra.
+    Los motores columnares usan en su lugar <strong>zone maps</strong> (min/max por bloque, para
+    descartar bloques enteros) y a veces <strong>bloom filters</strong> por columna para saltarse
+    bloques donde un valor exacto no puede estar. La estructura que más importa no es el índice,
+    es el <strong>orden físico</strong> de las filas (por fecha, por ejemplo): sin ordenar, los
+    rangos min/max de cada bloque se solapan y el pruning no ahorra nada.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Trampa: portar el esquema OLTP tal cual</p>
+    <p>Apuntar una herramienta de BI directo a una réplica de la base transaccional, sin
+    modelar, parece un atajo. El resultado: nombres de columna técnicos
+    (<code class="inline">fk_cli_id</code>), la lógica de negocio repartida en el código de la
+    app y no en las tablas, y una pregunta simple ("ingreso por país") exige diez
+    <code class="inline">JOIN</code> que cada analista escribe distinto —y cada uno cuadra
+    distinto. El modelado dimensional de la sección 3 no es burocracia, es la traducción de
+    "cómo se guardan los datos" a "cómo se piensa el negocio".</p>
+  </div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Dimensión</th><th>OLTP (transaccional)</th><th>OLAP (analítico)</th></tr></thead>
+    <tbody>
+      <tr><td>Patrón de acceso</td><td>Muchas operaciones chicas, pocas filas cada una</td><td>Pocas consultas, escanean millones de filas</td></tr>
+      <tr><td>Escrituras</td><td>Constantes y concurrentes</td><td>Carga por lotes; casi sin <code class="inline">UPDATE</code></td></tr>
+      <tr><td>Modelo de datos</td><td>Normalizado (3NF)</td><td>Desnormalizado (estrella, tabla ancha)</td></tr>
+      <tr><td>Almacenamiento</td><td>Por fila</td><td>Por columna, comprimido</td></tr>
+      <tr><td>Índices</td><td>Muchos, selectivos (árbol B+)</td><td>Pocos; se poda por partición y estadísticas</td></tr>
+      <tr><td>Métrica de éxito</td><td>Latencia p99 en ms, transacciones/seg</td><td>Bytes escaneados, coste y tiempo por consulta</td></tr>
+      <tr><td>Ejemplos</td><td>PostgreSQL, MySQL, SQL Server</td><td>Snowflake, BigQuery, Redshift, DuckDB, ClickHouse</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">Antes de montar un warehouse</span>
+    <p>Muchos equipos empiezan analizando sobre una <strong>réplica de lectura</strong> de la
+    base de producción o sobre un dump nocturno cargado en <strong>DuckDB</strong>. Aísla la
+    carga del tráfico real y cuesta casi nada. Solo cuando las consultas tardan, los datos
+    vienen de varias fuentes, o varias personas los necesitan a la vez, se justifica un
+    warehouse de verdad.</p>
+  </div>
+  <div class="note rust">
+    <span class="label">HTAP no te salva del modelado</span>
+    <p>Hay motores que prometen servir ambas cargas (bases "HTAP", o extensiones columnares
+    sobre PostgreSQL). Ayudan con el aislamiento físico, pero la tabla normalizada de la app
+    sigue siendo incómoda de analizar: los nombres son técnicos, la lógica de negocio no está,
+    y una pregunta simple exige conocer diez tablas. El trabajo de modelar para análisis no
+    desaparece.</p>
+  </div>
+</section>
+
+<section class="block" id="sql-analitico">
+  <span class="sec-num">02</span>
+  <h2>El SQL que no se ve en un CRUD</h2>
+  <p class="lead">
+    Ya sabes <code class="inline">SELECT</code>, <code class="inline">JOIN</code> y
+    <code class="inline">GROUP BY</code>. El SQL analítico añade una capa: subtotales en una
+    pasada, cálculos que miran filas vecinas sin colapsarlas, y pivotes. Con esto se resuelven
+    cohortes, retención y funnels sin exportar nada a Python.
+  </p>
+
+  <h3>Agregación con subtotales</h3>
+  <div class="concept">
+    <p class="term">GROUPING SETS · ROLLUP · CUBE</p>
+    <p>Un <code class="inline">GROUP BY</code> normal te da un nivel de detalle.
+    <strong>GROUPING SETS</strong> pide varios a la vez en una sola consulta: por región y
+    producto, solo por región, y el total global.
+    <code class="inline">ROLLUP(a, b)</code> es el atajo para jerarquías (a+b, a, total);
+    <code class="inline">CUBE(a, b)</code> genera todas las combinaciones. Evita hacer tres
+    consultas y unirlas con <code class="inline">UNION ALL</code>.</p>
+<pre><span class="c">-- subtotales por region+producto, por region, y total, en una pasada</span>
+SELECT region, producto, SUM(monto) AS total
+FROM ventas
+GROUP BY GROUPING SETS ((region, producto), (region), ());
+
+<span class="c">-- GROUPING() marca las filas de subtotal (1 = "agregado en esta columna")</span></pre>
+  </div>
+
+  <h3>Window functions</h3>
+  <div class="concept">
+    <p class="term">La idea: agregar sin colapsar</p>
+    <p>Una función de ventana calcula sobre un conjunto de filas <em>relacionadas con la fila
+    actual</em> pero devuelve un valor por fila, sin agruparlas. La cláusula
+    <code class="inline">OVER</code> define ese conjunto:
+    <code class="inline">PARTITION BY</code> lo divide en grupos independientes,
+    <code class="inline">ORDER BY</code> lo ordena dentro de cada grupo, y el
+    <strong>frame</strong> (<code class="inline">ROWS BETWEEN ...</code>) acota qué filas entran
+    en el cálculo acumulado.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Las familias que se usan</p>
+    <p><strong>Ranking</strong>: <code class="inline">ROW_NUMBER</code> (1,2,3 sin empates),
+    <code class="inline">RANK</code> (1,1,3), <code class="inline">DENSE_RANK</code> (1,1,2),
+    <code class="inline">NTILE(4)</code> (reparte en cuartiles).
+    <strong>Desplazamiento</strong>: <code class="inline">LAG</code>/<code class="inline">LEAD</code>
+    traen el valor de la fila anterior o siguiente (variación mes a mes, tiempo entre eventos).
+    <strong>Acumulados</strong>: <code class="inline">SUM/AVG/COUNT</code> con
+    <code class="inline">OVER (... ORDER BY ...)</code> dan running totals y medias móviles.</p>
+<pre><span class="c">-- ingreso acumulado por cliente y numero de pedido, media movil de 3</span>
+SELECT
+  cliente_id,
+  fecha,
+  monto,
+  SUM(monto) OVER (
+    PARTITION BY cliente_id ORDER BY fecha
+    ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW
+  )                                                    AS acumulado,
+  AVG(monto) OVER (
+    PARTITION BY cliente_id ORDER BY fecha
+    ROWS BETWEEN 2 PRECEDING AND CURRENT ROW
+  )                                                    AS media_movil_3,
+  monto - LAG(monto) OVER (
+    PARTITION BY cliente_id ORDER BY fecha
+  )                                                    AS delta_vs_anterior,
+  ROW_NUMBER() OVER (
+    PARTITION BY cliente_id ORDER BY fecha
+  )                                                    AS nro_pedido
+FROM pedidos;</pre>
+  </div>
+  <div class="note rust">
+    <span class="label">El frame por defecto muerde</span>
+    <p>Si pones <code class="inline">ORDER BY</code> dentro de <code class="inline">OVER</code>
+    pero no defines el frame, el default es
+    <code class="inline">RANGE BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW</code>. Con
+    <code class="inline">RANGE</code>, todas las filas con el mismo valor de orden (misma fecha,
+    por ejemplo) se suman juntas de golpe: tu "running total" salta en escalones y no cuadra.
+    Para acumulados fila a fila usa siempre <code class="inline">ROWS BETWEEN ...</code> de
+    forma explícita.</p>
+  </div>
+  <div class="concept">
+    <p class="term">QUALIFY <span>· filtrar por el resultado de una ventana</span></p>
+    <p>No puedes usar una window function en <code class="inline">WHERE</code> (se calcula
+    después del filtrado). <strong>QUALIFY</strong> resuelve eso: filtra por el valor de la
+    ventana sin subconsulta. Es una extensión de <strong>Snowflake, BigQuery y DuckDB</strong>;
+    en PostgreSQL o MySQL hay que envolver en una CTE y filtrar fuera.</p>
+<pre><span class="c">-- el ultimo pedido de cada cliente (Snowflake / BigQuery / DuckDB)</span>
+SELECT cliente_id, fecha, monto
+FROM pedidos
+QUALIFY ROW_NUMBER() OVER (PARTITION BY cliente_id ORDER BY fecha DESC) = 1;
+
+<span class="c">-- equivalente portatil</span>
+WITH r AS (
+  SELECT *, ROW_NUMBER() OVER (PARTITION BY cliente_id ORDER BY fecha DESC) AS rn
+  FROM pedidos
+)
+SELECT cliente_id, fecha, monto FROM r WHERE rn = 1;</pre>
+  </div>
+
+  <div class="concept">
+    <p class="term">El frame en detalle <span>· ROWS vs RANGE vs GROUPS</span></p>
+    <p><code class="inline">ROWS BETWEEN n PRECEDING AND CURRENT ROW</code> cuenta filas
+    físicas: siempre exactamente n+1 filas, sin importar si hay empates.
+    <code class="inline">RANGE</code> cuenta por <em>valor</em> de la columna de orden: todas las
+    filas con el mismo valor entran juntas, aunque sean miles. <code class="inline">GROUPS</code>
+    (menos soportado) cuenta por grupos de valores distintos, no por filas. Para una media móvil
+    de "los últimos 3 pedidos" quieres <code class="inline">ROWS</code>; para "todo lo vendido en
+    la misma fecha" el comportamiento de <code class="inline">RANGE</code> es el que quieres,
+    pero rara vez es el que crees que pediste.</p>
+  </div>
+
+  <h3>CTEs, recursión y pivote</h3>
+  <div class="concept">
+    <p class="term">Trampa: la CTE que el motor no materializa</p>
+    <p>Antes de PostgreSQL 12, un <code class="inline">WITH</code> era una barrera de
+    optimización: el motor la ejecutaba aparte y luego usaba el resultado. Desde PostgreSQL 12,
+    si la CTE se referencia una sola vez y no es recursiva, el planificador la
+    <strong>inlinea</strong> dentro de la consulta principal (como si fuera una subconsulta), lo
+    que en general mejora el plan pero cambia el comportamiento de código antiguo que dependía
+    del "corte" para forzar un orden de evaluación. Para forzar el comportamiento clásico se
+    marca <code class="inline">WITH x AS MATERIALIZED (...)</code>; para forzar el inlineo,
+    <code class="inline">NOT MATERIALIZED</code>. Snowflake, BigQuery y DuckDB también inlinean
+    CTEs simples por defecto.</p>
+  </div>
+  <div class="concept">
+    <p class="term">CTE y CTE recursiva</p>
+    <p>Un <code class="inline">WITH nombre AS (...)</code> nombra un paso intermedio y hace la
+    consulta legible de arriba abajo, como una tubería. La versión <strong>recursiva</strong>
+    (<code class="inline">WITH RECURSIVE</code>) se refiere a sí misma: sirve para jerarquías
+    (organigrama, categorías anidadas, árbol de comentarios) y para generar series (todas las
+    fechas de un rango, para no perder los días sin ventas).</p>
+<pre><span class="c">-- serie de fechas: una fila por dia aunque no haya datos</span>
+WITH RECURSIVE dias AS (
+  SELECT DATE '2026-01-01' AS d
+  UNION ALL
+  SELECT d + 1 FROM dias WHERE d &lt; DATE '2026-01-31'
+)
+SELECT dias.d, COUNT(v.id) AS ventas
+FROM dias LEFT JOIN ventas v ON v.fecha = dias.d
+GROUP BY dias.d ORDER BY dias.d;</pre>
+  </div>
+  <div class="concept">
+    <p class="term">PIVOT / UNPIVOT</p>
+    <p><strong>PIVOT</strong> gira filas a columnas (una columna por mes, una fila por
+    producto); <strong>UNPIVOT</strong> hace lo contrario, pasa una tabla ancha a formato
+    largo (que es el que quieren casi todas las herramientas de gráficos). La sintaxis
+    <code class="inline">PIVOT</code> existe en DuckDB, Snowflake y SQL Server; el patrón
+    portátil es <code class="inline">SUM(CASE WHEN ...)</code>.</p>
+<pre><span class="c">-- portatil: funciona en cualquier motor</span>
+SELECT
+  producto,
+  SUM(CASE WHEN mes = 'ene' THEN monto END) AS ene,
+  SUM(CASE WHEN mes = 'feb' THEN monto END) AS feb,
+  SUM(CASE WHEN mes = 'mar' THEN monto END) AS mar
+FROM ventas
+GROUP BY producto;
+
+<span class="c">-- DuckDB / Snowflake</span>
+SELECT * FROM ventas PIVOT (SUM(monto) FOR mes IN ('ene','feb','mar'));</pre>
+  </div>
+  <div class="concept">
+    <p class="term">Los tres patrones de analítica de producto</p>
+    <p><strong>Cohorte + retención</strong>: agrupa usuarios por mes de alta
+    (<code class="inline">DATE_TRUNC</code>), calcula para cada mes posterior cuántos siguieron
+    activos, divide. <strong>Funnel</strong>: por usuario, marca el paso máximo alcanzado con
+    <code class="inline">MAX(CASE WHEN evento = ...)</code> y cuenta. <strong>Sesiones</strong>:
+    ordena eventos por usuario y tiempo, usa <code class="inline">LAG</code> para ver el hueco,
+    y una <code class="inline">SUM() OVER</code> de "empezó sesión nueva" te da el id de sesión.
+    Los tres son window functions + un <code class="inline">GROUP BY</code>.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Legibilidad primero</span>
+    <p>El SQL analítico se vuelve ilegible rápido. Nombra cada CTE por lo que representa
+    (<code class="inline">pedidos_por_cliente</code>, no <code class="inline">t1</code>), un
+    paso por CTE, y comenta el grano de cada tabla intermedia ("una fila por usuario y día").
+    Esto es exactamente lo que dbt formaliza en la sección 06.</p>
+  </div>
+</section>
+
+<section class="block" id="modelado">
+  <span class="sec-num">03</span>
+  <h2>Modelado dimensional</h2>
+  <p class="lead">
+    El almacenamiento es barato, pero el modelo sigue importando: define qué preguntas son
+    fáciles de responder, qué números cuadran entre reportes, y si un analista nuevo entiende
+    las tablas sin preguntarle a nadie. El modelo dimensional de Kimball —hechos y
+    dimensiones— sigue siendo el lenguaje común.
+  </p>
+
+  <div class="concept">
+    <p class="term">Hechos &nbsp;·&nbsp; dimensiones</p>
+    <p>Una <strong>tabla de hechos</strong> registra eventos medibles del negocio: una venta,
+    un envío, una llamada de soporte. Contiene <em>medidas</em> numéricas (cantidad, monto,
+    duración) y <em>claves foráneas</em> a las dimensiones. Una <strong>dimensión</strong> es
+    el contexto por el que quieres cortar y filtrar: cliente, producto, tiempo, tienda,
+    campaña. Regla mental: los hechos responden "¿cuánto?", las dimensiones responden
+    "¿por qué, quién, cuándo, dónde?".</p>
+  </div>
+  <div class="concept">
+    <p class="term">El grano <span>· lo primero que se decide</span></p>
+    <p>El <strong>grano</strong> es qué representa exactamente una fila de la tabla de hechos:
+    "una línea de una factura", "un pedido", "el saldo de una cuenta al cierre del día". Se
+    define antes que las columnas. Un grano mal elegido o inconsistente (algunas filas por
+    pedido, otras por línea) hace que las sumas dupliquen o falten, y el error es silencioso.</p>
+    <p class="why"><b>por qué importa</b>Casi todos los "el dashboard no cuadra" se rastrean a
+    un <code class="inline">JOIN</code> que multiplicó filas porque alguien no tenía claro el
+    grano de las dos tablas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Tipos de tabla de hechos</p>
+    <p><strong>Transaccional</strong>: una fila por evento, el más común.
+    <strong>Snapshot periódico</strong>: una fila por entidad y periodo (inventario al cierre
+    de cada día), para medir estados, no eventos. <strong>Snapshot acumulado</strong>: una
+    fila por proceso que avanza por hitos (un pedido: creado → pagado → enviado → entregado),
+    con una fecha por hito, para medir tiempos de ciclo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Aditiva · semi-aditiva · no aditiva</p>
+    <p>Una medida es <strong>aditiva</strong> si sumarla tiene sentido en todas las dimensiones
+    (el monto de ventas). <strong>Semi-aditiva</strong> si suma en unas pero no en el tiempo
+    (un saldo de cuenta: sumar los saldos de todos los clientes sí, sumar el saldo de ayer y
+    hoy no). <strong>No aditiva</strong> si nunca se suma (un porcentaje, un ratio): hay que
+    recalcularlo desde los componentes, no promediar promedios.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Estrella &nbsp;vs&nbsp; copo de nieve</p>
+    <p>En el <strong>esquema estrella</strong>, cada dimensión es una sola tabla plana, aunque
+    repita datos (el país está en <code class="inline">dim_cliente</code> aunque haya un
+    catálogo de países). En el <strong>copo de nieve</strong>, las dimensiones se normalizan en
+    sub-tablas (<code class="inline">dim_cliente</code> → <code class="inline">dim_ciudad</code>
+    → <code class="inline">dim_pais</code>). La estrella es el default: menos joins, más rápida,
+    más legible. El copo solo si una dimensión es gigante y cambia mucho.</p>
+    <div class="diagram">                    +---------------+
+                    |  dim_tiempo   |
+                    | fecha_id (PK) |
+                    | dia mes anio  |
+                    +-------+-------+
+                            |
+ +--------------+   +-------+------------------+   +----------------+
+ | dim_cliente  |   |      fct_ventas          |   |  dim_producto  |
+ | cliente_id PK|---| cliente_id  (FK) --------|---| producto_id PK |
+ | pais  plan   |   | producto_id (FK)         |   | categoria      |
+ +--------------+   | fecha_id    (FK)         |   | marca          |
+                    | tienda_id   (FK)         |   +----------------+
+                    |------ grano: 1 fila -----|
+                    |  por linea de factura    |
+                    | cantidad   monto   desc  |  &lt;- solo medidas numericas
+                    +-------------+------------+
+                                  |
+                          +-------+-------+
+                          |  dim_tienda   |
+                          +---------------+</div>
+  </div>
+  <div class="concept">
+    <p class="term">Clave subrogada</p>
+    <p>Las dimensiones no usan la clave del sistema origen como clave primaria, sino una
+    <strong>clave subrogada</strong> propia (un entero autoincremental o un hash). Aísla el
+    warehouse de cambios en los ids de origen, permite tener una fila "desconocido" para
+    hechos sin dimensión, y es imprescindible para las SCD de tipo 2.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Slowly Changing Dimensions <span>· SCD 1 / 2 / 3</span></p>
+    <p>Un cliente cambia de plan o de país. ¿Qué hace la dimensión?
+    <strong>Tipo 1</strong>: sobrescribe. Simple, pero pierdes la historia: los pedidos viejos
+    ahora "parecen" del plan nuevo. <strong>Tipo 2</strong>: inserta una fila nueva con nueva
+    clave subrogada y marca <code class="inline">valido_desde</code>/<code class="inline">valido_hasta</code>
+    y <code class="inline">es_actual</code>; los hechos apuntan a la versión vigente cuando
+    ocurrieron. Es el estándar para análisis histórico correcto. <strong>Tipo 3</strong>:
+    guarda una columna "valor anterior"; solo sirve para un cambio.</p>
+    <div class="diagram">SCD Tipo 2 en dim_cliente
+
+sk  cliente_id  pais  plan   valido_desde  valido_hasta  es_actual
+--  ----------  ----  -----  ------------  ------------  ---------
+ 1     C-42      CL   free   2025-01-10    2026-03-01    false
+ 2     C-42      CL   pro    2026-03-01    9999-12-31    true
+
+  un pedido del 2025-06 apunta a sk=1  -> se reporta como "free"
+  un pedido del 2026-05 apunta a sk=2  -> se reporta como "pro"</div>
+  </div>
+  <div class="concept">
+    <p class="term">SCD tipo 1 y tipo 3, con el mismo caso</p>
+    <p>Mismo evento —el cliente C-42 cambia de plan free a pro el 2026-03-01— resuelto con las
+    otras dos estrategias, para comparar contra el tipo 2 de arriba.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th></th><th>Antes (2026-02)</th><th>Después (tipo 1)</th><th>Después (tipo 3)</th></tr></thead>
+      <tbody>
+        <tr><td>Filas en <code class="inline">dim_cliente</code></td><td>C-42 · plan=free</td><td>C-42 · plan=pro <em>(se sobrescribió)</em></td><td>C-42 · plan_actual=pro · plan_anterior=free</td></tr>
+        <tr><td>Un pedido de enero, consultado hoy</td><td>—</td><td>se reporta como "pro" (incorrecto)</td><td>se reporta con plan_actual=pro; la fecha exacta del cambio no queda registrada</td></tr>
+        <tr><td>Cuándo usarlo</td><td>—</td><td>el valor viejo no tiene valor analítico (corregir un typo)</td><td>solo importa comparar "antes vs. ahora", no la fecha exacta del cambio</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Tipo 1 es el default por accidente: es lo que hace un
+    <code class="inline">UPDATE</code> normal si nadie decide lo contrario. Elegir el tipo de SCD
+    por dimensión —y a veces por columna, mezclando tipo 1 y tipo 2 dentro de la misma
+    dimensión— es una conversación de modelado, no un detalle técnico.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Dimensión degenerada <span>· degenerate dimension</span></p>
+    <p>Un atributo como el <strong>número de factura</strong> o de <strong>orden</strong> vive en
+    la tabla de hechos sin tabla de dimensión propia: no tiene otros atributos que describir (no
+    hay "fecha de creación" del número de factura, solo el número). Se guarda directo como
+    columna del hecho en vez de crear una <code class="inline">dim_factura</code> de una sola
+    columna. Sirve para agrupar y para trazabilidad ("dame todas las líneas de la factura 88213")
+    sin el costo de mantener una dimensión vacía.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Tabla de puente <span>· bridge</span></p>
+    <p>Cuando la relación entre hecho y dimensión es muchos-a-muchos (una transacción de banco
+    con varias categorías, un paciente con varios diagnósticos), se mete una tabla intermedia
+    con un factor de reparto. Resuelve el problema pero es fácil que duplique sumas: se
+    documenta bien y se usa con cuidado.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Kimball · Inmon · "one big table"</p>
+    <p><strong>Kimball</strong> (bottom-up): construyes data marts dimensionales por proceso de
+    negocio y se integran por dimensiones compartidas ("conformadas"). <strong>Inmon</strong>
+    (top-down): primero un warehouse corporativo normalizado, y los marts salen de ahí.
+    <strong>OBT</strong> (one big table): una tabla ancha totalmente desnormalizada por área,
+    porque el storage es barato y algunas herramientas BI no hacen bien los joins. En la
+    práctica moderna con dbt se mezcla: staging normalizado → marts dimensionales o tablas
+    anchas según el consumidor.</p>
+  </div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Estrella</th><th>Copo de nieve</th><th>One Big Table</th></tr></thead>
+    <tbody>
+      <tr><td>Dimensiones</td><td>Una tabla plana por dimensión</td><td>Normalizadas en sub-tablas</td><td>Aplanadas dentro del hecho</td></tr>
+      <tr><td>Joins en la consulta</td><td>Pocos (hecho ↔ dim)</td><td>Muchos</td><td>Ninguno</td></tr>
+      <tr><td>Redundancia</td><td>Algo</td><td>Mínima</td><td>Mucha (aceptada)</td></tr>
+      <tr><td>Legibilidad para BI</td><td>Alta</td><td>Media</td><td>Alta si no explota en columnas</td></tr>
+      <tr><td>Cuándo</td><td>El default para BI</td><td>Dimensión enorme y muy cambiante</td><td>Herramienta sin buenos joins; feature store</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">Dimensiones conformadas</span>
+    <p>El valor real del modelo dimensional aparece cuando <code class="inline">dim_cliente</code>
+    y <code class="inline">dim_tiempo</code> son <em>las mismas</em> para ventas, soporte y
+    marketing. Ahí "clientes activos" significa lo mismo en los tres reportes y se pueden
+    cruzar. Sin dimensiones conformadas tienes silos con definiciones que no cuadran, que es
+    justo el problema que un warehouse debía resolver.</p>
+  </div>
+</section>
+
+<section class="block" id="warehouse">
+  <span class="sec-num">04</span>
+  <h2>El data warehouse hoy</h2>
+  <p class="lead">
+    El warehouse moderno separó dos cosas que antes venían pegadas: dónde viven los datos y qué
+    máquina los procesa. Eso cambió el modelo de costos, hizo viable el "carga todo y ya
+    veremos", y abrió la puerta al lakehouse. También hizo que, para muchos casos, DuckDB en tu
+    portátil sea suficiente.
+  </p>
+
+  <h4>Cómo está construido</h4>
+  <div class="concept">
+    <p class="term">Separación de cómputo y almacenamiento</p>
+    <p>Los datos se guardan una sola vez en almacenamiento de objetos barato (S3, GCS). El
+    <strong>cómputo</strong> es un clúster efímero que se enciende para una consulta y se apaga
+    después. Consecuencias: puedes tener varios clústeres de distinto tamaño sobre los mismos
+    datos sin copiarlos, escalar en segundos, y no pagar cómputo cuando nadie consulta.</p>
+    <div class="diagram">  consulta A          consulta B          consulta C
+  (warehouse XS)      (warehouse XL)      (warehouse M)
+       |                   |                   |
+       +---------+---------+---------+---------+
+                 v                   v
+       +-------------------------------------------+
+       |     ALMACEN DE OBJETOS  (S3 / GCS)         |
+       |     Parquet particionado + metadatos       |
+       +-------------------------------------------+
+
+  computo: se apaga si no corre, escala por consulta, aislado por equipo
+  almacen: barato, siempre disponible, una sola copia de la verdad</div>
+  </div>
+  <div class="concept">
+    <p class="term">Micro-particiones y pruning</p>
+    <p>El motor divide cada tabla en miles de bloques y guarda estadísticas de cada uno (min,
+    max, nº de nulos por columna). Cuando consultas
+    <code class="inline">WHERE fecha = '2026-09-01'</code>, lee los metadatos, descarta los
+    bloques cuyo rango no incluye esa fecha (<strong>partition pruning</strong>) y solo escanea
+    los que quedan. Consultar bien —filtrar por la columna de partición, no por una función
+    sobre ella— es la diferencia entre escanear 2 GB o 2 TB.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Formatos columnares en disco <span>· Parquet</span></p>
+    <p><strong>Parquet</strong> (y ORC) es un formato de archivo columnar, comprimido, con
+    esquema y estadísticas embebidas. Es el formato franco del ecosistema: lo leen Spark,
+    DuckDB, Polars, BigQuery, Snowflake, pandas. Guardar tus datos crudos en Parquet
+    particionado en S3 ya te da el 80% de un warehouse sin montar nada.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Formatos de tabla <span>· Iceberg, Delta, Hudi</span></p>
+    <p>Un montón de archivos Parquet no es una tabla: no hay transacciones, ni renombrar
+    columnas, ni "cómo estaba ayer". Un <strong>table format</strong> añade una capa de
+    metadatos encima que da <code class="inline">ACID</code>, evolución de esquema,
+    <em>time travel</em> (consultar un snapshot pasado) y borrados eficientes.
+    <strong>Apache Iceberg</strong> es el que está ganando como estándar abierto;
+    <strong>Delta Lake</strong> viene de Databricks.</p>
+  </div>
+  <h4>Dónde viven los datos y qué garantías dan</h4>
+  <div class="concept">
+    <p class="term">Lake &nbsp;vs&nbsp; warehouse &nbsp;vs&nbsp; lakehouse</p>
+    <p>El <strong>data lake</strong> es almacenamiento barato con archivos crudos y esquema al
+    leer: flexible, pero sin gobierno se vuelve un "pantano" que nadie confía. El
+    <strong>warehouse</strong> da estructura, ACID y rendimiento, a cambio de meter los datos
+    en su formato (y a veces lock-in y coste). El <strong>lakehouse</strong> intenta lo mejor
+    de ambos: archivos abiertos (Parquet) en tu bucket + un table format (Iceberg/Delta) que
+    aporta las garantías del warehouse, consultables por varios motores.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th></th><th>Data warehouse</th><th>Data lake</th><th>Lakehouse</th></tr></thead>
+      <tbody>
+        <tr><td>Formato</td><td>Propietario del motor</td><td>Archivos crudos (Parquet, JSON, CSV)</td><td>Parquet + capa de tabla (Iceberg/Delta)</td></tr>
+        <tr><td>Esquema</td><td>Al escribir</td><td>Al leer</td><td>Al escribir, sobre el lake</td></tr>
+        <tr><td>Transacciones / ACID</td><td>Sí</td><td>No</td><td>Sí (snapshots, time travel)</td></tr>
+        <tr><td>Gobierno y calidad</td><td>Fuerte</td><td>Débil</td><td>Fuerte</td></tr>
+        <tr><td>Coste</td><td>Cómputo + almacenamiento del motor</td><td>Solo objeto barato</td><td>Objeto barato + motor externo</td></tr>
+        <tr><td>Riesgo</td><td>Lock-in; caro a escala</td><td>Pantano sin catálogo</td><td>Stack más nuevo, más piezas</td></tr>
+        <tr><td>Ejemplos</td><td>Snowflake, Redshift, BigQuery</td><td>S3 + Glue Catalog</td><td>Databricks, Snowflake+Iceberg, DuckDB+Iceberg</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <h4>Coste y rendimiento</h4>
+  <div class="concept">
+    <p class="term">Cómo se cobra <span>· en términos relativos</span></p>
+    <p>Los modelos difieren y conviene entenderlos antes de elegir. <strong>BigQuery</strong>
+    cobra sobre todo por <em>bytes escaneados</em> por cada consulta (más una opción de
+    capacidad reservada): consultas mal filtradas o <code class="inline">SELECT *</code> sobre
+    tablas anchas se pagan caro. <strong>Snowflake</strong> cobra por <em>segundos de warehouse
+    activo</em> según el tamaño del clúster: importa apagarlo rápido y no
+    sobredimensionarlo. <strong>Redshift</strong> tradicionalmente cobra por nodos
+    provisionados (pagas aunque no consultes), con opciones serverless más recientes.
+    <strong>DuckDB</strong> corre en tu máquina: el "coste" es la RAM y el CPU que ya tienes.</p>
+    <p class="why"><b>por qué importa</b>La factura de un warehouse la infla casi siempre un
+    puñado de consultas o dashboards que se refrescan cada minuto escaneando tablas enormes.
+    Medir el coste por consulta y particionar bien es FinOps de datos.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Snowflake, BigQuery, Redshift y DuckDB, uno al lado del otro</p>
+    <p>Los cuatro resuelven "SQL analítico rápido sobre columnas", pero con arquitecturas y
+    modelos de costo distintos. Compara por lo estructural, no por precio de lista (cambia todo
+    el tiempo — ver la nota al pie de esta guía).</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th></th><th>Snowflake</th><th>BigQuery</th><th>Redshift</th><th>DuckDB</th></tr></thead>
+      <tbody>
+        <tr><td>Cómputo vs almacenamiento</td><td>Separados; "warehouses" virtuales que se apagan solos</td><td>Separados; serverless, sin clúster que administrar</td><td>Acoplados en clúster clásico; RA3/Serverless los separa</td><td>No aplica: motor embebido en un solo proceso</td></tr>
+        <tr><td>Unidad que se cobra</td><td>Segundos de cómputo activo (créditos)</td><td>Bytes escaneados (on-demand) o slots reservados</td><td>Nodos-hora, o cómputo serverless por uso</td><td>Ninguna: es la CPU/RAM que ya tienes</td></tr>
+        <tr><td>Formato de tabla nativo</td><td>Propietario (micro-particiones); lee Iceberg externo</td><td>Propietario (Capacitor); lee Iceberg/Delta externo</td><td>Propietario; Redshift Spectrum lee S3/Iceberg</td><td>Lee Parquet/CSV/JSON/Iceberg directo, sin importar</td></tr>
+        <tr><td>Escala típica cómoda</td><td>GB a decenas de TB por warehouse</td><td>TB a PB, sin límite operativo visible</td><td>GB a bajos PB</td><td>Hasta el tamaño de RAM/disco de una máquina</td></tr>
+        <tr><td>Cuándo</td><td>Equipo de analítica que no quiere operar infraestructura</td><td>Ya vives en GCP, cargas muy variables o picos grandes</td><td>Ya vives en AWS, carga predecible que justifica nodos reservados</td><td>Proyecto pequeño, notebook, o motor embebido dentro de una app</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="concept">
+    <p class="term">Clonado sin copia y "time travel"</p>
+    <p>Snowflake, BigQuery y los table formats tipo Iceberg permiten crear un <strong>clon</strong>
+    de una tabla o esquema completo que no copia bytes: solo apunta a los mismos micro-bloques
+    hasta que algo se modifica (copy-on-write). Sirve para clonar producción a un entorno de
+    pruebas en segundos, sin duplicar terabytes. El mismo mecanismo de versionado por snapshots
+    habilita <strong>time travel</strong>: consultar la tabla "como estaba hace 3 días" o
+    recuperarla tras un <code class="inline">DELETE</code> equivocado, dentro de una ventana de
+    retención configurable.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Particionado y clustering</p>
+    <p>Elegir por qué columna se agrupan físicamente los datos (normalmente fecha, a veces
+    tenant o región) determina cuánto se puede podar. Particionar por algo que casi nunca
+    aparece en el <code class="inline">WHERE</code> no ayuda; particionar por algo con
+    demasiados valores distintos (partición por usuario) genera millones de archivos
+    diminutos y empeora todo. La fecha del evento es el default sensato.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Cuándo DuckDB local basta</p>
+    <p><strong>DuckDB</strong> es un motor analítico columnar embebido (como "SQLite para
+    OLAP"): sin servidor, una dependencia, consulta Parquet/CSV/JSON directo, incluso desde S3.
+    Si tus datos caben en decenas de GB —y la mayoría de los datasets de una PyME o de un
+    proyecto freelance caben— procesarlos en DuckDB o en un notebook es más rápido de montar,
+    gratis y suficiente. El warehouse gestionado se justifica por escala, concurrencia de
+    muchos usuarios, o necesidad de que los datos estén siempre disponibles sin tu máquina.</p>
+<pre><span class="c">-- consulta directa sobre archivos, sin cargar ni crear tablas</span>
+SELECT categoria, COUNT(*) AS n, ROUND(AVG(precio), 2) AS precio_medio
+FROM read_parquet('s3://bucket/eventos/anio=2026/mes=*/*.parquet')
+WHERE precio &gt; 0
+GROUP BY categoria
+ORDER BY n DESC
+LIMIT 20;
+
+<span class="c">-- unir un CSV local con un Parquet remoto en la misma query</span>
+SELECT *
+FROM 'clientes.csv' c
+JOIN read_parquet('s3://bucket/pedidos/*.parquet') p USING (cliente_id);</pre>
+  </div>
+
+  <div class="note rust">
+    <span class="label">"Big data" es más raro de lo que parece</span>
+    <p>La mayoría de las organizaciones nunca tienen una tabla que no quepa en la RAM de una
+    máquina grande. Montar Spark, un clúster y un warehouse caro "por si acaso" añade meses de
+    complejidad para datos que DuckDB o Polars procesan en segundos. Mide el tamaño real de tus
+    tablas activas antes de elegir la arquitectura.</p>
+  </div>
+</section>
+
+<section class="block" id="etl-elt">
+  <span class="sec-num">05</span>
+  <h2>Ingesta: ETL, ELT y CDC</h2>
+  <p class="lead">
+    Antes de transformar hay que traer los datos: de la base de la app, de Stripe, de un CRM,
+    de archivos. El orden en que se hacen las tres letras —extraer, transformar, cargar—
+    cambió, y con él todo el stack. La clave operativa es que la ingesta sea repetible sin
+    duplicar ni perder nada.
+  </p>
+
+  <div class="concept">
+    <p class="term">ETL &nbsp;vs&nbsp; ELT</p>
+    <p><strong>ETL</strong> clásico: extraes, <em>transformas en un servidor intermedio</em>
+    (limpias, unes, agregas) y cargas el resultado ya cocinado. <strong>ELT</strong> moderno:
+    extraes, <em>cargas los datos crudos tal cual</em> en el warehouse ("raw"), y transformas
+    ahí con SQL. Ganó ELT porque el cómputo del warehouse se volvió barato y elástico, y porque
+    guardar el crudo te deja reprocesar sin volver a molestar a la fuente.</p>
+    <div class="diagram">  EXTRACT              LOAD                     TRANSFORM
+  (Fivetran /      ->  (tal cual, sin       ->  (dbt: SQL dentro
+   Airbyte / dlt)       transformar, "raw")      del warehouse)
+
+  Postgres app   -->  raw.app_pedidos     \
+  Stripe API     -->  raw.stripe_charges   +-->  staging --> intermediate --> marts
+  HubSpot        -->  raw.hubspot_contacts /       stg_*        int_revenue      fct_mrr
+  CSV en S3      -->  raw.uploads_csv              (renombra)   (une, calcula)   (para BI)
+
+  cambiar una regla de negocio:
+    ETL  -> reprocesar desde la fuente (si aun la tienes igual)
+    ELT  -> re-ejecutar el SQL sobre "raw", que ya esta cargado y versionado</div>
+  </div>
+  <h4>Cómo entran los datos</h4>
+  <div class="concept">
+    <p class="term">Batch &nbsp;vs&nbsp; streaming</p>
+    <p><strong>Batch</strong>: cargas cada hora, cada noche. Simple, barato, suficiente para
+    reportes y dashboards que nadie mira a las 3 a.m. <strong>Streaming</strong>: los eventos
+    llegan continuamente (Kafka, Kinesis) y se procesan en segundos. Necesario para detección
+    de fraude, alertas operativas, personalización en vivo. La mayoría de la analítica de
+    negocio no necesita streaming; añade una complejidad operativa grande.</p>
+  </div>
+  <div class="concept">
+    <p class="term">CDC <span>· change data capture</span></p>
+    <p>Replicar una base entera cada hora es caro y pesa sobre la fuente. <strong>CDC</strong>
+    captura solo lo que cambió. <strong>Basado en log</strong> (leyendo el WAL de PostgreSQL,
+    el binlog de MySQL con Debezium): captura inserciones, updates y <em>borrados</em>, con
+    bajo impacto, casi en tiempo real. <strong>Basado en consulta</strong> (pregunta
+    "¿qué filas tienen <code class="inline">updated_at</code> mayor que la última vez?"): fácil
+    de montar, pero no ve los borrados y necesita esa columna fiable en cada tabla.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Idempotencia y reprocesos</p>
+    <p>Una carga es <strong>idempotente</strong> si ejecutarla dos veces deja el mismo
+    resultado que ejecutarla una. Se logra con <code class="inline">MERGE</code> / upsert por
+    clave, o borrando la partición del día antes de reinsertarla. Sin idempotencia, un
+    reintento tras un fallo a medias te deja filas duplicadas, y nadie se entera hasta que un
+    número sale al doble en un reporte.</p>
+    <p class="why"><b>por qué importa</b>Los pipelines fallan a media ejecución todo el tiempo
+    (timeout de red, deploy, cuota de API). Si cada tarea es idempotente, la recuperación es
+    "vuelve a correr"; si no, es una investigación forense.</p>
+  </div>
+  <h4>Que se pueda re-ejecutar sin romper nada</h4>
+  <div class="concept">
+    <p class="term">Full refresh · incremental · backfill</p>
+    <p><strong>Full refresh</strong>: recarga toda la tabla desde cero. Simple y siempre
+    correcto, inviable cuando la tabla es enorme. <strong>Incremental</strong>: procesa solo lo
+    nuevo desde una marca de agua (<code class="inline">high-water mark</code>: el
+    <code class="inline">max(event_time)</code> ya cargado). <strong>Backfill</strong>: volver
+    a procesar un rango del pasado porque cambió la lógica o llegó data tarde. Un pipeline
+    serio soporta los tres modos y, en el incremental, tolera que lleguen eventos con fecha
+    vieja (<em>late-arriving data</em>).</p>
+  </div>
+  <div class="concept">
+    <p class="term">Herramientas de extract-load</p>
+    <p><strong>Fivetran</strong>: conectores gestionados, "funciona y no lo tocas", cobra
+    según filas activas movidas al mes; caro a volumen. <strong>Airbyte</strong>: open source /
+    gestionado, muchos conectores, más control y más mantenimiento.
+    <strong>Singer / Meltano</strong>: estándar abierto de "taps" y "targets".
+    <strong>dlt</strong>: librería Python para escribir tu propia ingesta con esquema y estado.
+    El punto de todas: <em>no transforman</em>, solo mueven crudo a "raw". La transformación es
+    dbt.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Reverse ETL <span>· el dato vuelve a las herramientas de negocio</span></p>
+    <p>ELT lleva datos de las herramientas operativas al warehouse para analizarlos.
+    <strong>Reverse ETL</strong> hace el camino inverso: toma una métrica ya calculada en el
+    warehouse (el <em>lifetime value</em> de un cliente, un score de riesgo de abandono) y la
+    sincroniza de vuelta a Salesforce, HubSpot o Intercom, para que un vendedor o un email
+    automatizado la use sin pedirle un reporte a analítica. Herramientas como
+    <strong>Census</strong> y <strong>Hightouch</strong> ocupan ese espacio; el patrón convierte
+    al warehouse en la fuente de verdad también para las herramientas operativas, no solo para
+    dashboards.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Schema drift <span>· cuando la fuente cambia sin avisar</span></p>
+    <p>Una API agrega un campo nuevo, renombra uno o cambia un tipo (de entero a string) sin
+    previo aviso, y la ingesta lo recibe igual. Sin manejo explícito: un campo nuevo se pierde
+    silenciosamente si el esquema de destino es rígido, o un cambio de tipo rompe la carga a
+    mitad de un batch. Las herramientas de extract-load serias detectan el <em>drift</em> y
+    ofrecen una política: agregar la columna automáticamente, alertar y pausar, o mandar el
+    cambio a una tabla de "esquema pendiente de revisión" en vez de fallar todo el pipeline.</p>
+  </div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>ETL</th><th>ELT</th></tr></thead>
+    <tbody>
+      <tr><td>Orden</td><td>extract → transform → load</td><td>extract → load → transform</td></tr>
+      <tr><td>Dónde transforma</td><td>Servidor / herramienta intermedia (Spark)</td><td>Dentro del warehouse (SQL / dbt)</td></tr>
+      <tr><td>Datos crudos</td><td>Se pierden si no los guardas aparte</td><td>Siempre en "raw", reprocesables</td></tr>
+      <tr><td>Cambiar una regla</td><td>Reprocesar desde la fuente</td><td>Re-ejecutar SQL sobre "raw"</td></tr>
+      <tr><td>PII sensible</td><td>Se puede filtrar antes de cargar</td><td>Entra cruda; hay que gobernar accesos</td></tr>
+      <tr><td>Cuándo</td><td>Destino con cómputo caro o limitado</td><td>Warehouse moderno (el default hoy)</td></tr>
+      <tr><td>Herramientas</td><td>Informatica, Talend, Spark</td><td>Fivetran / Airbyte + dbt</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note rust">
+    <span class="label">El backfill que duplicó todo</span>
+    <p>Reprocesar marzo con un pipeline que hace <code class="inline">INSERT</code> en vez de
+    <code class="inline">MERGE</code> o "borrar-y-reinsertar la partición" suma marzo dos veces.
+    Como los totales anuales siguen "razonables", puede pasar semanas sin que nadie lo note.
+    Toda tarea de carga debe poder re-ejecutarse para una fecha lógica y escribir
+    <em>solo</em> esa partición.</p>
+  </div>
+</section>
+
+<section class="block" id="dbt">
+  <span class="sec-num">06</span>
+  <h2>Transformación como código: dbt</h2>
+  <p class="lead">
+    La T de ELT es SQL, y ese SQL merece lo mismo que el código de la aplicación: control de
+    versiones, revisión, pruebas, documentación, CI. <strong>dbt</strong> es la herramienta que
+    impuso esa idea. No mueve datos ni corre nada por su cuenta: compila y ordena tus
+    <code class="inline">SELECT</code> y los ejecuta dentro del warehouse.
+  </p>
+
+  <div class="concept">
+    <p class="term">Un modelo es un SELECT</p>
+    <p>Cada archivo <code class="inline">.sql</code> en dbt es un modelo: un
+    <code class="inline">SELECT</code> que define una tabla o vista. dbt se encarga del
+    <code class="inline">CREATE TABLE AS</code> / <code class="inline">CREATE VIEW</code>, del
+    orden de ejecución y de recrearlo. Tú solo escribes la lógica de transformación.</p>
+  </div>
+  <div class="concept">
+    <p class="term">ref() y source() <span>· el DAG se construye solo</span></p>
+    <p>En vez de escribir el nombre físico de una tabla, escribes
+    <code class="inline">{{ ref('stg_pedidos') }}</code> o
+    <code class="inline">{{ source('stripe', 'charges') }}</code>. dbt reemplaza eso por el
+    nombre real según el entorno (dev/prod) y, sobre todo, <strong>deduce las dependencias</strong>:
+    si el modelo A referencia a B, B se construye antes. De ahí sale el grafo dirigido (DAG)
+    completo, sin que nadie lo declare a mano.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Las tres capas <span>· staging → intermediate → marts</span></p>
+    <p><strong>Staging</strong>: uno por tabla de origen, relación 1:1, solo renombra columnas
+    a la convención, castea tipos y limpieza trivial. Sin joins. <strong>Intermediate</strong>:
+    lógica reutilizable y joins que no quieres repetir; no se expone a nadie.
+    <strong>Marts</strong>: lo que consumen BI y los analistas, organizado por área de negocio
+    (finanzas, producto, marketing), en forma de hechos y dimensiones o tablas anchas.</p>
+    <div class="diagram"> sources (raw)          staging               intermediate          marts
+
+ raw.pedidos     -->  stg_pedidos     \
+ raw.clientes    -->  stg_clientes     +--> int_pedidos_enriq --> fct_pedidos
+ raw.pagos       -->  stg_pagos       /                       \-> dim_clientes
+                      stg_clientes  ------------------------------/
+
+ staging      : 1:1 con la fuente, renombra y castea, sin joins
+ intermediate : joins y calculos compartidos, no se expone
+ marts        : por area de negocio, es lo que consume el dashboard</div>
+  </div>
+  <div class="concept">
+    <p class="term">Materializaciones</p>
+    <p>Una directiva de configuración decide cómo se persiste cada modelo. Cambiarla es una
+    línea, no reescribir el SQL.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Materialización</th><th>Qué hace</th><th>Cuándo</th></tr></thead>
+      <tbody>
+        <tr><td><code class="inline">view</code></td><td>Crea una vista, cero almacenamiento</td><td>Modelo ligero, siempre fresco</td></tr>
+        <tr><td><code class="inline">table</code></td><td>Reconstruye la tabla en cada corrida</td><td>Transformación cara que se consulta mucho</td></tr>
+        <tr><td><code class="inline">incremental</code></td><td>Inserta/mergea solo filas nuevas</td><td>Tablas de eventos grandes; recompute total caro</td></tr>
+        <tr><td><code class="inline">ephemeral</code></td><td>Se inyecta como CTE en el modelo hijo</td><td>Lógica intermedia que no vale materializar</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+  <div class="concept">
+    <p class="term">Tests de datos</p>
+    <p>dbt corre aserciones sobre las tablas <em>después</em> de construirlas. Los cuatro
+    genéricos que cubren casi todo: <code class="inline">unique</code>,
+    <code class="inline">not_null</code>, <code class="inline">accepted_values</code> (el
+    estado solo puede ser uno de una lista), <code class="inline">relationships</code> (toda
+    <code class="inline">cliente_id</code> del hecho existe en la dimensión — integridad
+    referencial que el warehouse no impone). Además puedes escribir <strong>tests
+    singulares</strong>: un <code class="inline">SELECT</code> que no debería devolver ninguna
+    fila.</p>
+<pre><span class="c">-- models/marts/fct_pedidos.sql</span>
+{{ config(materialized='table') }}
+
+with pedidos as (
+    select * from {{ ref('stg_pedidos') }}
+),
+clientes as (
+    select * from {{ ref('stg_clientes') }}
+)
+select
+    p.pedido_id,
+    p.cliente_id,
+    c.pais,
+    p.fecha,
+    p.monto
+from pedidos p
+left join clientes c on p.cliente_id = c.cliente_id</pre>
+<pre><span class="c"># models/marts/_marts.yml  ->  documentacion + tests declarativos</span>
+models:
+  - name: fct_pedidos
+    description: "Una fila por pedido confirmado. Grano: pedido_id."
+    columns:
+      - name: pedido_id
+        tests: [unique, not_null]
+      - name: monto
+        tests:
+          - not_null
+      - name: cliente_id
+        tests:
+          - relationships:
+              to: ref('stg_clientes')
+              field: cliente_id</pre>
+<pre><span class="c">-- tests/assert_monto_no_negativo.sql  ->  test singular: falla si hay filas</span>
+select pedido_id, monto
+from {{ ref('fct_pedidos') }}
+where monto &lt; 0</pre>
+  </div>
+  <div class="concept">
+    <p class="term">Snapshots <span>· SCD tipo 2 automática</span></p>
+    <p>Si una tabla de origen se sobrescribe (el CRM no guarda historia), un
+    <strong>snapshot</strong> de dbt la fotografía en cada corrida y mantiene una tabla con
+    <code class="inline">dbt_valid_from</code>/<code class="inline">dbt_valid_to</code>. Así
+    reconstruyes "en qué plan estaba este cliente en junio" aunque la fuente solo tenga el
+    estado actual.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Macros y Jinja <span>· no te repitas en SQL</span></p>
+    <p>dbt compila cada modelo con <strong>Jinja</strong> antes de mandarlo al warehouse: permite
+    variables, condicionales y <strong>macros</strong> (funciones reutilizables que generan
+    SQL). Un caso típico: una macro <code class="inline">cents_to_dollars(column)</code> que se
+    llama igual en veinte modelos en vez de repetir la división. El paquete comunitario
+    <strong>dbt_utils</strong> trae macros ya hechas para lo común (generar claves subrogadas con
+    hash, pivotar, detectar huecos en series de fechas), y el ecosistema de <strong>packages</strong>
+    de dbt Hub permite instalar y reusar el trabajo de otros equipos como una dependencia más.</p>
+<pre><span class="c">-- macro reutilizable en macros/cents_to_dollars.sql</span>
+{% macro cents_to_dollars(column_name) %}
+    ({{ column_name }} / 100.0)
+{% endmacro %}
+
+<span class="c">-- uso en cualquier modelo</span>
+select pedido_id, {{ cents_to_dollars('monto_centavos') }} as monto_usd
+from {{ ref('stg_pedidos') }}</pre>
+  </div>
+  <div class="concept">
+    <p class="term">Contratos de modelo <span>· dbt Core 1.5+</span></p>
+    <p>Un modelo con <code class="inline">contract: {enforced: true}</code> declara de antemano
+    los nombres, tipos y algunas restricciones de sus columnas en el <code class="inline">.yml</code>;
+    dbt valida al construirlo que el <code class="inline">SELECT</code> real produce exactamente
+    ese esquema, y falla la corrida si no. Es la versión dbt de un contrato de datos (sección 08)
+    aplicado a los propios modelos: protege a quien consume un mart de que alguien cambie un tipo
+    o borre una columna sin darse cuenta. Se combina con <strong>model versions</strong> para
+    publicar una v2 de un modelo sin romper a quien todavía depende de la v1.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Documentación y lineage generados</p>
+    <p>De las descripciones en los <code class="inline">.yml</code> y del DAG de
+    <code class="inline">ref()</code>, dbt genera un sitio navegable: cada columna con su
+    definición, y el grafo completo de qué alimenta qué. Los <strong>exposures</strong>
+    declaran qué dashboard o modelo de ML consume cada mart, así el lineage llega hasta el
+    consumidor final.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Por qué se volvió el estándar</p>
+    <p>Trajo al mundo de los datos prácticas que el software ya tenía: cada cambio es un pull
+    request revisable, CI corre los tests antes de mergear, Jinja permite macros y no repetirse,
+    y el lineage hace visible el impacto de tocar una columna. <strong>dbt Core</strong> es la
+    CLI open source; <strong>dbt Cloud</strong> añade scheduler, IDE y control de accesos.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">dbt no es un orquestador</span>
+    <p><code class="inline">dbt run</code> construye tus modelos en orden, pero no sabe cuándo
+    llegó la data cruda, no reintenta media hora después, no lanza la ingesta previa ni avisa a
+    Slack si algo falla. Eso lo hace Airflow, Dagster o Prefect —la sección siguiente—
+    invocando a dbt como un paso más.</p>
+  </div>
+</section>
+
+<section class="block" id="orquestacion-datos">
+  <span class="sec-num">07</span>
+  <h2>Orquestación de pipelines</h2>
+  <p class="lead">
+    Un pipeline de datos es una cadena de pasos con dependencias, horarios, fallos parciales y
+    necesidad de reprocesar el pasado. Un <code class="inline">cron</code> con scripts no
+    aguanta eso. Los orquestadores —Airflow, Dagster, Prefect— existen para hacer visible y
+    recuperable esa cadena. Enlaza con la sección de observabilidad de la guía de DevOps.
+  </p>
+
+  <div class="concept">
+    <p class="term">Por qué no basta cron</p>
+    <p><code class="inline">cron</code> ejecuta un comando a una hora. No sabe que el paso B
+    depende de que A terminara <em>bien</em>, no reintenta con backoff, no te muestra qué
+    corrió y cuánto tardó, no permite relanzar solo la parte que falló, y no tiene concepto de
+    "procesar la fecha lógica 2026-09-01" independiente de cuándo lo corres. Un orquestador da
+    todo eso.</p>
+  </div>
+  <div class="concept">
+    <p class="term">DAG, scheduling y fecha lógica</p>
+    <p>El pipeline se declara como un <strong>DAG</strong>: nodos (tareas) y aristas
+    (dependencias). El scheduler lo dispara por horario o por evento. Cada ejecución tiene una
+    <strong>fecha lógica</strong> (el periodo que representa), distinta de la hora real de
+    ejecución: así un reintento o un backfill procesa el periodo correcto, no "hoy".</p>
+  </div>
+  <div class="concept">
+    <p class="term">Reintentos, backoff y sensores</p>
+    <p><strong>Reintentos</strong>: cada tarea define cuántas veces reintentar y con qué espera
+    creciente (<em>backoff</em>) ante fallos transitorios. <strong>Sensores</strong>: tareas
+    que esperan a que algo exista antes de seguir —un archivo en S3, una partición en una
+    tabla, otro DAG terminado—. Evitan la fragilidad de "corre a las 3 y reza para que la data
+    ya esté".</p>
+    <div class="diagram">03:00  extract_stripe --> load_raw --+--> dbt_run --> dbt_test --> publish_dash
+       (retry x3,        (idempotente|   (rebuild   |  fallo?         (solo si
+        backoff 5m)       MERGE por  |    marts)    |   |              dbt_test OK)
+           |              clave)     |              |   +--> alerta #data-alerts
+           +-- falla 3x --> alerta   |              |        y NO publica
+                            y para   |         sensor: espera a que
+                                     |         load_raw termine OK
+                                     |
+   backfill: re-ejecuta el DAG para fecha logica 2026-09-01 .. 09-08;
+   cada corrida escribe SOLO su particion  ->  sin duplicados</div>
+  </div>
+  <div class="concept">
+    <p class="term">Backfill</p>
+    <p>Relanzar el DAG para un rango de fechas pasadas: llegó data histórica, cambió una
+    transformación, o el pipeline estuvo caído dos días. Funciona bien solo si cada tarea es
+    idempotente y parametrizada por la fecha lógica. Un buen orquestador lo hace con un comando
+    y controla cuántas corridas lanza en paralelo para no saturar el warehouse.</p>
+  </div>
+  <div class="concept">
+    <p class="term">dbt dentro del orquestador</p>
+    <p>Lo normal no es que Airflow o Dagster reimplementen la lógica de transformación, sino que
+    disparen <code class="inline">dbt build</code> como un paso del DAG y observen su resultado.
+    <strong>Cosmos</strong> (Astronomer) convierte cada modelo dbt en una tarea individual de
+    Airflow, así el DAG visible muestra staging → intermediate → marts en vez de una caja negra
+    "correr dbt"; Dagster hace algo equivalente con su integración nativa de dbt, donde cada
+    modelo se ve como un activo más del grafo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Trampa: un backfill masivo tumba la fuente</p>
+    <p>Relanzar 90 días de un DAG a la vez dispara 90 llamadas concurrentes contra una API con
+    límite de tasa, o 90 consultas pesadas contra la base de producción a la misma hora. Un
+    orquestador serio permite limitar el <strong>paralelismo del backfill</strong> (procesar de a
+    5 fechas lógicas a la vez) y respetar el límite de tasa de la fuente. El backfill que
+    "funciona en dev" y tumba producción es uno de los incidentes más comunes y más evitables de
+    orquestación.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Orientado a tareas &nbsp;vs&nbsp; a activos</p>
+    <p>Airflow piensa en <strong>tareas</strong>: "¿qué se ejecuta y en qué orden?". Dagster
+    introdujo pensar en <strong>activos de datos</strong> (<em>software-defined assets</em>):
+    declaras "existe la tabla <code class="inline">fct_mrr</code> y depende de estas otras", y
+    el orquestador deriva el grafo, sabe qué está desactualizado y puede rematerializar solo
+    eso. Encaja de forma natural con el modelo de dbt.</p>
+  </div>
+  <div class="concept">
+    <p class="term">SLAs y observabilidad de datos</p>
+    <p>Un <strong>SLA de datos</strong> es un compromiso: "la tabla de ventas de ayer está
+    lista y validada antes de las 8:00". El orquestador debe alertar si no se cumple, registrar
+    duración de cada corrida para ver degradación, y exponer un panel de "qué corrió, cuándo, y
+    si pasó los tests". Sin esto, te enteras de que el pipeline lleva tres días roto porque
+    alguien de negocio pregunta por un número.</p>
+  </div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Airflow</th><th>Dagster</th><th>Prefect</th></tr></thead>
+    <tbody>
+      <tr><td>Modelo mental</td><td>DAG de tareas (imperativo)</td><td>Activos de datos (declarativo)</td><td>Flujos Python, dinámicos</td></tr>
+      <tr><td>Pregunta que responde</td><td>"¿Qué tareas y en qué orden?"</td><td>"¿Qué tablas existen y de qué dependen?"</td><td>"Mi función Python, con reintentos y visibilidad"</td></tr>
+      <tr><td>Backfill</td><td>Por fecha lógica</td><td>Por partición de activo</td><td>Por parámetros del flujo</td></tr>
+      <tr><td>Fuerte en</td><td>Ecosistema enorme, estándar de facto</td><td>Lineage nativo, dev local, tipos</td><td>Ergonomía Python, flujos dinámicos</td></tr>
+      <tr><td>Flojo en</td><td>Dev local, testing, pasar datos entre tareas</td><td>Comunidad más pequeña</td><td>Menos "batería incluida" para datos</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">Que el orquestador orqueste, no procese</span>
+    <p>La tentación es meter la transformación pesada en tareas Python del DAG. Mejor que el
+    orquestador solo dispare y vigile: la ingesta la hace la herramienta de extract-load, la
+    transformación la hace dbt <em>dentro del warehouse</em>. El orquestador aporta orden,
+    reintentos, backfill y alertas —no músculo de cómputo.</p>
+  </div>
+</section>
+
+<section class="block" id="calidad-datos">
+  <span class="sec-num">08</span>
+  <h2>Calidad de datos y confianza en los números</h2>
+  <p class="lead">
+    Un dashboard equivocado es peor que no tener dashboard: la gente toma decisiones con
+    confianza sobre datos falsos, y nadie lo cuestiona porque "sale de un sistema". La calidad
+    de datos es el trabajo de hacer que los números merezcan esa confianza, y de saber a quién
+    avisar cuando dejan de merecerla.
+  </p>
+
+  <div class="concept">
+    <p class="term">Las dimensiones de calidad</p>
+    <p>Lo que se monitorea, más allá de "¿está bien?": <strong>frescura</strong> (¿cuándo se
+    actualizó por última vez?), <strong>volumen</strong> (¿llegaron aproximadamente las filas
+    de siempre, o cero, o el triple?), <strong>esquema</strong> (¿cambió un tipo, desapareció
+    una columna?), <strong>distribución</strong> (¿el rango, la media, el % de nulos siguen
+    normales?), <strong>unicidad</strong> e <strong>integridad referencial</strong>.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Tests en el pipeline</p>
+    <p><strong>dbt tests</strong>: aserciones declarativas junto al modelo, la primera línea de
+    defensa. <strong>Great Expectations</strong>: un framework más rico —"expectativas"
+    versionadas sobre un dataset (esta columna entre 0 y 100, este % de nulos máximo), con
+    documentación de resultados—, útil sobre datos que entran antes de dbt.
+    <strong>Soda</strong> y otros ocupan un espacio parecido. La idea común: el pipeline
+    <em>se detiene o alerta</em> si los datos no cumplen, en vez de publicar basura.</p>
+<pre><span class="c"># Great Expectations: expectativas versionadas sobre un dataset</span>
+validator.expect_column_values_to_not_be_null("pedido_id")
+validator.expect_column_values_to_be_unique("pedido_id")
+validator.expect_column_values_to_be_between("monto", min_value=0, max_value=100000)
+validator.expect_column_values_to_be_in_set("estado", ["pagado", "pendiente", "anulado"])
+validator.expect_table_row_count_to_be_between(min_value=1000)   <span class="c"># volumen</span></pre>
+  </div>
+  <div class="concept">
+    <p class="term">Detección de anomalías</p>
+    <p>Los tests fijos ("monto entre 0 y 100000") no atrapan un descenso del 40% en las filas
+    diarias si sigue "dentro de rango". La detección de anomalías compara la métrica de hoy con
+    su historial (media móvil, banda de desviación, estacionalidad) y alerta cuando se sale del
+    patrón. Es lo que hacen las plataformas de <em>data observability</em> tipo Monte Carlo, y
+    se puede aproximar con un test que consulte los últimos 30 días.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Cuarentena de filas malas <span>· en vez de fallar todo el batch</span></p>
+    <p>Frente a un test que falla, la opción binaria "para todo el pipeline" es a veces peor que
+    el problema: cien filas con un <code class="inline">email</code> mal formado no deberían
+    bloquear las otras diez mil válidas. El patrón de <strong>cuarentena</strong>: las filas que
+    no pasan validación se apartan a una tabla separada (con el motivo del rechazo) en vez de
+    entrar al mart o de tumbar la corrida entera; alguien las revisa después. dbt lo soporta con
+    la config <code class="inline">store_failures: true</code> en un test, que guarda las filas
+    que fallaron en una tabla en vez de solo contarlas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">dbt source freshness</p>
+    <p>Un test de frescura no verifica el <em>contenido</em> de una tabla, verifica que
+    <strong>llegó a tiempo</strong>: compara la columna de fecha de actualización de una fuente
+    contra el reloj y falla si pasó demasiado (<code class="inline">warn_after</code> /
+    <code class="inline">error_after</code>). Es la primera alarma de un pipeline roto —antes de
+    que ningún test de calidad sobre los datos en sí llegue a ejecutarse, porque el dato nuevo
+    nunca llegó.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Contratos de datos <span>· data contracts</span></p>
+    <p>Un acuerdo explícito entre quien <strong>produce</strong> los datos (el equipo de la app
+    que emite eventos) y quien los <strong>consume</strong> (analítica): qué campos, con qué
+    tipos y semántica, con qué garantías de frescura y qué pasa si va a cambiar. Sin contrato,
+    un desarrollador renombra un campo en un sprint normal y rompe silenciosamente tres
+    dashboards y un modelo de ML aguas abajo.</p>
+    <p class="why"><b>por qué importa</b>La fuente de la mayoría de incidentes de datos es un
+    cambio upstream que nadie comunicó porque nadie sabía que alguien dependía de eso.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Data lineage <span>· de dónde viene cada columna</span></p>
+    <p>El grafo que rastrea una columna del dashboard hasta la tabla, el modelo, el campo de
+    staging y la fuente original, con las transformaciones en cada salto. Sirve para dos cosas:
+    <strong>impacto</strong> ("si toco este campo en Stripe, ¿qué se rompe?") y
+    <strong>depuración</strong> ("este número está mal, ¿en qué paso se torció?"). dbt lo
+    genera del DAG; herramientas de catálogo lo extienden hasta las columnas.</p>
+    <div class="diagram">  fct_mrr.mrr_usd
+    ^
+    |  sum(monto_centavos) / 100        agrupado por mes
+  int_revenue.monto_centavos
+    ^
+    |  coalesce(monto_reembolsado, monto_cobrado)
+  stg_stripe_charges.monto_cobrado
+    ^
+    |  cast(raw.amount as integer)      renombra y castea
+  raw.stripe_charges.amount            (columna JSON cruda)
+    ^
+    |  Fivetran sync cada 6 h
+  Stripe API  /v1/charges.amount
+
+  cambiar el tipo de "amount" en Stripe  ->  el cast en stg falla en silencio
+  ->  monto_cobrado queda NULL  ->  mrr_usd cae sin motivo aparente
+  el lineage te dice A QUIEN avisar ANTES de tocar nada</div>
+  </div>
+  <div class="concept">
+    <p class="term">El coste de un dashboard mal</p>
+    <p>Un bug en una API tira un error y alguien lo ve. Un bug en un pipeline produce un número
+    plausible pero falso: se presenta en la reunión, se decide sobre él, y el error se
+    descubre —si se descubre— meses después, cuando ya guió presupuesto y prioridades. Por eso
+    la inversión en tests, contratos y lineage se paga sola: el fallo silencioso es el caro.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">La métrica que nadie valida</span>
+    <p>En casi toda organización hay un número que todos citan ("tenemos 12.000 usuarios
+    activos") cuya definición exacta nadie recuerda y cuyo cálculo nadie ha revisado en un año.
+    Suele estar mal: cuenta bots, o incluye cuentas de prueba, o el filtro de fecha está
+    desfasado. Encuentra esa métrica, define su lógica en dbt con un test, y documéntala.</p>
+  </div>
+</section>
+
+<section class="block" id="analitica-producto">
+  <span class="sec-num">09</span>
+  <h2>Analítica de producto</h2>
+  <p class="lead">
+    Los datos de producto responden a "¿la gente usa esto, vuelve, y avanza hacia el valor?".
+    Las técnicas son pocas —cohortes, funnels, retención, una métrica norte— pero se prestan a
+    engaños de interpretación que llevan a conclusiones seguras y equivocadas.
+  </p>
+
+  <div class="concept">
+    <p class="term">DAU / WAU / MAU y stickiness</p>
+    <p>Usuarios activos diarios, semanales, mensuales. El ratio <strong>DAU/MAU</strong> mide
+    "pegajosidad": si es 0,5, el usuario medio usa el producto la mitad de los días del mes
+    —propio de herramientas diarias—; 0,1 es normal en productos de uso ocasional. El número
+    solo importa comparado consigo mismo en el tiempo y contra una definición estable de
+    "activo".</p>
+  </div>
+  <div class="concept">
+    <p class="term">Retención y cohortes</p>
+    <p>Agrupa usuarios por el periodo en que se registraron (<strong>cohorte</strong>) y mide
+    qué fracción sigue activa 1, 2, 4, 8 semanas después. <strong>N-day retention</strong>:
+    activo exactamente el día N. <strong>Rolling / unbounded</strong>: activo el día N o
+    después. La <strong>curva de retención</strong> típica cae fuerte y luego se aplana: si la
+    asíntota es mayor que cero, tienes un producto; si tiende a cero, tienes una fuga.</p>
+    <div class="diagram">Retencion por cohorte de registro (% activos)
+
+cohorte    sem0   sem1   sem2   sem4   sem8
+2026-06   100%    42%    31%    24%    22%   <- se aplana en ~22%: hay producto
+2026-07   100%    45%    33%    26%    23%
+2026-08   100%    51%    39%    30%     -    <- mejoro tras el cambio de onboarding
+
+curva:  100 |*
+         50 | *
+            |  *___
+          0 |      *________________  -> asintota > 0 = usuarios que se quedan</div>
+  </div>
+  <div class="concept">
+    <p class="term">Funnel <span>· embudo de conversión</span></p>
+    <p>Una secuencia de pasos hacia un objetivo (visita → registro → conecta datos → crea algo
+    → invita al equipo). Se mide cuántos usuarios llegan a cada paso y dónde está la mayor
+    caída. Decisiones importantes: la ventana de tiempo permitida entre pasos, y si el orden es
+    estricto o no.</p>
+    <div class="diagram">visita_landing    ####################   12 400   100%
+crea_cuenta       #########               5 580    45%   v cae 55% aqui
+conecta_datos     ########                4 960    40%
+crea_dashboard    ###                     1 860    15%   v cae 25% aqui
+invita_equipo     #                         620     5%
+
+activacion = crea_dashboard en los primeros 7 dias
+el escalon grande (cuenta -> datos) es donde conviene invertir</div>
+  </div>
+  <div class="concept">
+    <p class="term">North-star metric</p>
+    <p>Una métrica que captura el valor entregado al usuario y que el equipo entero mueve:
+    "mensajes enviados entre amigos", "noches reservadas", "documentos compartidos". Buena si
+    predice ingresos a futuro y refleja valor real; peligrosa si se puede subir sin dar valor
+    (entonces se optimiza el número, no el producto).</p>
+  </div>
+  <div class="concept">
+    <p class="term">Vanity metrics</p>
+    <p>Números que suben, se ven bien en una lámina y no informan ninguna decisión: total
+    acumulado de registros, page views, descargas, "usuarios totales". Suben siempre por
+    definición. La contrapartida útil es casi siempre una <em>tasa</em> o una métrica de
+    cohorte: registros que activan, no registros; ingreso recurrente, no ingreso acumulado.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Significancia estadística en un A/B</p>
+    <p>Que la variante B tenga una tasa de conversión más alta que A en la muestra no basta: hay
+    que saber si la diferencia es real o ruido. El <strong>valor p</strong> estima la
+    probabilidad de ver esa diferencia (o una mayor) si en realidad no hubiera ninguna; un umbral
+    común es 0,05. El <strong>error tipo I</strong> es declarar ganador a algo que no lo es
+    (falso positivo); el <strong>error tipo II</strong> es no detectar una mejora real por poca
+    muestra (falso negativo). El <strong>tamaño de muestra</strong> necesario se calcula antes
+    del experimento, a partir del efecto mínimo que importa detectar —no se decide sobre la
+    marcha mirando el dashboard cada día.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Guardrail metrics <span>· lo que no debe empeorar</span></p>
+    <p>Un experimento se diseña para mover una métrica objetivo (conversión), pero se monitorean
+    también <strong>métricas de guardarraíl</strong> que no deberían empeorar aunque la principal
+    mejore: tiempo de carga, tasa de error, cancelaciones. Ganar conversión a costa de duplicar
+    quejas de soporte no es una victoria; sin guardarraíles definidos de antemano, ese costo se
+    descubre semanas después, si se descubre.</p>
+  </div>
+
+  <h4>Instrumentación y herramientas</h4>
+  <div class="concept">
+    <p class="term">Event tracking <span>· el esquema de eventos</span></p>
+    <p>La analítica de producto vale lo que vale su instrumentación. El modelo estándar (Segment
+    y similares): <code class="inline">identify</code> asocia un usuario con sus rasgos,
+    <code class="inline">track</code> registra una acción con nombre y propiedades,
+    <code class="inline">page</code>/<code class="inline">screen</code> registra navegación,
+    <code class="inline">group</code> asocia el usuario a una organización. Necesita una
+    <strong>taxonomía</strong>: nombres consistentes (<code class="inline">objeto_accion</code>,
+    p. ej. <code class="inline">dashboard_creado</code>), propiedades tipadas, y un documento
+    vivo de qué evento significa qué.</p>
+    <p class="why"><b>por qué importa</b>Instrumentar mal es deuda cara: no puedes analizar
+    retroactivamente un evento que no registraste, y renombrar eventos en producción parte las
+    series históricas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Herramientas</p>
+    <p><strong>PostHog</strong>: analítica de producto (funnels, cohortes, session replay,
+    flags), self-host o cloud, todo en uno. <strong>Amplitude</strong> y <strong>Mixpanel</strong>:
+    especializadas en analítica de producto, potentes en exploración.
+    <strong>Metabase</strong>: BI ligero, preguntas y dashboards sobre SQL, fácil de dar a
+    gente de negocio. <strong>Superset</strong>: BI open source más flexible y técnico. Un
+    stack común: eventos → warehouse → dbt → Metabase/Superset para negocio, PostHog para
+    producto.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Errores de interpretación</p>
+    <p><strong>Paradoja de Simpson</strong>: una tendencia que se ve en cada subgrupo se
+    invierte al agregarlos (un cambio mejora la conversión en móvil y en escritorio, pero
+    "empeora" el total porque cambió la mezcla de tráfico). <strong>Sesgo de supervivencia</strong>:
+    analizas solo a los que se quedaron. <strong>Regresión a la media</strong>: mediste un pico,
+    hiciste un cambio, "bajó" —habría bajado igual. <strong>Promedios que mienten</strong>: el
+    tiempo de carga medio es 1,2 s pero el p95 es 9 s; usa percentiles. <strong>p-hacking</strong>:
+    mirar un experimento hasta que "sale significativo".</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Instrumenta antes de lanzar</span>
+    <p>La pregunta "¿funcionó la feature?" solo se puede responder si los eventos que la miden
+    ya estaban emitiéndose el día del lanzamiento. Definir el evento y las propiedades es parte
+    del diseño de la feature, no un extra para después. Lo mismo aplica a un experimento A/B:
+    la métrica y el tamaño de muestra se fijan antes, no se eligen mirando el resultado.</p>
+  </div>
+</section>
+
+<section class="block" id="pandas-python">
+  <span class="sec-num">10</span>
+  <h2>Cuando SQL no alcanza: pandas, Polars, DuckDB</h2>
+  <p class="lead">
+    SQL es el mejor lenguaje para transformar datos tabulares en conjunto, y debería ser el
+    default. Pero hay trabajo —exploración iterativa, limpieza irregular, estadística, preparar
+    datos para modelos— donde Python encaja mejor. La clave es saber qué va en el warehouse y
+    qué va en un script, y no confundir un notebook con un pipeline.
+  </p>
+
+  <div class="concept">
+    <p class="term">Cuándo mover el trabajo a Python</p>
+    <p>Se queda en el warehouse: transformación repetible, sobre tablas grandes, que alimenta
+    dashboards o modelos —eso es dbt. Se va a Python: análisis exploratorio de una vez, parsing
+    de formatos raros, limpieza con reglas que cambian cada dos filas, estadística y ML,
+    integración con APIs, y cualquier cosa que necesite librerías que no existen en SQL. Regla:
+    <em>si lo vas a correr todas las noches, es SQL; si es para responder una pregunta hoy, es
+    Python</em>.</p>
+  </div>
+  <div class="concept">
+    <p class="term">pandas <span>· el estándar histórico</span></p>
+    <p><strong>DataFrame</strong> en memoria, evaluación inmediata, un solo núcleo. Enorme
+    ecosistema y todo tutorial lo usa. Límites: consume varias veces el tamaño del archivo en
+    RAM, se pone lento con millones de filas, la API tiene muchas formas de hacer lo mismo, y
+    el índice y el <code class="inline">SettingWithCopyWarning</code> confunden. Bien para
+    datasets de hasta unos pocos millones de filas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Polars <span>· el reemplazo moderno</span></p>
+    <p>DataFrame escrito en Rust, sobre Apache Arrow. <strong>Multinúcleo</strong> por defecto,
+    API más consistente, y un modo <strong>lazy</strong>: encadenas operaciones sin ejecutar y
+    un optimizador de consultas reordena filtros y proyecciones antes de correr. Procesa
+    datasets más grandes que la RAM en streaming. Para trabajo de datos nuevo, es la opción
+    razonable.</p>
+<pre><span class="c"># lazy: no ejecuta hasta collect(); el optimizador empuja el filtro</span>
+<span class="c"># y solo lee las columnas usadas</span>
+import polars as pl
+
+q = (
+    pl.scan_parquet("eventos/*.parquet")
+      .filter(pl.col("precio") &gt; 0)
+      .group_by("categoria")
+      .agg(pl.col("precio").mean().alias("precio_medio"))
+      .sort("precio_medio", descending=True)
+)
+df = q.collect()</pre>
+  </div>
+  <div class="concept">
+    <p class="term">DuckDB como pegamento</p>
+    <p>DuckDB consulta con SQL directamente sobre DataFrames de pandas/Polars, sobre Parquet y
+    sobre CSV, y suele ganar a pandas en agregaciones y joins. El patrón práctico: exploras en
+    un notebook, y cuando necesitas un <code class="inline">GROUP BY</code> o un join serio,
+    lo escribes en SQL con DuckDB sobre el DataFrame que ya tienes. SQL y Python en el mismo
+    flujo, sin mover datos.</p>
+<pre><span class="c"># SQL sobre un DataFrame de Python, sin cargarlo a ninguna base</span>
+import duckdb
+resumen = duckdb.sql("""
+    SELECT categoria, COUNT(*) AS n, SUM(monto) AS total
+    FROM df                         -- 'df' es un DataFrame en memoria
+    WHERE fecha &gt;= DATE '2026-01-01'
+    GROUP BY categoria ORDER BY total DESC
+""").df()</pre>
+  </div>
+  <div class="concept">
+    <p class="term">Vectorizar en vez de iterar</p>
+    <p>Un <code class="inline">for</code> fila por fila, o <code class="inline">.apply()</code>
+    con una función Python, procesan una fila a la vez en el intérprete de Python: son órdenes de
+    magnitud más lentos que una operación vectorizada (<code class="inline">df['a'] + df['b']</code>,
+    <code class="inline">df.groupby().sum()</code>), que delega el bucle al código en C/Rust de
+    abajo. La señal de alarma es un <code class="inline">.apply(lambda row: ...)</code> que
+    recorre millones de filas: casi siempre existe una operación vectorizada equivalente, y si no
+    la hay, es momento de pensarlo en SQL o en Polars.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Apache Arrow <span>· el formato que todos comparten en memoria</span></p>
+    <p>Arrow define cómo representar datos columnares <em>en memoria</em> (no en disco, ahí está
+    Parquet) de forma estándar. Polars, DuckDB, pandas 2.x (con el backend Arrow opcional) y
+    muchos conectores lo usan, lo que permite pasar un DataFrame de una librería a otra
+    <strong>sin copiar ni serializar</strong> —"zero-copy". Es la razón práctica de que
+    <code class="inline">duckdb.sql("... FROM df")</code> del ejemplo anterior sea instantáneo en
+    vez de exportar e importar.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Notebooks: para qué sí y para qué no</p>
+    <p>El notebook es imbatible para explorar: ves cada paso, graficas, iteras. Sus problemas
+    aparecen cuando se quiere que sea producción: <strong>estado oculto</strong> (una variable
+    de una celda borrada sigue viva), <strong>orden de ejecución</strong> no lineal, difícil de
+    versionar (es JSON con salidas), difícil de testear, y sin manejo de errores. Un notebook
+    que "funciona" puede no volver a funcionar desde cero.</p>
+    <p class="why"><b>por qué importa</b>Muchos incidentes de datos son un notebook crítico que
+    corría en la máquina de una persona, con celdas ejecutadas en un orden que solo ella
+    conocía, y que dejó de funcionar cuando se fue.</p>
+  </div>
+  <div class="concept">
+    <p class="term">De notebook a pipeline</p>
+    <p>Cuando un análisis exploratorio se vuelve recurrente: extrae la lógica a funciones en un
+    módulo <code class="inline">.py</code> con tests, muévela a dbt si es transformación SQL, y
+    déjala corriendo bajo el orquestador. Herramientas como <code class="inline">papermill</code>
+    o <code class="inline">nbconvert</code> permiten parametrizar y ejecutar un notebook de
+    forma controlada como paso intermedio, pero el destino sano es código normal.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">No pongas un notebook en cron</span>
+    <p>"Lo dejo agendado y listo" con un <code class="inline">.ipynb</code> es deuda garantizada:
+    sin logs útiles, sin alertas, sin reintentos, sin control de versiones real, y cuando falla
+    a las 4 a.m. no hay traza de qué celda ni por qué. Si algo tiene que correr solo, merece
+    ser un script o un modelo dbt bajo un orquestador.</p>
+  </div>
+</section>
+
+<section class="block" id="datos-para-ia">
+  <span class="sec-num">11</span>
+  <h2>Datos para IA aplicada</h2>
+  <p class="lead">
+    Casi todo lo que hace útil a una feature de IA es trabajo de datos: preparar el corpus que
+    alimenta un RAG, construir los conjuntos con los que se evalúa un modelo, y sacar de los
+    logs de producción los ejemplos para afinar prompts o hacer fine-tune. El warehouse y las
+    técnicas de esta guía son la base de ese puente hacia la guía de IA aplicada.
+  </p>
+
+  <div class="concept">
+    <p class="term">Preparar un corpus para RAG</p>
+    <p>La recuperación es tan buena como el corpus. El trabajo: <strong>extraer</strong> el
+    texto desde su fuente (docs, tickets, wiki, tablas del warehouse),
+    <strong>limpiar</strong> el ruido (cabeceras, pies, navegación, HTML),
+    <strong>normalizar</strong> (codificación, saltos de línea, tablas a texto),
+    <strong>enriquecer</strong> con metadatos para filtrar después (fuente, fecha, autor,
+    permisos, tipo de documento). Es exactamente limpieza y modelado de datos, aplicada a
+    texto.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Deduplicación</p>
+    <p>Los corpus reales tienen duplicados: la misma FAQ en tres sitios, versiones casi
+    idénticas de un contrato. <strong>Exacta</strong>: hash del contenido normalizado.
+    <strong>Casi-duplicados</strong>: <em>MinHash</em> / LSH sobre shingles, o similitud de
+    embeddings sobre un umbral. Sin deduplicar, el modelo recupera cinco fragmentos que dicen
+    lo mismo y desperdicia la ventana de contexto; en datasets de entrenamiento, sesga hacia lo
+    repetido.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Chunking <span>· trocear el texto</span></p>
+    <p>Los documentos se parten en fragmentos que se indexan y recuperan. Dimensiones a
+    decidir: <strong>estrategia</strong> (por tamaño fijo, por estructura —secciones, párrafos—,
+    o semántica), <strong>tamaño</strong> (típico 300–800 tokens; muy grande diluye la
+    relevancia, muy chico pierde contexto), <strong>solape</strong> entre fragmentos (10–20%,
+    para no cortar una idea a la mitad). Cada fragmento guarda su <code class="inline">doc_id</code>,
+    posición y un hash, para poder rastrearlo y regenerarlo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">El pipeline de embeddings</p>
+    <p>Convertir cada fragmento en un vector con un modelo de embedding, en lote, y guardarlo
+    indexado. Puntos operativos: procesar por batches (coste y límites de API), y sobre todo
+    <strong>versionar el modelo</strong>: si cambias de modelo o de dimensión, los vectores
+    viejos y nuevos no son comparables y hay que recomputar todo el índice.</p>
+    <div class="diagram"> warehouse              chunking             embedding           indice
+ marts.documentos  --> split por seccion --> modelo emb. v3  --> pgvector
+ (texto + metadata)    300-800 tokens        batch 1000/req      HNSW
+                       solape 15%            vector[1536]        + filtro por
+                       guarda doc_id,                            metadata (tenant,
+                       posicion, hash                            fecha, tipo)
+
+ cambiar el modelo de embedding  ->  recomputar TODO el indice
+ por eso cada fila lleva  embedding_model = 'v3'</div>
+  </div>
+  <h4>Datasets a partir de los logs de producción</h4>
+  <div class="concept">
+    <p class="term">Datasets de evaluación desde logs de producción</p>
+    <p>Para saber si un cambio de prompt o de modelo mejora algo, necesitas un conjunto fijo de
+    casos con respuesta esperada (<em>golden set</em>). La materia prima son los logs reales:
+    se muestrean (cubriendo casos frecuentes y raros), se anotan con la respuesta correcta o
+    con una rúbrica, y se congelan. Cuidado con la <strong>fuga</strong>: si el caso de
+    evaluación también entró al contexto o al fine-tune, la métrica miente.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Datasets de fine-tune</p>
+    <p>Se arman con el mismo material —logs curados—, en el formato de mensajes que pide el
+    proveedor. Lo que importa: <strong>calidad sobre cantidad</strong> (cientos de ejemplos
+    buenos superan a miles ruidosos), <strong>balance</strong> (que no sean todos el mismo tipo
+    de petición), y consistencia de estilo en las respuestas objetivo. Es curación de datos,
+    lenta y poco glamorosa, y es el 80% del resultado.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Medir si la recuperación funciona <span>· recall@k, MRR, nDCG</span></p>
+    <p>Antes de medir si el LLM responde bien, hay que medir si el paso de <em>retrieval</em>
+    trae los fragmentos correctos. <strong>Recall@k</strong>: de los fragmentos relevantes que
+    existen, qué fracción aparece entre los primeros k resultados. <strong>MRR</strong> (mean
+    reciprocal rank): promedia 1/posición del primer resultado relevante —castiga que lo correcto
+    aparezca en el puesto 8 en vez del 1. <strong>nDCG</strong> pondera además cuán relevante es
+    cada resultado, no solo si es relevante o no. Se calculan contra un conjunto de preguntas con
+    la respuesta "correcta" ya etiquetada, igual que el golden set de más arriba.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Búsqueda híbrida <span>· BM25 + vectores</span></p>
+    <p>La búsqueda semántica por embeddings falla en casos donde el usuario espera coincidencia
+    exacta: códigos de producto, siglas, nombres propios poco frecuentes en el corpus de
+    entrenamiento del modelo de embedding. <strong>BM25</strong> (la familia de algoritmos detrás
+    de la búsqueda léxica clásica, basada en frecuencia de términos) los resuelve bien. La
+    <strong>búsqueda híbrida</strong> combina ambos rankings (suma ponderada o <em>reciprocal
+    rank fusion</em>) y suele superar a cualquiera de los dos solos. pgvector se combina con el
+    índice de texto completo nativo de PostgreSQL para esto, sin sistemas adicionales.</p>
+  </div>
+
+  <h4>Almacenar y buscar los vectores</h4>
+  <div class="concept">
+    <p class="term">pgvector <span>· warehouse y búsqueda semántica en una BD</span></p>
+    <p><strong>pgvector</strong> es una extensión de PostgreSQL que añade un tipo
+    <code class="inline">vector</code> y búsqueda por vecino más cercano con índices
+    <strong>HNSW</strong> o <strong>IVFFlat</strong>. Ventaja: los embeddings viven junto a los
+    datos relacionales, filtras por metadatos con SQL normal y no operas otro sistema. Basta
+    para millones de vectores; un vector store dedicado (con más algoritmos de índice, sharding
+    y filtrado híbrido) se justifica a escalas mayores o con requisitos de latencia estrictos.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Feature store <span>· mención</span></p>
+    <p>Para modelos de ML "clásicos" (no LLM), un feature store centraliza el cálculo de
+    variables y resuelve dos problemas: que la feature en entrenamiento y en producción se
+    calcule igual (<em>training-serving skew</em>), y que al entrenar solo se usen datos
+    disponibles <em>en ese momento</em> (<em>point-in-time correctness</em>, no filtrar futuro).
+    Para la mayoría de proyectos pequeños es sobredimensionado; conviene conocer el concepto.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">El vector no es la fuente de verdad</span>
+    <p>El índice de embeddings es un artefacto derivado y desechable: siempre regenerable desde
+    el corpus. Guarda en el warehouse el texto de cada fragmento, su origen y su hash, y trata
+    el índice vectorial como una caché reconstruible. Así puedes cambiar de modelo, de tamaño
+    de chunk o de vector store sin haber perdido nada.</p>
+  </div>
+</section>
+
+
+      <section class="block" id="curriculo">
+        <span class="sec-num">12</span>
+        <h2>Currículo: libros y cursos</h2>
+        <p class="lead">
+          Elige uno por etapa según lo que estés construyendo.
+          <span class="rl-tag free">gratis</span> es libre online;
+          <span class="rl-tag paid">pago</span> cuesta;
+          <span class="rl-tag lvl">nivel</span> indica dificultad.
+        </p>
+
+        <div class="stage">
+          <h4>Etapa 1 · SQL analítico de verdad</h4>
+          <div class="book"><span class="t">SQL for Data Analysis</span> — <span class="a">Cathy Tanimura</span> <span class="rl-tag lvl">intermedio</span><span class="d">Window functions, series temporales, cohortes, texto, anomalías — todo con SQL. El libro para esta guía. En <a href="https://www.oreilly.com/library/view/sql-for-data/9781492088776/" target="_blank" rel="noopener">O'Reilly</a>.</span></div>
+          <div class="book"><span class="t">Mode — SQL Tutorial for Data Analysis</span> — <span class="a">mode.com</span> <span class="rl-tag free">gratis</span><span class="d">Del SELECT básico a window functions y performance, con datasets reales para practicar. Mode fue adquirida por ThoughtSpot; el tutorial sigue vivo en <a href="https://www.thoughtspot.com/sql-tutorial" target="_blank" rel="noopener">thoughtspot.com/sql-tutorial</a>.</span></div>
+          <div class="book"><span class="t">Kaggle — Advanced SQL</span> — <span class="a">curso</span> <span class="rl-tag free">gratis</span><span class="d">JOINs, uniones, subconsultas analíticas y window functions en un par de horas. En <a href="https://www.kaggle.com/learn/advanced-sql" target="_blank" rel="noopener">kaggle.com/learn/advanced-sql</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 2 · Modelado y warehouse</h4>
+          <div class="book"><span class="t">The Data Warehouse Toolkit</span> — <span class="a">Ralph Kimball &amp; Margy Ross</span> <span class="rl-tag lvl">referencia</span><span class="d">La biblia del modelado dimensional: hechos, dimensiones, SCD. Se consulta por técnica. En <a href="https://www.kimballgroup.com/data-warehouse-business-intelligence-resources/books/data-warehouse-dw-toolkit/" target="_blank" rel="noopener">kimballgroup.com</a>.</span></div>
+          <div class="book"><span class="t">Designing Data-Intensive Applications</span> — <span class="a">Martin Kleppmann</span> <span class="rl-tag lvl">intermedio</span><span class="d">Ya en la guía de Backend. Los capítulos de almacenamiento columnar y procesamiento batch/stream son esta guía. En <a href="https://dataintensive.net" target="_blank" rel="noopener">dataintensive.net</a>.</span></div>
+          <div class="book"><span class="t">The Analytics Setup Guidebook</span> — <span class="a">Holistics</span> <span class="rl-tag free">gratis</span><span class="d">Cómo montar un stack analítico moderno de cero, decisión por decisión. Corto y online, en <a href="https://www.holistics.io/books/setup-analytics/" target="_blank" rel="noopener">holistics.io</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 3 · Data engineering y transformación</h4>
+          <div class="book"><span class="t">Fundamentals of Data Engineering</span> — <span class="a">Joe Reis &amp; Matt Housley</span> <span class="rl-tag lvl">intermedio</span><span class="d">El panorama completo del ciclo de vida de los datos, agnóstico de herramienta. La referencia actual. En <a href="https://www.oreilly.com/library/view/fundamentals-of-data/9781098108298/" target="_blank" rel="noopener">O'Reilly</a>.</span></div>
+          <div class="book"><span class="t">Analytics Engineering with SQL and dbt</span> — <span class="a">O'Reilly</span> <span class="rl-tag lvl">intermedio</span><span class="d">dbt de principio a fin: modelos, tests, la capa de marts, el flujo de equipo. Buena base para la certificación dbt Analytics Engineer. En <a href="https://www.oreilly.com/library/view/analytics-engineering-with/9781098142377/" target="_blank" rel="noopener">O'Reilly</a>.</span></div>
+          <div class="book"><span class="t">dbt Learn</span> — <span class="a">courses.getdbt.com</span> <span class="rl-tag free">gratis</span><span class="d">Los cursos oficiales de dbt, de "dbt Fundamentals" a temas avanzados. Gratis con cuenta. Es la preparación oficial para la certificación dbt Analytics Engineer. En <a href="https://learn.getdbt.com/catalog" target="_blank" rel="noopener">learn.getdbt.com</a>.</span></div>
+          <div class="book"><span class="t">Data Pipelines Pocket Reference</span> — <span class="a">James Densmore</span> <span class="rl-tag lvl">principiante</span><span class="d">ETL/ELT en Python sin frameworks: extraer, cargar, orquestar. Corto y directo. En <a href="https://www.oreilly.com/library/view/data-pipelines-pocket/9781492087823/" target="_blank" rel="noopener">O'Reilly</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 4 · Comunicar los datos</h4>
+          <div class="book"><span class="t">Storytelling with Data</span> — <span class="a">Cole Nussbaumer Knaflic</span> <span class="rl-tag lvl">principiante</span><span class="d">Qué gráfico usar, qué quitar, cómo dirigir la atención. Un dashboard que nadie entiende no sirve. En <a href="https://www.storytellingwithdata.com/books" target="_blank" rel="noopener">storytellingwithdata.com</a>.</span></div>
+          <div class="book"><span class="t">CMU 15-445 — Database Systems</span> — <span class="a">Andy Pavlo, curso</span> <span class="rl-tag free">gratis</span><span class="d">Ya en Backend. Las clases de almacenamiento columnar y ejecución de consultas explican el warehouse por dentro. En <a href="https://15445.courses.cs.cmu.edu" target="_blank" rel="noopener">15445.courses.cs.cmu.edu</a>.</span></div>
+        </div>
+
+        <h3>Práctica</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://pgexercises.com" target="_blank" rel="noopener">PGExercises</a></td><td>Ejercicios de SQL contra una base real, del básico a window functions y CTEs recursivas</td></tr>
+            <tr><td><a href="https://datalemur.com" target="_blank" rel="noopener">DataLemur</a> · <a href="https://www.stratascratch.com" target="_blank" rel="noopener">StrataScratch</a></td><td>Problemas de SQL de entrevistas de data, con soluciones y explicación</td></tr>
+            <tr><td><a href="https://sqlbolt.com" target="_blank" rel="noopener">SQLBolt</a> · <a href="https://selectstarsql.com" target="_blank" rel="noopener">Select Star SQL</a></td><td>Tutoriales interactivos para consolidar la base antes de lo analítico</td></tr>
+            <tr><td><a href="https://adventofsql.com" target="_blank" rel="noopener">Advent of SQL</a></td><td>Un reto de SQL por día cada diciembre; bueno para practicar lo raro</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="block" id="laboratorio">
+        <span class="sec-num">13</span>
+        <h2>Laboratorio: tocar el concepto en el navegador</h2>
+        <p class="lead">
+          Todo corre en la pestaña, sin cuenta ni instalación. Ideal para probar una consulta o
+          un modelo de datos sin montar nada.
+        </p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Herramienta</th><th>Qué concepto de la guía vuelve tangible</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://shell.duckdb.org/" target="_blank" rel="noopener">DuckDB WASM shell</a></td><td>§1 · §4 · §10 — un motor analítico columnar entero en el navegador: consulta CSV/JSON/Parquet remoto con SQL, mira los planes</td></tr>
+            <tr><td><a href="https://sqlime.org/" target="_blank" rel="noopener">Sqlime</a> · <a href="https://lite.datasette.io" target="_blank" rel="noopener">Datasette Lite</a></td><td>§2 — SQLite en WASM: practicar window functions, CTEs y GROUPING SETS sin backend</td></tr>
+            <tr><td><a href="https://jonathanwalker.github.io/SQLChef/" target="_blank" rel="noopener">SQLChef</a></td><td>§5 — consultar un archivo (CSV, JSON, Parquet) con SQL directo: ver un archivo como fuente de datos</td></tr>
+            <tr><td><a href="https://www.drawdb.app" target="_blank" rel="noopener">drawDB</a></td><td>§3 — dibujar un esquema estrella (hechos, dimensiones, claves) y exportar el DDL</td></tr>
+            <tr><td><a href="https://www.db-fiddle.com" target="_blank" rel="noopener">DB Fiddle</a> · <a href="https://sqlfiddle.com" target="_blank" rel="noopener">SQL Fiddle</a></td><td>§2 — probar la misma consulta en Postgres, MySQL y SQLite y ver dónde cambia el dialecto</td></tr>
+            <tr><td><a href="https://jsoncrack.com/" target="_blank" rel="noopener">JSON Crack</a></td><td>§5 — pegar un payload de una API de ingesta y verlo como árbol antes de modelarlo</td></tr>
+            <tr><td><a href="https://docs.malloydata.dev/documentation/" target="_blank" rel="noopener">Malloy playground</a></td><td>§3 · §6 — un lenguaje de modelado moderno: definir métricas y dimensiones una vez, reutilizarlas</td></tr>
+          </tbody>
+        </table></div>
+        <div class="note">
+          <span class="label">El siguiente paso</span>
+          <p>Cuando lo del navegador te quede chico: una cuenta gratis de <strong>BigQuery</strong>
+          (sandbox, sin tarjeta) o <strong>Snowflake</strong> (trial) y un proyecto de <strong>dbt
+          Core</strong> local contra ella. Ahí se aprende de verdad el flujo staging → marts.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Datos y SQL de Punta a Punta</strong> — guía hermana de la serie <em>Atlas</em>.
+    El lado analítico (OLAP) que la guía de Backend no cubre: consultar, modelar, mover y confiar
+    en los datos para tomar decisiones.</p>
+    <p>Los productos gestionados (Snowflake, BigQuery, dbt Cloud, Fivetran…), sus precios y sus
+    cuotas cambian rápido; los conceptos de las secciones 1 a 11 —modelado dimensional, ELT,
+    window functions, calidad de datos— son estables. Verifica límites y precios antes de decidir.
+    Los libros y cursos son referencia amplia, no una lista cerrada.</p>
+  </div>
+</footer>

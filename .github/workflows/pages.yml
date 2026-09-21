@@ -1,0 +1,56 @@
+name: Deploy Atlas to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check local links (no broken .html hrefs)
+        run: |
+          for html in index.html guia/*.html; do
+            grep -oE 'href="[^"#]+\.html"' "$html" | sed 's/href="//;s/"//' | while read href; do
+              case "$href" in
+                http*) ;;  # external URL, skip
+                *) test -f "$href" || { echo "broken link in $html -> $href"; exit 1; } ;;
+              esac
+            done || exit 1
+          done
+          echo "OK: all local links resolve"
+
+  deploy:
+    needs: validate
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: .
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

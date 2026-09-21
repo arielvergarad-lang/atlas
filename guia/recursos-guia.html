@@ -1,0 +1,624 @@
+<title>Recursos y Comunidades</title>
+<meta name="description" content="Guía de estudio: programas y recursos de Google y AWS, plataformas de ciberseguridad, comunidades de programación y sistemas, higiene al entrar a comunidades y plan de 4 meses hacia AWS Community Builders.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #23272e;
+    --ink: #e7e5df;
+    --ink-soft: #b9bdc6;
+    --muted: #8b919c;
+    --line: #333842;
+    --line-soft: #2a2f37;
+    --accent: #4bb7a8;
+    --accent-soft: #16302d;
+    --accent-ink: #7fd3c7;
+    --rust: #d98a5f;
+    --rust-soft: #35241b;
+    --code-bg: #10131a;
+    --code-ink: #d9e2ec;
+    --code-comment: #7b8798;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-inner { padding: clamp(2.4rem, 6vw, 4.2rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem) 0 5rem; }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: 244px minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.88rem; border-left: 2px solid var(--line); padding-left: 1rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  nav.toc p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.7rem;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: flex; flex-direction: column; gap: 0.1rem; }
+  nav.toc a {
+    display: block; padding: 0.3rem 0.4rem; color: var(--ink-soft); text-decoration: none;
+    border-radius: 5px; counter-increment: toc; transition: background 0.15s, color 0.15s;
+  }
+  nav.toc a::before {
+    content: counter(toc, decimal-leading-zero); font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--muted); margin-right: 0.55rem;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+  nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 979px) {
+    nav.toc {
+      position: static; border-left: none; border: 1px solid var(--line); border-radius: 10px;
+      padding: 1.1rem 1.2rem; background: var(--surface); max-height: none;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 1rem; }
+  }
+
+  main { min-width: 0; }
+  section.block { scroll-margin-top: 2rem; padding-top: 1rem; }
+  section.block + section.block { margin-top: 3.4rem; border-top: 1px solid var(--line-soft); padding-top: 2.6rem; }
+  .sec-num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--accent-ink); }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.55rem, 4vw, 2.1rem);
+    line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; margin: 0.3rem 0 1rem;
+  }
+  h3 { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 1.16rem; margin: 2rem 0 0.6rem; letter-spacing: -0.005em; }
+  h4 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.86rem;
+    letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-soft); margin: 1.4rem 0 0.5rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  main a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  .lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 66ch; }
+  ul, ol.body-list { max-width: 68ch; padding-left: 1.2rem; margin: 0 0 1rem; }
+  li { margin: 0.35rem 0; }
+
+  code.inline {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.08em 0.36em; color: var(--ink);
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-ink);
+    font-size: 0.82rem; line-height: 1.6; padding: 1rem 1.15rem; border-radius: 9px; overflow-x: auto;
+    margin: 0 0 1.2rem; border: 1px solid rgba(255,255,255,0.06);
+  }
+  pre .c { color: var(--code-comment); }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  .concept { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 1.1rem 1.25rem; margin: 0 0 0.9rem; }
+  .concept .term {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.95rem;
+    color: var(--accent-ink); margin: 0 0 0.35rem;
+  }
+  .concept .term span { color: var(--muted); font-weight: 400; }
+  .concept p { margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .concept p:first-of-type { margin-top: 0; }
+  .concept .why { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.9rem; color: var(--ink-soft); }
+  .concept .why b {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 0.1rem;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.85rem 1.1rem;
+    border-radius: 0 8px 8px 0; margin: 0 0 1.3rem; font-size: 0.94rem;
+  }
+  .note.rust { border-left-color: var(--rust); background: var(--rust-soft); }
+  .note p { margin: 0; max-width: none; }
+  .note p + p { margin-top: 0.5rem; }
+  .note .label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-ink); display: block; margin-bottom: 0.25rem;
+  }
+  .note.rust .label { color: var(--rust); }
+
+  .diagram {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; line-height: 1.5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 1rem 1.15rem;
+    overflow-x: auto; white-space: pre; color: var(--ink-soft); margin: 0 0 1.3rem;
+  }
+
+  .chip {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; white-space: nowrap;
+  }
+  .chip.t1 { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* Reading list */
+  .stage { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 1.15rem 1.3rem; margin: 0 0 1rem; }
+  .stage > h4 { margin: 0 0 0.6rem; color: var(--accent-ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 0.5rem; }
+  .stage > p { font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.7rem; }
+  .book { padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  .book:last-child { border-bottom: none; }
+  .book .t { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 600; }
+  .book .a { color: var(--muted); }
+  .book .d { display: block; color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.1rem; }
+  .rl-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.08rem 0.38rem; border-radius: 3px; margin-left: 0.35rem; white-space: nowrap; vertical-align: 0.08em;
+  }
+  .rl-tag.free { background: var(--accent-soft); color: var(--accent-ink); }
+  .rl-tag.paid { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .rl-tag.lvl { background: var(--rust-soft); color: var(--rust); }
+
+  .project { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 0 0 1.8rem; box-shadow: var(--shadow); }
+  .project-head { padding: 1.2rem 1.4rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .project-head .stack {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 0.3rem;
+  }
+  .project-head h3 { margin: 0 0 0.4rem; font-size: 1.28rem; font-family: "IBM Plex Serif", Georgia, serif; }
+  .project-head p { margin: 0; font-size: 0.95rem; color: var(--ink-soft); max-width: none; }
+  .project-body { padding: 0.6rem 1.4rem 1.4rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line-soft); }
+  .phase:last-of-type { border-bottom: none; }
+  .phase .pn {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 5px; padding: 0.1rem 0.4rem; height: fit-content; white-space: nowrap;
+  }
+  .phase .pt { font-weight: 600; font-size: 0.95rem; grid-column: 2; }
+  .phase .pd { grid-column: 2; font-size: 0.92rem; color: var(--ink-soft); }
+  .phase .pd code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; }
+  .learn { margin-top: 1rem; font-size: 0.9rem; background: var(--accent-soft); color: var(--accent-ink); padding: 0.7rem 0.95rem; border-radius: 8px; }
+  .learn b { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
+
+  footer.foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.5rem 0 3.5rem; font-size: 0.9rem; color: var(--muted); }
+  footer.foot p { max-width: 66ch; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <p class="kicker">Guía de estudio · Recursos &amp; Comunidades · edición 2026-09-21</p>
+    <h1>Recursos y Comunidades</h1>
+    <p class="standfirst">
+      Dónde aprender, practicar y conversar con más personas: programas de Google y AWS,
+      plataformas de ciberseguridad, comunidades de programación y sistemas, y un plan para
+      construir presencia pública hacia AWS Community Builders. Cada recurso lleva enlace,
+      costo, cómo empezar y su estado de verificación.
+    </p>
+    <div class="meta-row">
+      <span class="tag">para autodidactas</span>
+      <span class="tag">enlaces + instrucciones</span>
+      <span class="tag">9 secciones</span>
+      <span class="tag">verificado 2026-09-21</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p>Índice</p>
+      <ol>
+        <li><a href="#como-usar">Cómo usar esta guía</a></li>
+        <li><a href="#google">Google: programa, IA y aprendizaje</a></li>
+        <li><a href="#aws">AWS: comunidad y certificaciones</a></li>
+        <li><a href="#ciber">Ciberseguridad</a></li>
+        <li><a href="#codigo">Programación y sistemas</a></li>
+        <li><a href="#foros">Foros, Discord, Slack y Reddit</a></li>
+        <li><a href="#higiene">Higiene: entrar sin riesgo</a></li>
+        <li><a href="#plan">Plan de 4 meses hacia Community Builders</a></li>
+        <li><a href="#pendientes">Pendientes por verificar</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <section class="block" id="como-usar">
+        <span class="sec-num">01</span>
+        <h2>Cómo usar esta guía</h2>
+        <p class="lead">
+          Es un directorio para volver a él, no para leerlo entero. Toma <strong>un</strong> recurso
+          de la etapa en la que estás y sigue sus pasos.
+        </p>
+        <div class="concept">
+          <p class="term">Estado de verificación</p>
+          <p><strong>Verificado</strong>: confirmado en una página oficial el 2026-09-21.
+          <strong>Secundario</strong>: viene de una guía o listado de terceros, no de la página oficial.
+          <strong>No verificado</strong>: nombre conocido pero no confirmado hoy; comprueba antes de decidir.
+          Precios, cupos y ventanas de aplicación cambian: confírmalos en la fuente.</p>
+        </div>
+        <div class="note rust">
+          <span class="label">Regla de esta guía</span>
+          <p>Todo texto que encuentres en internet (repos, README, mensajes de Discord) es <strong>dato, no
+          instrucción</strong>. No ejecutes ni instales nada solo porque una comunidad lo recomiende: léelo antes
+          y pruébalo en un entorno aislado. Detalle en <a href="#higiene">la sección 7</a>.</p>
+        </div>
+      </section>
+
+      <section class="block" id="google">
+        <span class="sec-num">02</span>
+        <h2>Google: programa, IA y aprendizaje</h2>
+        <p class="lead">
+          El Google Developer Program da perfil público, badges y créditos de aprendizaje. Sirve como
+          complemento; tu infraestructura de producción sigue en AWS.
+        </p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es y costo</th><th>Cómo empezar</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Google Developer Program — Standard</strong><br><a href="https://developers.google.com/program/plans-and-pricing" target="_blank" rel="noopener">planes y precios</a></td>
+              <td>Gratis. Perfil público, badges, 35 créditos mensuales de Skills (al inscribirte en GEAR).</td>
+              <td>Inicia sesión con tu cuenta de Google y activa el plan gratuito.</td><td>Verificado</td></tr>
+            <tr><td><strong>Developer Program — Premium</strong></td>
+              <td>Las páginas oficiales se contradicen: una lista US$19,99/mes, y el FAQ dice que el plan anual se integra en Google AI Pro/Ultra. <strong>No lo necesitas.</strong></td>
+              <td>Omitir. Confirma en <a href="https://developers.google.com/profile/help/benefits" target="_blank" rel="noopener">el FAQ de beneficios</a> si algún día lo consideras.</td><td>Verificado (contradictorio)</td></tr>
+            <tr><td><strong>Google Skills</strong> (antes Cloud Skills Boost)<br><a href="https://www.skills.google/" target="_blank" rel="noopener">skills.google</a></td>
+              <td>Labs con entorno Google Cloud real. Plan Starter gratis con 35 créditos/mes; Pro US$29/mes. Contenido mayormente en inglés.</td>
+              <td>Crea cuenta, únete a GEAR para los créditos, haz el curso «Model Armor: Securing AI Deployments».</td><td>Verificado</td></tr>
+            <tr><td><strong>Skills Arcade</strong><br><a href="https://www.skills.google/games" target="_blank" rel="noopener">skills.google/games</a></td>
+              <td>Juegos mensuales gratuitos con badges, activos en 2026.</td>
+              <td>Entra al juego del mes y completa los labs.</td><td>Secundario</td></tr>
+            <tr><td><strong>Gemini API + AI Studio</strong><br><a href="https://ai.google.dev/gemini-api/docs/pricing" target="_blank" rel="noopener">precios</a> · <a href="https://ai.google.dev/gemini-api/docs/rate-limits" target="_blank" rel="noopener">límites</a></td>
+              <td>Nivel gratuito disponible; Chile figura entre las regiones. <strong>En el nivel gratuito Google usa tus datos para mejorar productos</strong>; en el de pago, no. Los límites RPM/RPD se ven dentro de AI Studio.</td>
+              <td>Crea una clave en AI Studio y prueba solo con datos no sensibles.</td><td>Verificado</td></tr>
+            <tr><td><strong>ADK</strong> (Agent Development Kit)<br><a href="https://adk.dev/" target="_blank" rel="noopener">adk.dev</a></td>
+              <td>Framework open source de agentes (Python, TypeScript, Go, Java, Kotlin). Soporta MCP y A2A.</td>
+              <td>Sigue el quickstart de la documentación. Si soporta Bedrock: no verificado.</td><td>Verificado</td></tr>
+            <tr><td><strong>Google Cloud Free Trial</strong><br><a href="https://cloud.google.com/free" target="_blank" rel="noopener">cloud.google.com/free</a></td>
+              <td>US$300 por 90 días; pide tarjeta. Cupos «siempre gratis» (Cloud Run, BigQuery, Storage) sin verificar línea por línea.</td>
+              <td>Solo si quieres probar Vertex; tu producción está en AWS.</td><td>Verificado (parcial)</td></tr>
+            <tr><td><strong>Gemma</strong> (modelos abiertos)<br><a href="https://deepmind.google/models/gemma" target="_blank" rel="noopener">deepmind.google/models/gemma</a></td>
+              <td>Corren en local con Ollama. Incluye EmbeddingGemma y ShieldGemma. Licencia exacta: no verificada.</td>
+              <td>Descarga vía Ollama o Hugging Face y pruébalo para RAG local.</td><td>Verificado (parcial)</td></tr>
+            <tr><td><strong>Machine Learning Crash Course</strong><br><a href="https://developers.google.com/machine-learning/crash-course" target="_blank" rel="noopener">enlace</a></td>
+              <td>Gratis, con versión «Español – América Latina».</td>
+              <td>Elige el idioma en el selector de la página.</td><td>Verificado</td></tr>
+          </tbody>
+        </table></div>
+        <div class="note">
+          <span class="label">Para tu perfil</span>
+          <p>Prioriza Standard + Skills Starter + AI Studio (con datos de prueba) + ADK. Deja el Free Trial, Agent Runtime,
+          Genkit, Kaggle y Colab para cuando tengas un proyecto concreto que los necesite.</p>
+        </div>
+      </section>
+
+      <section class="block" id="aws">
+        <span class="sec-num">03</span>
+        <h2>AWS: comunidad y certificaciones</h2>
+        <p class="lead">
+          Lo más parecido al Google Developer Program es <strong>AWS Builder Center</strong>, la casa de todos los
+          programas de comunidad de AWS.
+        </p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th><th>Cómo empezar</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>AWS Builder Center</strong><br><a href="https://builder.aws.com" target="_blank" rel="noopener">builder.aws.com</a></td>
+              <td>Portal central de comunidad, contenido y programas.</td>
+              <td>Crea un <strong>AWS Builder ID</strong> gratuito (lo necesitas para aplicar a Community Builders).</td><td>Verificado</td></tr>
+            <tr><td><strong>AWS User Groups</strong><br><a href="https://aws.amazon.com/developer/community/usergroups/" target="_blank" rel="noopener">enlace</a></td>
+              <td>Más de 590 meetups comunitarios, presenciales o virtuales, y los <strong>Community Days</strong> (conferencias locales).</td>
+              <td>Filtra por Chile o Santiago y únete a uno. Si hay grupo activo en Chile: no verificado.</td><td>Verificado</td></tr>
+            <tr><td><strong>AWS re:Post</strong><br><a href="https://repost.aws/" target="_blank" rel="noopener">repost.aws</a></td>
+              <td>Foro de preguntas y respuestas con reputación; reemplazó a los foros de AWS. Tiene el tema «Training and Certification».</td>
+              <td>Responde 1 o 2 preguntas por semana en lo que ya dominas.</td><td>Verificado</td></tr>
+            <tr><td><strong>AWS Skill Builder</strong><br><a href="https://skillbuilder.aws/" target="_blank" rel="noopener">skillbuilder.aws</a> · <a href="https://skillbuilder.aws/exam-prep" target="_blank" rel="noopener">Exam Prep</a></td>
+              <td>Más de 600 cursos gratuitos, cursos de Exam Prep por certificación y <strong>AWS Escape Room</strong> (100+ preguntas tipo examen y labs). Qué es de pago: no verificado.</td>
+              <td>Empieza por Cloud Practitioner y luego <a href="https://aws.amazon.com/certification/certified-security-specialty" target="_blank" rel="noopener">Security Specialty</a>.</td><td>Verificado</td></tr>
+            <tr><td><strong>AWS Community Builders</strong><br><a href="https://builder.aws.com/community/community-builders" target="_blank" rel="noopener">enlace</a></td>
+              <td>Programa por selección con recursos, formación y networking. Áreas: AI Engineering, Security, Serverless, Containers, Machine Learning, entre otras.</td>
+              <td>Ver <a href="#cb">detalle abajo</a> y el <a href="#plan">plan de 4 meses</a>.</td><td>Verificado (programa) / Secundario (proceso)</td></tr>
+            <tr><td><strong>Student Builder Groups</strong> (antes Cloud Clubs)</td>
+              <td>Solo estudiantes de educación superior mayores de 18 años.</td>
+              <td>Probablemente no te aplica (autodidacta).</td><td>Verificado</td></tr>
+          </tbody>
+        </table></div>
+
+        <h4 id="cb">Cómo funciona aplicar a Community Builders</h4>
+        <p>Es un programa <strong>por selección</strong>, no de inscripción libre. Estos datos vienen de guías de terceros
+        (DEV, Medium, Tutorials Dojo); confírmalos en la página oficial.</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Punto</th><th>Lo que dicen las fuentes</th></tr></thead>
+          <tbody>
+            <tr><td>Quién puede</td><td>Cualquier persona de 18 años o más que construya en AWS, de cualquier nivel y región. No exigen título ni certificación.</td></tr>
+            <tr><td>Cómo se aplica</td><td>Con un AWS Builder ID gratuito, un formulario corto con enlaces a tu contenido: blogs, videos, código abierto, charlas.</td></tr>
+            <tr><td>Qué evalúan</td><td>Sobre todo evidencia de contenido técnico útil y correcto. Sin contenido público, la solicitud es débil.</td></tr>
+            <tr><td>Cuándo</td><td>Una vez al año, normalmente la primera semana de enero durante unas dos semanas (el ciclo 2026 cerró el 21-ene-2026). Próxima ventana probable: enero 2027 <em>[inferido]</em>.</td></tr>
+            <tr><td>Duración</td><td>1 año; hay que reaplicar cada año.</td></tr>
+            <tr><td>Qué ganas</td><td>Recursos, formación y networking. Un canal de Slack con empleados de AWS, según una guía de terceros.</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="block" id="ciber">
+        <span class="sec-num">04</span>
+        <h2>Ciberseguridad</h2>
+        <p class="lead">
+          Práctica guiada, marcos de referencia y defensa personal. Los ataques con IA no son nuevos: son más
+          baratos, rápidos y convincentes. Se defienden con lo mismo de siempre, aplicado con más rigor.
+        </p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es y costo</th><th>Cómo empezar</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Advanced Protection Program</strong><br><a href="https://landing.google.com/advancedprotection/" target="_blank" rel="noopener">enlace</a></td>
+              <td>Protección reforzada de tu cuenta Google con passkey o llave FIDO. Bloquea phishing. Existe en español. Precio de una llave física: no verificado.</td>
+              <td>Es lo más rápido y valioso: actívalo primero.</td><td>Verificado</td></tr>
+            <tr><td><strong>SAIF</strong> (Secure AI Framework)<br><a href="https://saif.google" target="_blank" rel="noopener">saif.google</a> · <a href="https://safety.google/intl/es/cybersecurity-advancements/saif/" target="_blank" rel="noopener">español</a></td>
+              <td>Guía gratuita con 15 riesgos y controles, autoevaluación y foco en agentes.</td>
+              <td>Lee el mapa de riesgos y haz la autoevaluación sobre tu propio chatbot.</td><td>Verificado</td></tr>
+            <tr><td><strong>Informes GTIG</strong> (Google Threat Intelligence)<br><a href="https://cloud.google.com/blog/topics/threat-intelligence/from-prompting-to-autonomy-the-evolution-of-adversarial-ai" target="_blank" rel="noopener">IA adversarial</a> · <a href="https://cloud.google.com/blog/topics/threat-intelligence/ai-vulnerability-exploitation-initial-access" target="_blank" rel="noopener">explotación de vulnerabilidades</a></td>
+              <td>Gratis, en inglés. Casos reales del uso de IA por atacantes, incluida una campaña de robo de credenciales con agentes en menos de 6 horas.</td>
+              <td>Lee uno al mes y anota qué control lo habría frenado.</td><td>Verificado</td></tr>
+            <tr><td><strong>Cloud Threat Horizons H1 2026</strong><br><a href="https://cloud.google.com/security/report/resources/cloud-threat-horizons-report-h1-2026" target="_blank" rel="noopener">enlace</a></td>
+              <td>Identidad comprometida en el 83% de los incidentes, según el informe.</td>
+              <td>Refuerza tu foco en menor privilegio y MFA en AWS.</td><td>Verificado</td></tr>
+            <tr><td><strong>TryHackMe</strong><br><a href="https://tryhackme.com/" target="_blank" rel="noopener">tryhackme.com</a> · <a href="https://discord.com/invite/tryhackme" target="_blank" rel="noopener">Discord</a></td>
+              <td>Labs guiados para principiantes. El Discord tiene unos 374.000 miembros (cifra de una búsqueda, puede haber cambiado). Costo del plan de pago: no verificado.</td>
+              <td>Empieza por la ruta «Pre Security» y luego «Jr Penetration Tester».</td><td>Verificado (parcial)</td></tr>
+            <tr><td><strong>Hack The Box</strong><br><a href="https://www.hackthebox.com/" target="_blank" rel="noopener">hackthebox.com</a></td>
+              <td>Plataforma para practicar pentesting; retos actualizados. Discord y costos: no verificados.</td>
+              <td>Después de TryHackMe, cuando ya manejes las bases.</td><td>Secundario</td></tr>
+            <tr><td><strong>OWASP, CIS Controls, MITRE ATT&amp;CK</strong></td>
+              <td>Material gratuito de referencia. Cómo unirse al Slack de OWASP: no verificado.</td>
+              <td>Recorre el OWASP Top 10 y luego el <em>OWASP Top 10 for LLM Applications</em> (URL no verificada).</td><td>Secundario</td></tr>
+            <tr><td><strong>Google Cybersecurity Certificate</strong><br><a href="https://grow.google/certificates/cybersecurity/" target="_blank" rel="noopener">grow.google</a></td>
+              <td>8 cursos, unas 170 h, nivel SOC/analista. US$49/mes en EE. UU.; precio en Chile no verificado. Solo en inglés. Hay ayuda financiera en Coursera.</td>
+              <td>Solo si te faltan bases de SOC.</td><td>Verificado</td></tr>
+            <tr><td><strong>Professional Cloud Security Engineer</strong><br><a href="https://cloud.google.com/learn/certification/cloud-security-engineer" target="_blank" rel="noopener">enlace</a></td>
+              <td>Examen de US$200, en inglés y japonés. Tu nube es AWS: te conviene más AWS Security Specialty.</td>
+              <td>Opcional.</td><td>Verificado</td></tr>
+            <tr><td><strong>Model Armor</strong><br><a href="https://docs.cloud.google.com/model-armor/overview" target="_blank" rel="noopener">documentación</a></td>
+              <td>Filtra prompt injection, jailbreak y fuga de datos. Solo documenta Google Cloud; no hay confirmación de que funcione con AWS.</td>
+              <td>Sirve para aprender el concepto.</td><td>Verificado</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="block" id="codigo">
+        <span class="sec-num">05</span>
+        <h2>Programación y sistemas</h2>
+        <p class="lead">
+          Ya programas en producción, así que tu prioridad es feedback de otras personas y práctica
+          con mentoría, no otro curso de inicio.
+        </p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th><th>Cómo empezar</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>freeCodeCamp</strong><br><a href="https://www.freecodecamp.org/" target="_blank" rel="noopener">enlace</a></td>
+              <td>Ruta estructurada por proyectos (web, Python, datos) y foro público.</td><td>Usa el foro para dudas concretas.</td><td>Secundario</td></tr>
+            <tr><td><strong>The Odin Project</strong><br><a href="https://www.theodinproject.com/" target="_blank" rel="noopener">enlace</a></td>
+              <td>Full-stack por proyectos, cercano al trabajo real.</td><td>Sigue su ruta y su comunidad.</td><td>Secundario</td></tr>
+            <tr><td><strong>CS50</strong><br><a href="https://cs50.harvard.edu/x/" target="_blank" rel="noopener">enlace</a></td>
+              <td>Fundamentos de cómo funciona un computador. Encaja con la guía de Fundamentos de CS.</td><td>Empieza por la semana 0.</td><td>Secundario</td></tr>
+            <tr><td><strong>Exercism</strong><br><a href="https://exercism.org/" target="_blank" rel="noopener">enlace</a></td>
+              <td>Ejercicios en más de 70 lenguajes con <strong>mentoría gratuita de voluntarios</strong>.</td><td>Elige TypeScript o Python y pide mentoría.</td><td>Secundario</td></tr>
+            <tr><td><strong>Linux Upskill Challenge</strong></td>
+              <td>Curso de 20 días de administración de servidores Linux. Vive en el subreddit r/linuxupskillchallenge.</td><td>Búscalo en Reddit; el sitio propio no verificado.</td><td>Secundario</td></tr>
+            <tr><td><strong>LPI</strong><br><a href="https://www.lpi.org/" target="_blank" rel="noopener">lpi.org</a> · <a href="https://learning.lpi.org/en/learning-materials/010-160/" target="_blank" rel="noopener">Linux Essentials</a></td>
+              <td>Certificación neutral de Linux con material gratuito.</td><td>Linux Essentials primero.</td><td>Verificado</td></tr>
+            <tr><td><strong>Linux Foundation Education</strong><br><a href="https://training.linuxfoundation.org/resources/" target="_blank" rel="noopener">recursos gratuitos</a></td>
+              <td>Recursos gratuitos de Linux, Kubernetes y ciberseguridad.</td><td>Revisa el catálogo de recursos gratuitos.</td><td>Verificado</td></tr>
+            <tr><td><strong>Unix &amp; Linux Stack Exchange, AskUbuntu, linuxquestions.org</strong></td>
+              <td>Foros de preguntas y respuestas de sistemas.</td><td>Busca antes de preguntar; incluye tu versión y el error exacto.</td><td>Secundario</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="block" id="foros">
+        <span class="sec-num">06</span>
+        <h2>Foros, Discord, Slack y Reddit</h2>
+        <p class="lead">
+          Aquí es donde se conversa con más personas. Entra por el enlace oficial de cada plataforma y
+          lee las reglas antes de escribir.
+        </p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Comunidad</th><th>Tipo y uso</th><th>Estado</th></tr></thead>
+          <tbody>
+            <tr><td><strong>AWS Cloud Discord</strong></td><td>Más de 20.000 miembros; canales técnicos, de carrera y de certificaciones.</td><td>Secundario</td></tr>
+            <tr><td><strong>Cloud Resume Challenge</strong> (Discord)</td><td>Activo, para principiantes y proyectos prácticos.</td><td>Secundario</td></tr>
+            <tr><td><strong>SweetOps</strong> (Slack, Cloud Posse)</td><td>DevOps, más de 9.000 miembros, office hours semanales gratis.</td><td>Secundario</td></tr>
+            <tr><td><strong>AWS Community Builders</strong> (Slack)</td><td>Solo miembros del programa; una fuente dice que se puede pedir acceso.</td><td>Secundario</td></tr>
+            <tr><td><strong>A Cloud Guru</strong> (foro y Discord)</td><td>Foro público de cloud y certificaciones.</td><td>Secundario</td></tr>
+            <tr><td><strong>Directorios</strong></td><td><a href="https://openupthecloud.com/best-online-cloud-communities/" target="_blank" rel="noopener">Open Up The Cloud</a> · <a href="https://thehiveindex.com/topics/cloud-computing/" target="_blank" rel="noopener">The Hive Index</a> · <a href="https://dev.to/loujaybee/best-online-communities-for-cloud-engineers-forums-chats-more-48ab" target="_blank" rel="noopener">DEV: comunidades para cloud</a></td><td>Secundario</td></tr>
+            <tr><td><strong>DEV.to</strong></td><td>Donde publican los Community Builders; buen lugar para tu contenido.</td><td>Secundario</td></tr>
+          </tbody>
+        </table></div>
+        <h4>Subreddits (no verificados: Reddit bloqueó las herramientas de búsqueda)</h4>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Área</th><th>Subreddits</th></tr></thead>
+          <tbody>
+            <tr><td>Programación</td><td>r/learnprogramming · r/learnpython · r/webdev · r/cscareerquestions</td></tr>
+            <tr><td>Sistemas</td><td>r/linuxadmin · r/linux4noobs · r/sysadmin · r/homelab · r/devops</td></tr>
+            <tr><td>Ciberseguridad</td><td>r/cybersecurity · r/AskNetsec · r/netsec · r/blueteamsec</td></tr>
+            <tr><td>Cloud/AWS</td><td>r/aws · r/AWSCertifications · r/awsdevelopers · r/terraform</td></tr>
+            <tr><td>IA</td><td>r/LocalLLaMA · r/LLMDevs · r/ClaudeAI</td></tr>
+          </tbody>
+        </table></div>
+        <div class="note">
+          <span class="label">Instrucciones</span>
+          <p>Verifica tú en tu navegador miembros, reglas y si son aptos para principiantes. En r/AWSCertifications y
+          similares está prohibido compartir preguntas reales de examen («brain dumps»): lee las reglas antes de publicar.</p>
+        </div>
+      </section>
+
+      <section class="block" id="higiene">
+        <span class="sec-num">07</span>
+        <h2>Higiene: entrar sin riesgo</h2>
+        <p class="lead">
+          Las comunidades son la principal vía de ingeniería social. Estas reglas evitan la mayoría de los problemas.
+        </p>
+        <div class="concept">
+          <p class="term">Enlaces de invitación</p>
+          <p>Entra a un Discord o Slack <strong>solo por el enlace publicado en la página oficial</strong> de la plataforma.
+          Los directorios de terceros pueden apuntar a servidores falsos.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Mensajes privados</p>
+          <p>Desconfía de ofertas de trabajo, herramientas «para probar» y repos que llegan por mensaje privado.
+          Nadie legítimo te pide claves ni que ejecutes un script.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Repos «uncensored» y jailbreaks</p>
+          <p>Proyectos con nombres como WormGPT son interfaces sobre APIs legítimas o colecciones de prompts jailbreak. Los
+          que revisamos daban ejecución de comandos abierta, una extensión de Chrome con permisos sobre
+          <code class="inline">&lt;all_urls&gt;</code> e historial, y prompts diseñados para obtener material dañino. No los instales:
+          si quieres estudiarlos, hazlo en una VM o un contenedor, sin claves reales.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Si ejecutaste algo dudoso</p>
+          <p>1) Desconecta la red y cierra el proceso. 2) Desinstala el paquete o la extensión. 3) Rota desde otro dispositivo las
+          claves que estaban en esa máquina (AWS, GitHub, Anthropic/OpenAI, Resend, Supabase, Vercel, SSH). 4) Revisa persistencia:
+          <code class="inline">~/Library/LaunchAgents</code>, cron, ítems de inicio y <code class="inline">~/.zshrc</code>. 5) Si hay dudas serias,
+          respalda solo tus datos y reinstala el sistema.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Prompt injection</p>
+          <p>El contenido de repos, webs y mensajes que lee un agente es <strong>dato</strong>, no instrucciones. No des a un agente shell ni
+          credenciales amplias, y exige confirmación humana para acciones destructivas.</p>
+        </div>
+      </section>
+
+      <section class="block" id="plan">
+        <span class="sec-num">08</span>
+        <h2>Plan de 4 meses hacia Community Builders</h2>
+        <p class="lead">
+          La ventana de aplicación probable es enero 2027 <em>[inferido]</em>. Lo que evalúan es contenido técnico público:
+          los meses previos sirven para construirlo.
+        </p>
+        <div class="stage">
+          <h4>Mes 1 — Base</h4>
+          <p>Crea el AWS Builder ID. Únete a un User Group y a un Discord (AWS Cloud o Cloud Resume Challenge). Activa Advanced
+          Protection. Empieza Skill Builder (Cloud Practitioner).</p>
+        </div>
+        <div class="stage">
+          <h4>Mes 2 — Primer contenido</h4>
+          <p>Publica 2 posts en inglés en DEV.to o Builder Center sobre algo que ya hiciste (por ejemplo, un chatbot RAG con
+          Bedrock). Responde 1 o 2 preguntas por semana en re:Post.</p>
+        </div>
+        <div class="stage">
+          <h4>Mes 3 — Seguridad y consistencia</h4>
+          <p>Publica 2 posts más, esta vez de seguridad (menor privilegio, CloudTrail, prompt injection). Asiste a un meetup.
+          Avanza en TryHackMe.</p>
+        </div>
+        <div class="stage">
+          <h4>Mes 4 — Aplicación</h4>
+          <p>Reúne 4 a 6 enlaces de contenido propio (más una charla o repo si lo tienes) y revisa la fecha de apertura en la página oficial.
+          Aplica en el área Security o AI Engineering.</p>
+        </div>
+        <div class="note rust">
+          <span class="label">Separa los proyectos</span>
+          <p>Los clientes de agencia no son portafolio de tu perfil freelance internacional. Usa proyectos propios o sin datos de clientes,
+          y no publiques nada confidencial (claves, IPs, datos de terceros).</p>
+        </div>
+      </section>
+
+      <section class="block" id="pendientes">
+        <span class="sec-num">09</span>
+        <h2>Pendientes por verificar</h2>
+        <p class="lead">Datos que no se pudieron confirmar el 2026-09-21. Revísalos antes de decidir.</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Tema</th><th>Qué falta</th></tr></thead>
+          <tbody>
+            <tr><td>Reddit</td><td>Miembros, reglas y actividad de cada subreddit (herramientas bloqueadas).</td></tr>
+            <tr><td>Chile</td><td>User Group o Community Day activo de AWS; comunidades locales en español.</td></tr>
+            <tr><td>Community Builders</td><td>Requisitos y fechas en la página oficial; costo del programa.</td></tr>
+            <tr><td>Skill Builder</td><td>Qué contenido es gratuito y qué requiere suscripción.</td></tr>
+            <tr><td>Gemini free tier</td><td>Límites exactos RPM/RPD (se ven en AI Studio).</td></tr>
+            <tr><td>Precios en Chile</td><td>Google Cybersecurity Certificate, TryHackMe, llaves FIDO.</td></tr>
+            <tr><td>Español</td><td>Cobertura en español de Skills y de los certificados.</td></tr>
+            <tr><td>Contenido sin revisar</td><td>Los enlaces de freeCodeCamp, The Odin Project, CS50, Exercism, HackTheBox y Skills responden (Skills y Exercism dan 403 a scripts, no a navegadores), pero no revisé su contenido hoy. OWASP LLM Top 10 y MITRE ATLAS no llevan enlace porque no verifiqué su URL.</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Recursos y Comunidades</strong> — guía 10 de Atlas, compilada el 2026-09-21 a partir de páginas oficiales de Google y AWS y de guías
+    de terceros. Pensada para consultar por partes.</p>
+    <p>Los precios, cupos, ventanas de aplicación y tamaños de comunidad cambian. Confirma en la fuente antes de pagar, aplicar o instalar algo.
+    Lo marcado «Secundario» o «No verificado» no salió de una página oficial.</p>
+  </div>
+</footer>

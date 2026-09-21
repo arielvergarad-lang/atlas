@@ -1,0 +1,2346 @@
+<title>Backend de Punta a Punta</title>
+<meta name="description" content="Guía de estudio densa: lenguajes, frameworks, cómo funciona el backend por dentro, bases de datos, arquitectura, sistemas distribuidos, seguridad y un currículo completo de libros y cursos.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #23272e;
+    --ink: #e7e5df;
+    --ink-soft: #b9bdc6;
+    --muted: #8b919c;
+    --line: #333842;
+    --line-soft: #2a2f37;
+    --accent: #4bb7a8;
+    --accent-soft: #16302d;
+    --accent-ink: #7fd3c7;
+    --rust: #d98a5f;
+    --rust-soft: #35241b;
+    --code-bg: #10131a;
+    --code-ink: #d9e2ec;
+    --code-comment: #7b8798;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-inner { padding: clamp(2.4rem, 6vw, 4.2rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem) 0 5rem; }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: 244px minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.88rem; border-left: 2px solid var(--line); padding-left: 1rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  nav.toc p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.7rem;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: flex; flex-direction: column; gap: 0.1rem; }
+  nav.toc a {
+    display: block; padding: 0.3rem 0.4rem; color: var(--ink-soft); text-decoration: none;
+    border-radius: 5px; counter-increment: toc; transition: background 0.15s, color 0.15s;
+  }
+  nav.toc a::before {
+    content: counter(toc, decimal-leading-zero); font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--muted); margin-right: 0.55rem;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+  nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 979px) {
+    nav.toc {
+      position: static; border-left: none; border: 1px solid var(--line); border-radius: 10px;
+      padding: 1.1rem 1.2rem; background: var(--surface); max-height: none;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 1rem; }
+  }
+
+  main { min-width: 0; }
+  section.block { scroll-margin-top: 2rem; padding-top: 1rem; }
+  section.block + section.block { margin-top: 3.4rem; border-top: 1px solid var(--line-soft); padding-top: 2.6rem; }
+  .sec-num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--accent-ink); }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.55rem, 4vw, 2.1rem);
+    line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; margin: 0.3rem 0 1rem;
+  }
+  h3 { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 1.16rem; margin: 2rem 0 0.6rem; letter-spacing: -0.005em; }
+  h4 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.86rem;
+    letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-soft); margin: 1.4rem 0 0.5rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  main a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  .lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 66ch; }
+  ul, ol.body-list { max-width: 68ch; padding-left: 1.2rem; margin: 0 0 1rem; }
+  li { margin: 0.35rem 0; }
+
+  code.inline {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.08em 0.36em; color: var(--ink);
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-ink);
+    font-size: 0.82rem; line-height: 1.6; padding: 1rem 1.15rem; border-radius: 9px; overflow-x: auto;
+    margin: 0 0 1.2rem; border: 1px solid rgba(255,255,255,0.06);
+  }
+  pre .c { color: var(--code-comment); }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  .concept { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 1.1rem 1.25rem; margin: 0 0 0.9rem; }
+  .concept .term {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.95rem;
+    color: var(--accent-ink); margin: 0 0 0.35rem;
+  }
+  .concept .term span { color: var(--muted); font-weight: 400; }
+  .concept p { margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .concept p:first-of-type { margin-top: 0; }
+  .concept .why { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.9rem; color: var(--ink-soft); }
+  .concept .why b {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 0.1rem;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.85rem 1.1rem;
+    border-radius: 0 8px 8px 0; margin: 0 0 1.3rem; font-size: 0.94rem;
+  }
+  .note.rust { border-left-color: var(--rust); background: var(--rust-soft); }
+  .note p { margin: 0; max-width: none; }
+  .note p + p { margin-top: 0.5rem; }
+  .note .label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-ink); display: block; margin-bottom: 0.25rem;
+  }
+  .note.rust .label { color: var(--rust); }
+
+  .diagram {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; line-height: 1.5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 1rem 1.15rem;
+    overflow-x: auto; white-space: pre; color: var(--ink-soft); margin: 0 0 1.3rem;
+  }
+
+  .chip {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; white-space: nowrap;
+  }
+  .chip.t1 { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* Reading list */
+  .stage { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 1.15rem 1.3rem; margin: 0 0 1rem; }
+  .stage > h4 { margin: 0 0 0.6rem; color: var(--accent-ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 0.5rem; }
+  .stage > p { font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.7rem; }
+  .book { padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  .book:last-child { border-bottom: none; }
+  .book .t { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 600; }
+  .book .a { color: var(--muted); }
+  .book .d { display: block; color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.1rem; }
+  .rl-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.08rem 0.38rem; border-radius: 3px; margin-left: 0.35rem; white-space: nowrap; vertical-align: 0.08em;
+  }
+  .rl-tag.free { background: var(--accent-soft); color: var(--accent-ink); }
+  .rl-tag.paid { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .rl-tag.lvl { background: var(--rust-soft); color: var(--rust); }
+
+  .project { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 0 0 1.8rem; box-shadow: var(--shadow); }
+  .project-head { padding: 1.2rem 1.4rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .project-head .stack {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 0.3rem;
+  }
+  .project-head h3 { margin: 0 0 0.4rem; font-size: 1.28rem; font-family: "IBM Plex Serif", Georgia, serif; }
+  .project-head p { margin: 0; font-size: 0.95rem; color: var(--ink-soft); max-width: none; }
+  .project-body { padding: 0.6rem 1.4rem 1.4rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line-soft); }
+  .phase:last-of-type { border-bottom: none; }
+  .phase .pn {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 5px; padding: 0.1rem 0.4rem; height: fit-content; white-space: nowrap;
+  }
+  .phase .pt { font-weight: 600; font-size: 0.95rem; grid-column: 2; }
+  .phase .pd { grid-column: 2; font-size: 0.92rem; color: var(--ink-soft); }
+  .phase .pd code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; }
+  .learn { margin-top: 1rem; font-size: 0.9rem; background: var(--accent-soft); color: var(--accent-ink); padding: 0.7rem 0.95rem; border-radius: 8px; }
+  .learn b { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
+
+  footer.foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.5rem 0 3.5rem; font-size: 0.9rem; color: var(--muted); }
+  footer.foot p { max-width: 66ch; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <p class="kicker">Guía de estudio · Backend &amp; Arquitectura · edición densa</p>
+    <h1>Backend de Punta a Punta</h1>
+    <p class="standfirst">
+      Todo lo que sostiene un sistema de servidor: los lenguajes y frameworks, cómo funciona
+      el backend por dentro, bases de datos, arquitectura, sistemas distribuidos, seguridad y
+      operación — más un currículo ordenado de libros y cursos, y tres proyectos guiados.
+    </p>
+    <div class="meta-row">
+      <span class="tag">para autodidactas</span>
+      <span class="tag">conceptos &gt; sintaxis</span>
+      <span class="tag">20 secciones</span>
+      <span class="tag">~60 libros y cursos</span>
+      <span class="tag">3 proyectos completos</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p>Índice</p>
+      <ol>
+        <li><a href="#lenguajes">Lenguajes de backend</a></li>
+        <li><a href="#frameworks">Frameworks y sus diferencias</a></li>
+        <li><a href="#como-corre">Cómo corre tu código</a></li>
+        <li><a href="#capas">Las capas de un sistema</a></li>
+        <li><a href="#conceptos">Conceptos del backend web</a></li>
+        <li><a href="#datos">Bases de datos a profundidad</a></li>
+        <li><a href="#arquitectura">Arquitectura de software</a></li>
+        <li><a href="#distribuidos">Sistemas distribuidos y escala</a></li>
+        <li><a href="#seguridad">Seguridad</a></li>
+        <li><a href="#ciclo">El ciclo de vida y el testing</a></li>
+        <li><a href="#observabilidad">Observabilidad y confiabilidad</a></li>
+        <li><a href="#tipos">Tipos de software y dominios</a></li>
+        <li><a href="#opensource">Open source y licencias</a></li>
+        <li><a href="#git">Git, GitHub y de dónde sacar proyectos</a></li>
+        <li><a href="#portafolio">Cómo mostrar el portafolio</a></li>
+        <li><a href="#bd-produccion">Bases de datos en producción</a></li>
+        <li><a href="#curriculo">Currículo: libros y cursos</a></li>
+        <li><a href="#proyectos">Tres proyectos de punta a punta</a></li>
+        <li><a href="#ruta">Plan de estudio de 12 meses</a></li>
+        <li><a href="#recursos">Recursos y enlaces</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+      <!-- 01 -->
+      <section class="block" id="lenguajes">
+        <span class="sec-num">01</span>
+        <h2>Lenguajes de backend</h2>
+        <p class="lead">
+          Casi cualquier lenguaje puede correr en un servidor. Lo que cambia es el peso real en
+          producción, el ecosistema y para qué carga rinde. Ordenados por qué tan segura es la apuesta.
+        </p>
+
+        <h4>Tier 1 — apuesta segura</h4>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Lenguaje</th><th>Runtime / frameworks</th><th>Donde manda</th></tr></thead>
+          <tbody>
+            <tr><td><strong>JavaScript / TypeScript</strong></td><td>Node.js, Deno, Bun — Express, NestJS, Fastify, Hono</td><td>startups, full-stack, serverless</td></tr>
+            <tr><td><strong>Python</strong></td><td>Django, FastAPI, Flask</td><td>APIs, datos, machine learning, scripting</td></tr>
+            <tr><td><strong>Java</strong></td><td>Spring Boot, Quarkus</td><td>banca, seguros, enterprise</td></tr>
+            <tr><td><strong>C#</strong></td><td>ASP.NET Core</td><td>enterprise Microsoft, backend de juegos</td></tr>
+            <tr><td><strong>Go</strong></td><td>net/http, Gin, Echo, Chi</td><td>infraestructura, microservicios, alto throughput</td></tr>
+            <tr><td><strong>PHP</strong></td><td>Laravel, Symfony</td><td>~70% de la web, SaaS PYME</td></tr>
+            <tr><td><strong>Ruby</strong></td><td>Rails, Sinatra</td><td>startups clásicas (GitHub, Shopify)</td></tr>
+          </tbody>
+        </table></div>
+
+        <h4>Tier 2 — sólido, más nicho</h4>
+        <p>
+          <strong>Rust</strong> (Actix, Axum — rendimiento + seguridad de memoria, curva dura),
+          <strong>Kotlin</strong> (Ktor, Spring — Java moderno, sirve para Android),
+          <strong>Elixir</strong> (Phoenix — concurrencia brutal, base de WhatsApp/Discord),
+          <strong>Scala</strong> (Play, Akka — big data), <strong>C++</strong> (Drogon — latencia extrema).
+        </p>
+
+        <h4>Tier 3 — legacy pero vivo</h4>
+        <p>
+          <strong>COBOL</strong> (mainframes de banca), <strong>Perl</strong>, <strong>Erlang</strong>
+          (telecom, base de Elixir), <strong>Clojure</strong> (Lisp sobre la JVM, fintech como Nubank),
+          <strong>F#</strong>, <strong>Haskell</strong>.
+        </p>
+
+        <h4>Tier 4 — lenguajes chiste, no para producción</h4>
+        <p>
+          Existen para bromear o poner a prueba el diseño de lenguajes: <strong>Brainfuck</strong>,
+          <strong>Malbolge</strong>, <strong>Whitespace</strong>, <strong>LOLCODE</strong>,
+          <strong>Shakespeare</strong>, <strong>Rockstar</strong> (el código parece la letra de una
+          canción), <strong>HolyC</strong>, <strong>INTERCAL</strong>. Se nombran para reconocerlos.
+        </p>
+
+        <div class="note">
+          <span class="label">Cómo elegir</span>
+          <p>Para el 80% de los proyectos, varios lenguajes sirven igual. La elección la ganan, en
+          este orden: (1) el que el equipo domina, (2) qué tan fácil es contratar, (3) el ecosistema.
+          El lenguaje "óptimo" solo pesa en los extremos: tiempo real masivo → Elixir; latencia y
+          coste al límite → Go o Rust; panel de administración ya → Django / Rails / Laravel.</p>
+        </div>
+      </section>
+
+      <!-- 02 -->
+      <section class="block" id="frameworks">
+        <span class="sec-num">02</span>
+        <h2>Frameworks y sus diferencias</h2>
+        <p class="lead">
+          Un framework resuelve por ti los problemas repetidos de todo backend. Ejes que los separan:
+          <strong>full-stack</strong> (trae base de datos, login, panel) vs <strong>micro</strong>
+          (trae lo mínimo), y <strong>síncrono</strong> vs <strong>asíncrono</strong>.
+        </p>
+
+        <h3>JavaScript / TypeScript</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Framework</th><th>Tipo</th><th>Diferencia clave</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Express</strong></td><td>micro</td><td>El estándar histórico. Todo se arma apilando <em>middleware</em>. Sin tipado ni validación de fábrica.</td></tr>
+            <tr><td><strong>Fastify</strong></td><td>micro + rendimiento</td><td>Como Express pero 2-3× más rápido, con validación por <em>schema</em> y mejor TypeScript.</td></tr>
+            <tr><td><strong>NestJS</strong></td><td>full-stack</td><td>"Angular para el backend": módulos, inyección de dependencias, estructura impuesta. Equipos grandes.</td></tr>
+            <tr><td><strong>Hono</strong></td><td>micro, edge</td><td>Ultraligero, corre en cualquier runtime. Default para <em>edge</em> y <em>serverless</em>.</td></tr>
+            <tr><td><strong>AdonisJS</strong></td><td>full-stack</td><td>"El Laravel de Node": ORM, auth, CLI y migraciones incluidas.</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Python</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Framework</th><th>Tipo</th><th>Diferencia clave</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Django</strong></td><td>full-stack</td><td>ORM propio, panel de administración autogenerado, auth, migraciones. Síncrono por diseño.</td></tr>
+            <tr><td><strong>FastAPI</strong></td><td>micro, async</td><td>Asíncrono nativo, validación con Pydantic, documentación OpenAPI automática, tipado.</td></tr>
+            <tr><td><strong>Flask</strong></td><td>micro</td><td>Mínimo, síncrono, extensiones para todo. Para proyectos nuevos, FastAPI lo reemplaza.</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Java · C# · Go · PHP · Ruby · Rust · Elixir</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Framework</th><th>Diferencia clave</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Spring Boot</strong> (Java)</td><td>El estándar enterprise. Ecosistema gigante. Arranque lento, RAM alta.</td></tr>
+            <tr><td><strong>Quarkus</strong> (Java)</td><td>"Spring para Kubernetes": compila a binario nativo, arranca en milisegundos, poca memoria.</td></tr>
+            <tr><td><strong>ASP.NET Core</strong> (C#)</td><td>Muy rápido. <em>MVC/Web API</em> (estructura para APIs grandes) o <em>Minimal APIs</em> (estilo FastAPI).</td></tr>
+            <tr><td><strong>Chi / stdlib</strong> (Go)</td><td>La librería estándar ya sirve para producción. Chi añade solo un router idiomático, 100% compatible.</td></tr>
+            <tr><td><strong>Gin</strong> (Go)</td><td>El más popular. Router rápido + utilidades listas. Más productivo, menos "puro".</td></tr>
+            <tr><td><strong>Laravel</strong> (PHP)</td><td>Ecosistema enorme: ORM Eloquent, colas, auth, panel. El default de PHP moderno.</td></tr>
+            <tr><td><strong>Symfony</strong> (PHP)</td><td>Componentes desacoplados y reutilizables. Más estricto, más config, más enterprise.</td></tr>
+            <tr><td><strong>Rails</strong> (Ruby)</td><td>El origen de "convención sobre configuración". Generas un CRUD completo con un comando.</td></tr>
+            <tr><td><strong>Axum</strong> (Rust)</td><td>Del equipo de Tokio. Async, extractores tipados. El default de Rust. Actix es aún más rápido.</td></tr>
+            <tr><td><strong>Phoenix</strong> (Elixir)</td><td>Hecho para tiempo real: <em>channels</em>, PubSub, LiveView. Un servidor aguanta cientos de miles de conexiones.</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- 03 -->
+      <section class="block" id="como-corre">
+        <span class="sec-num">03</span>
+        <h2>Cómo corre tu código</h2>
+        <p class="lead">
+          Lo que pasa entre "escribo un archivo de texto" y "hay un programa atendiendo peticiones".
+          Sin esto, todo lo demás son cajas mágicas.
+        </p>
+
+        <div class="concept">
+          <p class="term">Compilado &nbsp;·&nbsp; interpretado &nbsp;·&nbsp; máquina virtual &nbsp;·&nbsp; JIT</p>
+          <p><strong>Compilado</strong> (Go, Rust, C): un programa traduce todo tu código a
+          instrucciones de la máquina <em>antes</em> de ejecutar, y produce un <strong>binario</strong>.
+          Arranca rápido, corre rápido. <strong>Interpretado</strong> (Python, Ruby, JS clásico): otro
+          programa —el intérprete— lee y ejecuta tu código línea por línea cada vez. Más lento, más
+          flexible. <strong>Máquina virtual</strong> (Java, C#): tu código se compila a un formato
+          intermedio (<em>bytecode</em>) que corre sobre una VM (la JVM, el CLR). <strong>JIT</strong>
+          (<em>just-in-time</em>): la VM detecta el código que más se usa y lo compila a máquina en
+          caliente — lo mejor de ambos mundos, tras un calentamiento.</p>
+          <p class="why"><b>Por qué importa</b>
+          Explica por qué Go arranca en milisegundos y un Spring Boot clásico tarda segundos, por qué
+          un binario Rust no necesita que instales "el runtime", y por qué Python es cómodo para
+          scripts pero se queda corto en cálculo intensivo.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Proceso &nbsp;vs&nbsp; hilo <span>· thread</span></p>
+          <p>Un <strong>proceso</strong> es un programa en ejecución con su propia memoria aislada; el
+          sistema operativo no deja que uno lea la memoria de otro. Un <strong>hilo</strong> es una
+          línea de ejecución <em>dentro</em> de un proceso; varios hilos del mismo proceso comparten
+          memoria. Crear un proceso es caro; crear un hilo es barato; cambiar entre ellos
+          (<em>context switch</em>) siempre cuesta.</p>
+          <p class="why"><b>Cómo lo usan los servidores</b>
+          Unos usan varios procesos (PHP-FPM, Gunicorn con <em>workers</em>), otros varios hilos
+          (Java), otros un solo hilo con un bucle de eventos que nunca se bloquea (Node.js), y otros
+          "hilos verdes" livianísimos gestionados por el runtime, no por el OS (goroutines de Go,
+          procesos de Elixir).</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Concurrencia &nbsp;vs&nbsp; paralelismo</p>
+          <p><strong>Concurrencia</strong> = estructurar el programa para manejar muchas tareas que
+          progresan intercaladas (un cocinero alternando entre tres ollas). <strong>Paralelismo</strong>
+          = ejecutar varias de verdad al mismo tiempo, en varios núcleos (tres cocineros). Puedes
+          tener concurrencia sin paralelismo (un solo núcleo repartiendo su tiempo).</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Primitivas de sincronización <span>· lock, mutex, semáforo</span></p>
+          <p>Cuando dos hilos tocan el mismo dato a la vez, el resultado puede quedar corrupto
+          (<strong>condición de carrera</strong>). Un <strong>mutex</strong> ("exclusión mutua") es un
+          candado: solo un hilo lo tiene a la vez, el resto espera. Un <strong>semáforo</strong>
+          permite hasta N a la vez (por ejemplo "máximo 10 conexiones a la base"). Abusar de candados
+          los serializa a todos (matas el rendimiento) o crea un <strong>deadlock</strong>: dos hilos
+          esperándose mutuamente para siempre.</p>
+          <p class="why"><b>La alternativa</b>
+          Modelos que evitan compartir memoria: pasar mensajes entre actores (Elixir), o canales
+          (Go: "no te comuniques compartiendo memoria; comparte memoria comunicándote").</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Bucle de eventos <span>· event loop</span></p>
+          <p>El modelo de Node.js y de todo lo async de un solo hilo. Hay un bucle que va tomando
+          tareas de una cola. Cuando una tarea pide algo lento (leer un archivo, la red), no espera:
+          registra "cuando esto termine, ejecuta esta función (<em>callback</em>)" y sigue con la
+          siguiente. El sistema operativo avisa al terminar, y el callback vuelve a la cola.</p>
+          <p class="why"><b>La trampa</b>
+          Si una tarea hace un cálculo pesado sin ceder el control, <em>bloquea el bucle entero</em>
+          y nadie más es atendido. Por eso en Node el trabajo intensivo va a un hilo aparte
+          (<em>worker</em>).</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Qué pasa cuando escribes una URL</p>
+          <div class="diagram">1. DNS      "api.midominio.com" → 34.120.5.8   (resolución de nombre)
+2. TCP      apretón de manos de 3 pasos con esa IP en el puerto 443
+3. TLS      negociación de cifrado + verificación del certificado → canal seguro
+4. HTTP     el cliente envía:  GET /pedidos/42  + cabeceras
+5. Servidor router → middleware → handler → consulta a la base → respuesta
+6. HTTP     el servidor devuelve:  200 OK  + cuerpo JSON
+7. La conexión se reutiliza (keep-alive) o se cierra</div>
+          <p class="why"><b>Por qué saberlo</b>
+          Cada uno de esos pasos es un lugar donde algo puede fallar o ir lento (DNS mal configurado,
+          certificado vencido, <em>handshake</em> lento, conexión no reutilizada). Depurar producción
+          es saber en cuál de los siete estás.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">HTTP a fondo</p>
+          <p>Es un protocolo de texto de petición-respuesta. Una petición tiene <strong>método</strong>
+          (GET, POST, PUT, PATCH, DELETE), <strong>ruta</strong>, <strong>cabeceras</strong>
+          (metadatos: quién soy, qué formato acepto, autenticación) y a veces <strong>cuerpo</strong>.
+          La respuesta trae un <strong>código de estado</strong>: 2xx éxito, 3xx redirección, 4xx
+          error del cliente (400 mal formado, 401 sin autenticar, 403 sin permiso, 404 no existe, 429
+          demasiadas peticiones), 5xx error del servidor. HTTP es <strong>sin estado</strong>: el
+          servidor no recuerda peticiones anteriores por sí solo; para eso están cookies y tokens.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Idempotencia de los métodos</p>
+          <p>GET, PUT y DELETE son <strong>idempotentes</strong>: repetir la misma petición deja el
+          sistema en el mismo estado. POST no lo es (dos POST = dos recursos creados). Importa porque
+          en redes las peticiones se pierden y se reintentan; un cobro debe diseñarse para que
+          reintentarlo no cobre dos veces (con una <em>clave de idempotencia</em>).</p>
+        </div>
+      </section>
+
+      <!-- CAPAS -->
+      <section class="block" id="capas">
+        <span class="sec-num">04</span>
+        <h2>Las capas de un sistema</h2>
+        <p class="lead">
+          "Capa" se usa para cosas muy distintas y se mezclan todo el tiempo. Aquí van cinco mapas
+          por niveles. Cada uno sirve para depurar un tipo de problema: cuando algo falla, primero
+          nombras la capa, después tocas.
+        </p>
+
+        <div class="concept">
+          <p class="term">1 · La pila de ejecución <span>· del transistor a tu configuración</span></p>
+          <p>Todo lo que hay entre el silicio y tu archivo de texto. Cada nivel le ofrece al de arriba
+          una interfaz estable y le esconde su complejidad.</p>
+          <div class="diagram">Configuración / variables de entorno
+Tu código
+Framework y librerías
+Runtime del lenguaje        (V8/Node, CPython, la JVM, el runtime de Go)
+Librerías del sistema       (libc, OpenSSL)
+Llamadas al sistema         (syscalls: open, read, write, socket)
+Kernel del sistema operativo
+Controladores (drivers)
+Firmware / BIOS / UEFI
+CPU + juego de instrucciones (ISA: x86-64, ARM)
+Microarquitectura           (cachés L1/L2/L3, pipeline, predicción de saltos)
+Compuertas lógicas
+Transistores</div>
+          <p class="why"><b>Para qué</b>
+          "El binario no arranca en el servidor" → librerías del sistema. "Va lento solo en
+          producción" → normalmente kernel/disco o la capa de datos, casi nunca la microarquitectura.
+          Un lenguaje compilado (Go, Rust) se salta el "runtime del lenguaje"; uno interpretado lo
+          carga entero en cada arranque.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">2 · La pila de red <span>· modelo OSI y TCP/IP</span></p>
+          <p>Cómo un mensaje viaja de una máquina a otra. El modelo OSI tiene 7 capas de teoría; el
+          modelo TCP/IP real las agrupa en 4. Lo útil es el orden: para depurar "no conecta", bajas
+          capa por capa.</p>
+          <div class="table-scroll"><table>
+            <thead><tr><th>OSI</th><th>Qué hace</th><th>Protocolos</th><th>Síntoma cuando falla</th></tr></thead>
+            <tbody>
+              <tr><td><strong>7 Aplicación</strong></td><td>El contenido y su significado</td><td>HTTP, DNS, SMTP</td><td>404, API mal usada, DNS no resuelve</td></tr>
+              <tr><td><strong>6 Presentación</strong></td><td>Cifrado, compresión, formato</td><td>TLS, gzip, JSON</td><td>certificado vencido, error de serialización</td></tr>
+              <tr><td><strong>5 Sesión</strong></td><td>Abrir y mantener el diálogo</td><td>reanudación TLS</td><td>(rara vez se depura sola)</td></tr>
+              <tr><td><strong>4 Transporte</strong></td><td>Entrega fiable, puertos</td><td>TCP, UDP</td><td>conexión rechazada, timeout, puerto cerrado</td></tr>
+              <tr><td><strong>3 Red</strong></td><td>Direcciones y rutas entre redes</td><td>IP, ICMP</td><td>host inalcanzable, ruta mala, firewall</td></tr>
+              <tr><td><strong>2 Enlace</strong></td><td>Entre dos máquinas del mismo cable/WiFi</td><td>Ethernet, ARP</td><td>problema de LAN local</td></tr>
+              <tr><td><strong>1 Física</strong></td><td>Señales, cables, radio</td><td>—</td><td>cable suelto</td></tr>
+            </tbody>
+          </table></div>
+          <p class="why"><b>El método</b>
+          ¿Resuelve el DNS? (7) → ¿responde el puerto? <code class="inline">telnet host 443</code> (4)
+          → ¿hay ruta? <code class="inline">ping</code>, <code class="inline">traceroute</code> (3).
+          El modelo TCP/IP colapsa esto en: Aplicación · Transporte · Internet · Acceso a red.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">3 · Las capas de una aplicación <span>· n-tier, Clean, hexagonal</span></p>
+          <p>Cómo divides <em>tu</em> código por responsabilidad. Las cuatro capas clásicas:</p>
+          <div class="diagram">Presentación     → controladores HTTP, serialización, validar la entrada
+Aplicación       → casos de uso: "crear pedido" = orquestar varios pasos
+Dominio          → reglas de negocio puras, entidades. NO sabe de HTTP ni de SQL
+Infraestructura  → base de datos, colas, APIs externas, envío de email</div>
+          <p>La regla de oro (Clean Architecture, hexagonal, Onion — es el mismo tema con nombres
+          distintos): <strong>las dependencias apuntan hacia adentro</strong>. El dominio no importa
+          nada de infraestructura; la infraestructura implementa interfaces que <em>define</em> el
+          dominio. Resultado: pruebas la lógica de negocio sin base de datos, y cambias PostgreSQL
+          por otra cosa sin tocarla.</p>
+          <p class="why"><b>Señal de que está mal</b>
+          Si tu función que calcula el consolidado también abre la conexión a la base y arma el JSON
+          de respuesta, tienes las tres capas pegadas. Extraer la lógica pura a su propio módulo es
+          el refactor con mejor retorno.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">4 · Las capas de infraestructura <span>· el camino de una petición en producción</span></p>
+          <div class="diagram">Navegador / app móvil
+      │
+CDN / edge              → sirve estáticos, cachea, filtra bots
+      │
+Balanceador de carga    → reparte entre servidores, termina el TLS
+      │
+API gateway (opcional)  → autenticación, rate limit, enrutado
+      │
+Servidores de aplicación  (varios, sin estado)
+      │
+Capa de caché (Redis)   → sesiones, resultados calientes
+      │
+Base de datos           (primaria + réplicas de lectura)
+      │
+Almacenamiento de objetos (S3) + backups</div>
+          <p>Y una capa ortogonal — <strong>dónde corre cada proceso</strong>: servidor físico →
+          máquina virtual → contenedor → orquestador (Kubernetes). Cada nivel añade aislamiento y
+          portabilidad a cambio de sobrecarga. Un proyecto chico vive feliz en "VM + contenedor" sin
+          orquestador.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">5 · Las capas de los datos <span>· del byte al JSON</span></p>
+          <div class="diagram">Bytes en el SSD
+Páginas / bloques
+Motor de almacenamiento    (heap, árbol B, LSM-tree)
+Índices
+Modelo lógico              (tablas, filas, columnas)
+Consulta SQL + plan de ejecución
+Driver de base de datos + pool de conexiones
+ORM / mapeo objeto-relacional
+Objetos de dominio
+DTO / esquema de respuesta
+JSON en la red</div>
+          <p class="why"><b>Para qué</b>
+          Cada salto es una traducción y un lugar donde se pierde rendimiento o correctitud: un ORM
+          que genera N+1 consultas, una serialización que expone campos de más, un pool mal
+          dimensionado. Depurar "la API va lenta" es recorrer esta lista hacia abajo.</p>
+        </div>
+
+        <div class="note">
+          <span class="label">La idea que une las cinco</span>
+          <p>Una capa <strong>ofrece una interfaz</strong> y <strong>esconde cómo lo hace</strong>.
+          Eso te deja razonar sobre un nivel sin cargar con los de abajo — hasta que algo falla, y
+          entonces la habilidad clave es <strong>localizar la capa</strong> antes de cambiar nada. El
+          90% de depurar es eso.</p>
+        </div>
+      </section>
+
+      <!-- 04 -->
+      <section class="block" id="conceptos">
+        <span class="sec-num">05</span>
+        <h2>Conceptos del backend web</h2>
+        <p class="lead">
+          El vocabulario que hace que un framework tenga sentido. Cada uno resuelve un problema
+          concreto: qué es, por qué existe, qué pasaría sin él.
+        </p>
+
+        <div class="concept">
+          <p class="term">Lenguaje &nbsp;vs&nbsp; librería &nbsp;vs&nbsp; framework</p>
+          <p>El <strong>lenguaje</strong> son las reglas (el idioma). Una <strong>librería</strong> es
+          código ya hecho que <em>tú</em> llamas cuando lo necesitas. Un <strong>framework</strong> es
+          una estructura que te llama <em>a ti</em>: él controla el flujo y ejecuta tus funciones en
+          el momento correcto. El concepto se llama <strong>inversión de control</strong>.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Enrutamiento <span>· routing</span></p>
+          <p>Una tabla que conecta cada URL + método con la función que la maneja.
+          <code class="inline">GET /usuarios/42</code> → <code class="inline">verUsuario(42)</code>.
+          Sin esto, tendrías un <code class="inline">if</code> gigante mirando la URL a mano.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Middleware</p>
+          <p>Funciones "en medio" del camino. La petición pasa por una fila de middlewares antes de
+          tu lógica y la respuesta al salir. Sirve para lo que quieres en <em>todas</em> las
+          peticiones: log, autenticación, límite de frecuencia, compresión, CORS.</p>
+          <div class="diagram">petición → [log] → [auth] → [rate limit] → TU HANDLER
+                                              ↓
+respuesta ← [log] ← ← ← ← ← ← ← ← ← ← ← ← ← ← ┘</div>
+        </div>
+        <div class="concept">
+          <p class="term">ORM y query builder</p>
+          <p>Los datos se piden con SQL. Un <strong>ORM</strong> mapea tabla ↔ clase, fila ↔ objeto:
+          escribes <code class="inline">Usuario.get(42)</code> y genera el SQL. Un
+          <strong>query builder</strong> es un punto medio: construyes la consulta con métodos
+          (<code class="inline">.where().join()</code>) pero pensando en SQL, no en objetos. Django,
+          Rails y Laravel traen ORM propio; con Go o Express eliges uno (Prisma, SQLAlchemy, GORM,
+          Drizzle) o escribes SQL.</p>
+          <p class="why"><b>El costo del ORM</b>
+          Esconde lo que pasa: es fácil generar consultas lentas sin darte cuenta (el problema
+          <strong>N+1</strong>: una consulta para la lista + una por cada elemento). Hay que saber
+          leer el SQL que genera.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Validación &nbsp;·&nbsp; serialización</p>
+          <p><strong>Validar</strong> = verificar la forma de los datos que llegan antes de usarlos.
+          <strong>Serializar</strong> = convertir un objeto en texto (JSON) para enviarlo;
+          <strong>deserializar</strong> es lo inverso. FastAPI con Pydantic, o NestJS con
+          <em>class-validator</em>, rechazan lo inválido automáticamente y devuelven un error claro.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Autenticación &nbsp;·&nbsp; autorización</p>
+          <p><strong>Autenticación</strong>: ¿quién eres? <strong>Autorización</strong>: ¿qué te dejo
+          hacer? Dos mecanismos para recordar quién eres entre peticiones:</p>
+          <p><strong>Sesión (cookie):</strong> al hacer login el servidor guarda tu sesión (en memoria,
+          Redis o base) y te manda un identificador en una cookie. Cómodo para webs con navegador;
+          el servidor recuerda estado. <strong>Token (JWT):</strong> el servidor te firma un token con
+          tus datos dentro; lo mandas en cada petición y el servidor solo verifica la firma, sin
+          recordar nada. Ideal para apps móviles y para escalar a muchos servidores.</p>
+          <p class="why"><b>Trampas del JWT</b>
+          No se pueden invalidar antes de que expiren (un logout no "borra" el token). No metas datos
+          sensibles: el contenido es legible, solo va firmado, no cifrado. Expiración corta + un
+          <em>refresh token</em> es el patrón habitual.</p>
+        </div>
+        <div class="concept">
+          <p class="term">OAuth 2.0 &nbsp;·&nbsp; OpenID Connect</p>
+          <p><strong>OAuth 2.0</strong> es el protocolo de "iniciar sesión con Google/GitHub":
+          delegas a un tercero la autenticación y recibes un token con permisos acotados, sin ver
+          nunca la contraseña del usuario. <strong>OpenID Connect</strong> es una capa sobre OAuth
+          que añade identidad ("este token corresponde a esta persona"). No implementes esto a mano:
+          usa una librería o un proveedor (Auth0, Clerk, Keycloak, Supabase Auth).</p>
+        </div>
+        <div class="concept">
+          <p class="term">Hashing de contraseñas</p>
+          <p>Nunca guardes contraseñas en texto. Se guarda un <strong>hash</strong> lento y con
+          <strong>sal</strong> (un valor aleatorio por usuario que evita ataques con tablas
+          precalculadas). Algoritmos correctos hoy: <strong>argon2</strong>, <strong>bcrypt</strong>,
+          <strong>scrypt</strong>. Nunca MD5 ni SHA-256 a secas: son demasiado rápidos, un atacante
+          prueba miles de millones por segundo.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Migraciones</p>
+          <p>Archivos con instrucciones de cambio a la base, versionados junto al código y aplicados
+          en orden ("007: agrega columna teléfono"). Mantienen tu máquina, la de tus compañeros y
+          producción sincronizadas. Herramientas: las de Django/Rails/Laravel, o Alembic, Flyway,
+          golang-migrate.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Síncrono &nbsp;vs&nbsp; asíncrono</p>
+          <p>Cuando el servidor espera algo lento: <strong>síncrono</strong> se queda parado;
+          <strong>asíncrono</strong> deja esa tarea en pausa y atiende otra. Importa cuando hay muchas
+          conexiones que esperan mucho (chats, tiempo real, APIs que llaman APIs). Async-first: Node,
+          FastAPI, Go, Elixir. Síncronos de raíz: Django, Flask, Rails.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Inyección de dependencias <span>· DI</span></p>
+          <p>En vez de que una clase cree por dentro lo que necesita (y quede pegada a ello), alguien
+          de afuera se lo pasa. Sirve para probar (le pasas una base falsa) y para cambiar piezas sin
+          tocar la clase. El framework tiene un "contenedor" que sabe qué entregar a cada quién
+          (NestJS, Spring, Angular).</p>
+        </div>
+        <div class="concept">
+          <p class="term">Los 12 factores <span>· 12-factor app</span></p>
+          <p>Un conjunto de reglas para que una app sea fácil de desplegar y escalar en la nube. Las
+          más importantes: la <strong>configuración vive en variables de entorno</strong>, no en el
+          código; los <strong>procesos son sin estado</strong> (nada importante en memoria local);
+          las <strong>dependencias se declaran explícitamente</strong>; <strong>dev y producción se
+          parecen lo más posible</strong>; los <strong>logs se escriben a la salida estándar</strong>
+          y otro sistema los recoge. Es la base de casi toda la infraestructura moderna.</p>
+        </div>
+      
+  <div class="concept">
+          <p class="term">Tiempo, zonas horarias y UTC</p>
+          <p>Guarda todos los instantes en <strong>UTC</strong>, con un tipo consciente de zona
+          (<code class="inline">timestamptz</code> en PostgreSQL, nunca
+          <code class="inline">timestamp</code> a secas). Convierte a la zona del usuario
+          <em>solo al mostrar</em>. Un <code class="inline">timestamp</code> sin zona es ambiguo: no
+          sabes si esas 15:00 son de Santiago o de Madrid, y cuando lo descubras ya habrá datos
+          históricos sin forma de saberlo.</p>
+          <p class="why"><b>Trampas</b>
+          El horario de verano hace que una hora local ocurra dos veces o ninguna. "Mañana a esta
+          hora" no es "+24 h" el día del cambio de hora. Para fechas sin hora (cumpleaños, feriados)
+          usa un tipo <code class="inline">date</code>, no un instante a medianoche —esa medianoche
+          también tiene zona.</p>
+        </div>
+
+  <div class="concept">
+          <p class="term">Manejo de dinero <span>· nunca en coma flotante</span></p>
+          <p><code class="inline">0.1 + 0.2</code> no da <code class="inline">0.3</code> en coma
+          flotante binaria. Con dinero, eso son centavos que aparecen y desaparecen, y cuadraturas que
+          no cierran a fin de mes. Guarda <strong>enteros en la unidad mínima</strong> (centavos) o un
+          <strong>tipo decimal exacto</strong> (<code class="inline">NUMERIC</code> /
+          <code class="inline">DECIMAL</code> en la base, <code class="inline">BigDecimal</code> o
+          <code class="inline">decimal</code> en el código). Guarda siempre la <strong>moneda</strong>
+          junto al monto. Redondea solo al final del cálculo y con una regla explícita y escrita.</p>
+          <p class="why"><b>Por qué importa</b>
+          Es de los bugs más caros y más difíciles de explicarle a un cliente, y se evita por completo
+          eligiendo el tipo correcto el primer día. Cambiarlo después obliga a re-procesar el
+          histórico.</p>
+        </div>
+
+  <div class="concept">
+          <p class="term">Paginación <span>· offset vs cursor (keyset)</span></p>
+          <p><code class="inline">LIMIT 20 OFFSET 10000</code> obliga a la base a leer y descartar diez
+          mil filas: la página 500 cuesta 500 veces más que la primera. Y si llegan filas nuevas
+          mientras el usuario pagina, verá duplicados o se saltará registros. La
+          <strong>paginación por cursor</strong> (o <em>keyset</em>) cambia "salta N filas" por "dame
+          lo que viene después de este valor":
+          <code class="inline">WHERE (creado, id) &lt; (:ult_creado, :ult_id) ORDER BY creado DESC, id DESC LIMIT 20</code>,
+          apoyada en un índice por esas columnas. Coste constante en cualquier página y estable ante
+          inserciones.</p>
+          <p class="why"><b>El precio</b>
+          Con cursor no puedes saltar a "página 47" ni mostrar "resultado 900 de 5000". Para APIs,
+          <em>feeds</em> y exportaciones grandes, <em>keyset</em> es el patrón por defecto;
+          <code class="inline">OFFSET</code> solo para tablas chicas o pantallas de administración.</p>
+        </div>
+
+  <div class="concept">
+          <p class="term">Idempotencia de endpoints <span>· claves de idempotencia</span></p>
+          <p>Una operación es <strong>idempotente</strong> si repetirla deja el sistema igual que
+          hacerla una vez. <code class="inline">GET</code>, <code class="inline">PUT</code> y
+          <code class="inline">DELETE</code> lo son por definición; <code class="inline">POST</code>
+          no. El problema real: el cliente manda "crear pago", la respuesta se pierde por un corte de
+          red, el cliente reintenta y cobras dos veces. Solución: el cliente genera una
+          <strong>clave única</strong> por intento lógico y la manda en una cabecera
+          (<code class="inline">Idempotency-Key</code>); el servidor guarda esa clave junto con el
+          resultado de la primera vez y, si la clave vuelve, devuelve el mismo resultado sin
+          reejecutar. Es como las APIs de pago serias evitan los cargos dobles.</p>
+          <p class="why"><b>Por qué importa</b>
+          Todo lo que reintentas —colas, <em>webhooks</em>, el backoff de la sección de sistemas
+          distribuidos— necesita idempotencia del otro lado, o los reintentos corrompen datos en vez
+          de repararlos.</p>
+        </div>
+</section>
+
+      <!-- 05 -->
+      <section class="block" id="datos">
+        <span class="sec-num">06</span>
+        <h2>Bases de datos a profundidad</h2>
+        <p class="lead">
+          La base de datos es casi siempre el cuello de botella y la parte más difícil de cambiar.
+          Vale la pena entenderla de verdad.
+        </p>
+
+        <div class="concept">
+          <p class="term">El modelo relacional &nbsp;·&nbsp; normalización</p>
+          <p>Datos en <strong>tablas</strong> (filas y columnas) conectadas por <strong>claves</strong>:
+          una <em>clave primaria</em> identifica cada fila, una <em>clave foránea</em> apunta a la
+          primaria de otra tabla. <strong>Normalizar</strong> es dividir los datos para que cada
+          hecho viva en un solo lugar (no repites el nombre del cliente en cada pedido, lo referencias).
+          Evita inconsistencias. A veces se <strong>desnormaliza</strong> a propósito —duplicar un dato—
+          para acelerar lecturas.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Índices &nbsp;·&nbsp; el árbol B</p>
+          <p>Sin índice, buscar una fila obliga a leer toda la tabla (<em>full scan</em>). Un
+          <strong>índice</strong> es una estructura ordenada aparte —casi siempre un
+          <strong>árbol B+</strong>— que permite encontrar un valor en pocos saltos, como el índice
+          de un libro. Aceleran las lecturas y frenan las escrituras (hay que mantener el índice), y
+          ocupan espacio. La consulta más común de tu app define qué índices necesitas.</p>
+          <p class="why"><b>Cómo se depura</b>
+          <code class="inline">EXPLAIN</code> delante de una consulta te muestra si usa un índice o
+          hace un <em>full scan</em>. Aprender a leer ese plan es de las habilidades de backend con
+          mejor relación esfuerzo/impacto.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Transacciones &nbsp;·&nbsp; ACID</p>
+          <p>Una <strong>transacción</strong> agrupa operaciones que pasan <em>todas o ninguna</em>.
+          <strong>ACID</strong>: <strong>A</strong>tomicidad (todo o nada), <strong>C</strong>onsistencia
+          (nunca queda en un estado que viole las reglas), <strong>A</strong>islamiento (transacciones
+          simultáneas no se ven a medias), <strong>D</strong>urabilidad (una vez confirmada, sobrevive
+          a un corte de luz). Es lo que hace que una transferencia bancaria sea confiable.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Niveles de aislamiento</p>
+          <p>Cuánto se "aíslan" las transacciones concurrentes, de menos a más estricto:
+          <em>read committed</em> (default de PostgreSQL), <em>repeatable read</em>,
+          <em>serializable</em> (como si corrieran una tras otra). Más aislamiento = menos anomalías
+          raras (lecturas fantasma, actualizaciones perdidas) pero más contención. Saber que esto
+          existe evita bugs de concurrencia que solo aparecen bajo carga.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Pool de conexiones <span>· connection pool</span></p>
+          <p>Abrir una conexión a la base es caro. Un <strong>pool</strong> mantiene un puñado de
+          conexiones abiertas y las presta y devuelve. Si tu app pide más de las que hay, el resto
+          espera. Dimensionar mal el pool es una causa clásica de caídas bajo carga.</p>
+        </div>
+        <div class="concept">
+          <p class="term">SQL &nbsp;vs&nbsp; NoSQL — las familias</p>
+          <p><strong>Relacional</strong> (PostgreSQL, MySQL): el default; datos estructurados y
+          conectados, transacciones fuertes. <strong>Documental</strong> (MongoDB): guarda objetos
+          JSON, esquema flexible. <strong>Clave-valor</strong> (Redis, DynamoDB): un diccionario
+          gigante, rapidísimo, para caché y sesiones. <strong>Columnar</strong> (ClickHouse,
+          BigQuery): para analítica sobre miles de millones de filas. <strong>Grafo</strong> (Neo4j):
+          para relaciones densas (redes sociales, fraude). <strong>Búsqueda</strong> (Elasticsearch):
+          texto libre.</p>
+          <p class="why"><b>Regla</b>
+          Empieza con PostgreSQL. Hoy cubre documentos (JSONB), clave-valor, búsqueda de texto y
+          hasta vectores para IA. Solo agrega otra base cuando tengas un problema medido que
+          PostgreSQL no resuelve.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Replicación &nbsp;·&nbsp; particionado <span>· sharding</span></p>
+          <p><strong>Replicación</strong>: copias de la base. Una <em>primaria</em> recibe las
+          escrituras y las propaga a <em>réplicas</em> que sirven lecturas. Escala lecturas y da
+          tolerancia a fallos, pero las réplicas van un instante atrasadas (<em>replication lag</em>).
+          <strong>Particionado / sharding</strong>: partir los datos en varias bases por algún
+          criterio (por ejemplo, usuarios A-M en una, N-Z en otra). Escala escrituras, a costa de
+          una complejidad enorme: las consultas que cruzan particiones se vuelven difíciles.</p>
+        </div>
+      
+  <div class="concept">
+          <p class="term">La clave primaria <span>· autoincremento vs UUID</span></p>
+          <p>Un entero autoincremental (<code class="inline">bigserial</code>) es compacto, ordenado y
+          rapidísimo de indexar, pero es adivinable (revela cuántos registros hay), obliga a un ida y
+          vuelta a la base para conocer el id asignado, y complica fusionar datos de varias bases o
+          generar ids sin conexión. Un <strong>UUID aleatorio</strong> (v4) resuelve eso, pero ocupa
+          16 bytes y, al ser aleatorio, cada inserción cae en una página distinta del índice
+          &rarr; fragmentación y escrituras lentas en tablas grandes.</p>
+          <p><strong>UUID v7</strong> (estándar RFC&nbsp;9562, 2024) es el punto medio: lleva un
+          <em>timestamp</em> en los bits altos, así que queda casi ordenado y se indexa casi como un
+          entero, manteniendo la unicidad global. PostgreSQL 18 (2025) trae la función
+          <code class="inline">uuidv7()</code> nativa; antes hacía falta una extensión.</p>
+          <p class="why"><b>Por qué importa</b>
+          Cambiar el tipo de la clave primaria de una tabla grande más adelante es de las migraciones
+          más caras (ver <a href="#bd-produccion">Bases de datos en producción</a>). Decide el primer
+          día pensando en si vas a exponer el id en URLs y en el tamaño que tendrá la tabla en dos
+          años.</p>
+        </div>
+</section>
+
+      <!-- 06 -->
+      <section class="block" id="arquitectura">
+        <span class="sec-num">07</span>
+        <h2>Arquitectura de software</h2>
+        <p class="lead">
+          Cómo organizas el código y los componentes grandes para que el sistema se pueda entender,
+          cambiar y hacer crecer sin que se convierta en un nudo.
+        </p>
+
+        <div class="concept">
+          <p class="term">Acoplamiento &nbsp;·&nbsp; cohesión</p>
+          <p><strong>Acoplamiento</strong>: cuánto depende una pieza de otra — bajo es bueno.
+          <strong>Cohesión</strong>: cuánto tienen que ver entre sí las cosas de una misma pieza —
+          alta es buena. Todo el resto de la arquitectura son técnicas para bajar el acoplamiento y
+          subir la cohesión.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Arquitectura en capas</p>
+          <p>Dividir por responsabilidad: <strong>presentación</strong> (rutas de la API, UI) →
+          <strong>lógica de negocio</strong> (las reglas del dominio) → <strong>acceso a datos</strong>
+          (hablar con la base). Cada capa solo conoce a la de abajo. Cambiar la base solo toca una
+          capa. Esto es <strong>separación de responsabilidades</strong>.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Arquitectura hexagonal <span>· puertos y adaptadores</span></p>
+          <p>La lógica de negocio ("el núcleo") no sabe nada del mundo exterior. Define
+          <strong>puertos</strong> (interfaces: "necesito guardar un pedido") y el mundo exterior
+          provee <strong>adaptadores</strong> que los cumplen (uno para PostgreSQL, uno para pruebas
+          en memoria, uno para una API REST). Puedes probar el núcleo sin base de datos ni red, y
+          cambiar cualquier pieza de infraestructura sin tocarlo.</p>
+        </div>
+        <div class="concept">
+          <p class="term">SOLID</p>
+          <p>Cinco principios de diseño orientado a objetos. Los dos que más se usan:
+          <strong>S</strong> — responsabilidad única (una clase, un motivo para cambiar);
+          <strong>D</strong> — inversión de dependencias (depende de abstracciones, no de
+          implementaciones concretas — la idea detrás de la inyección de dependencias y de la
+          arquitectura hexagonal). Los otros tres (abierto/cerrado, sustitución de Liskov, segregación
+          de interfaces) importan menos a diario.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Patrones de diseño <span>· los que de verdad usarás</span></p>
+          <p>Soluciones con nombre a problemas repetidos. Los frecuentes en backend:
+          <strong>Repository</strong> (aísla el acceso a datos detrás de una interfaz),
+          <strong>Factory</strong> (centraliza la creación de objetos complejos),
+          <strong>Strategy</strong> (intercambiar algoritmos: distintos métodos de pago),
+          <strong>Adapter</strong> (envolver una librería externa con tu propia interfaz),
+          <strong>Observer / Pub-Sub</strong> (avisar a varios interesados de un evento),
+          <strong>Decorator</strong> (añadir comportamiento envolviendo). No fuerces patrones: son
+          vocabulario para reconocer estructuras, no una lista de tareas.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Domain-Driven Design <span>· DDD</span></p>
+          <p>Modelar el software alrededor del <strong>lenguaje del negocio</strong>, no de la técnica.
+          Ideas clave: <strong>lenguaje ubicuo</strong> (código y negocio usan las mismas palabras);
+          <strong>contexto acotado</strong> (<em>bounded context</em>: "cliente" significa cosas
+          distintas en ventas y en soporte, y está bien que sean modelos separados);
+          <strong>agregado</strong> (un grupo de objetos que se modifican como una unidad y protegen
+          sus reglas). Vale la pena en dominios complejos; es exceso en un CRUD.</p>
+        </div>
+        <div class="concept">
+          <p class="term">CQRS &nbsp;·&nbsp; event sourcing</p>
+          <p><strong>CQRS</strong>: separar el modelo de <em>escritura</em> del de <em>lectura</em>
+          (por ejemplo, escribes en PostgreSQL normalizado y lees de vistas desnormalizadas o de
+          Elasticsearch). <strong>Event sourcing</strong>: en vez de guardar el estado actual, guardas
+          la lista completa de eventos que ocurrieron ("creado", "pagado", "enviado") y reconstruyes
+          el estado sumándolos. Potente para auditoría, pero mucha complejidad — reservado a casos
+          que lo justifican.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Monolito &nbsp;·&nbsp; microservicios &nbsp;·&nbsp; serverless</p>
+          <p><strong>Monolito:</strong> un solo programa. Simple de desarrollar, probar y desplegar.
+          <strong>Microservicios:</strong> muchos programas chicos, uno por área, que se hablan por la
+          red. Cada equipo despliega el suyo y se escala solo lo necesario — a cambio de una
+          complejidad operativa enorme (fallos parciales, latencia de red, monitoreo distribuido,
+          consistencia entre servicios). <strong>Serverless:</strong> funciones que el proveedor
+          ejecuta bajo demanda y apaga; pagas por uso, sufren <em>arranque en frío</em>.</p>
+          <p class="why"><b>Regla</b>
+          Casi siempre se empieza con un <strong>monolito bien modularizado</strong>. Los
+          microservicios resuelven problemas de escala organizativa (muchos equipos pisándose) que la
+          mayoría no tiene. "Monolito primero" es el consejo por defecto de casi toda la industria.</p>
+        </div>
+      
+  <div class="concept">
+          <p class="term">El patrón outbox <span>· el problema de la doble escritura</span></p>
+          <p>Quieres guardar un pedido en la base <em>y</em> publicar un evento "pedido creado" en una
+          cola. Si haces las dos cosas por separado, una puede fallar: pedido guardado y evento
+          perdido, o evento emitido y transacción revertida. No existe una transacción que abarque la
+          base y la cola a la vez.</p>
+          <p><strong>Outbox</strong>: en la misma transacción que escribe el pedido, insertas una fila
+          en una tabla <code class="inline">outbox</code>. Un proceso aparte lee esa tabla, publica en
+          la cola y marca cada fila como enviada. Así el evento existe <strong>si y solo si</strong> el
+          pedido se guardó. La entrega es "al menos una vez", de modo que los consumidores deben ser
+          <a href="#conceptos">idempotentes</a>.</p>
+          <p class="why"><b>Por qué importa</b>
+          Es la forma estándar de conectar una base de datos con un bus de eventos sin perder ni
+          duplicar mensajes de forma silenciosa. Herramientas de <em>change data capture</em> como
+          Debezium implementan la misma idea leyendo el registro de cambios de la base en lugar de una
+          tabla.</p>
+        </div>
+</section>
+
+      <!-- 07 -->
+      <section class="block" id="distribuidos">
+        <span class="sec-num">08</span>
+        <h2>Sistemas distribuidos y escala</h2>
+        <p class="lead">
+          En cuanto hay más de una máquina, aparecen problemas nuevos: la red falla, los relojes no
+          coinciden, y "el estado del sistema" deja de ser una sola verdad.
+        </p>
+
+        <div class="concept">
+          <p class="term">Las 8 falacias de la computación distribuida</p>
+          <p>Suposiciones falsas que todos hacemos al principio: la red es confiable, la latencia es
+          cero, el ancho de banda es infinito, la red es segura, la topología no cambia, hay un solo
+          administrador, el coste de transporte es cero, la red es homogénea. Cada bug serio de un
+          sistema distribuido es una de estas mordiendo.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Teorema CAP</p>
+          <p>Cuando hay una <strong>partición</strong> de red (dos mitades del sistema no se pueden
+          hablar), tienes que elegir: <strong>C</strong>onsistencia (todos ven el mismo dato, aunque
+          haya que rechazar peticiones) o <strong>A</strong>vailability (todos reciben respuesta,
+          aunque sea de un dato viejo). No puedes tener ambas durante la partición. En la práctica se
+          extiende con <strong>PACELC</strong>: y cuando NO hay partición, eliges entre latencia y
+          consistencia.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Consistencia fuerte &nbsp;vs&nbsp; eventual</p>
+          <p><strong>Fuerte</strong>: después de escribir, cualquier lectura ve el valor nuevo.
+          <strong>Eventual</strong>: las lecturas pueden ver el valor viejo un rato, pero "con el
+          tiempo" convergen. Muchísimos sistemas a escala (carritos, contadores de "me gusta", feeds)
+          eligen eventual a propósito porque es mucho más barata y el usuario no nota el retraso.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Cachés y su invalidación</p>
+          <p>Guardar un resultado caro para no recalcularlo. Estrategias:
+          <strong>cache-aside</strong> (la app consulta la caché; si no está, va a la base y la
+          llena), <strong>write-through</strong> (escribe en caché y base a la vez). El problema
+          difícil es la <strong>invalidación</strong>: cuándo borrar el dato viejo. Herramientas:
+          expiración por tiempo (<em>TTL</em>), borrado explícito al cambiar el dato. "Solo hay dos
+          problemas difíciles en informática: invalidar cachés y nombrar cosas."</p>
+        </div>
+        <div class="concept">
+          <p class="term">Colas de mensajes &nbsp;·&nbsp; arquitectura orientada a eventos</p>
+          <p>Una tarea lenta (enviar 10.000 emails, procesar un video) no se hace durante la petición:
+          se pone un <strong>mensaje</strong> en una <strong>cola</strong> y un proceso aparte
+          (<em>worker</em>) lo consume. <strong>Pub-Sub</strong>: un evento ("pedido pagado") se
+          publica y varios servicios reaccionan (facturación, envío, analítica) sin que el emisor
+          sepa de ellos. Desacopla y absorbe picos. Herramientas: RabbitMQ, Kafka, Redis, SQS,
+          NATS.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Backpressure &nbsp;·&nbsp; rate limiting</p>
+          <p><strong>Backpressure</strong>: cuando un componente recibe más de lo que puede procesar,
+          necesita una forma de decir "más lento" en vez de reventar. <strong>Rate limiting</strong>:
+          límite de peticiones por cliente y ventana de tiempo, para protegerte de abuso y de picos.
+          Algoritmos: <em>token bucket</em> (el más usado), <em>ventana deslizante</em>.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Reintentos, backoff y jitter</p>
+          <p>Si una llamada falla por algo transitorio, reintentas — pero no de inmediato ni siempre
+          igual: <strong>backoff exponencial</strong> (espera 1s, 2s, 4s, 8s...) para no martillar un
+          servicio caído, más <strong>jitter</strong> (un poco de azar) para que mil clientes no
+          reintenten todos en el mismo milisegundo (el "rebaño atronador"). Y solo reintenta
+          operaciones idempotentes.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Circuit breaker <span>· cortacircuitos</span></p>
+          <p>Si un servicio del que dependes está caído, seguir llamándolo desperdicia recursos y
+          propaga la caída. El cortacircuitos detecta la racha de fallos, "abre el circuito" y
+          durante un tiempo falla rápido sin ni siquiera intentar la llamada, dando tiempo al otro
+          servicio a recuperarse. Patrón de <em>Release It!</em>.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Balanceo de carga &nbsp;·&nbsp; CDN</p>
+          <p>Un <strong>balanceador</strong> reparte peticiones entre varios servidores idénticos
+          (algoritmos: <em>round-robin</em>, <em>least connections</em>, por hash de IP). Requiere que
+          los servidores sean <strong>sin estado</strong>. Una <strong>CDN</strong> (Cloudflare,
+          CloudFront) es una red de servidores caché repartidos por el mundo que sirven contenido
+          estático (imágenes, JS, CSS) desde el punto más cercano al usuario.</p>
+        </div>
+      
+  <div class="note">
+          <span class="label">Presupuesto de latencia y deadlines</span>
+          <p>Si tu endpoint promete responder en 300&nbsp;ms y por dentro llama a tres servicios en
+          serie, no puedes darle 250&nbsp;ms de <em>timeout</em> a cada uno: el presupuesto total son
+          300&nbsp;ms y hay que repartirlo. Cada llamada hacia abajo recibe un <strong>deadline</strong>
+          igual a <em>lo que queda</em> del presupuesto, no un timeout fijo, y ese deadline se propaga
+          en la petición (una cabecera, el contexto de gRPC) para que un servicio no siga trabajando
+          en algo cuyo cliente ya se rindió.</p>
+          <p>Sin esto, un servicio lento aguas abajo hace que se acumulen peticiones aguas arriba
+          —cada una esperando su timeout largo—, se agotan los hilos y las conexiones, y la caída se
+          propaga hacia el usuario. <em>Timeout</em> agresivo + reintento idempotente +
+          <a href="#distribuidos">circuit breaker</a> es el trío que lo contiene.</p>
+        </div>
+
+  <div class="concept">
+          <p class="term">Cache stampede <span>· estampida de caché</span></p>
+          <p>Una clave de caché muy consultada expira. En ese instante, mil peticiones fallan la caché
+          a la vez y todas van a recalcular lo mismo contra la base, que se cae por la avalancha
+          (también: <em>dogpile</em>, <em>thundering herd</em>). Defensas: <strong>recomputación
+          anticipada</strong> —renovar la clave un poco antes de que expire, de forma probabilística;
+          un <strong>lock o lease</strong> para que solo una petición recalcule y el resto espere o
+          sirva el valor viejo; <strong>TTL con jitter</strong> para que las claves no expiren todas
+          juntas; y no cachear con expiración dura lo que puedas invalidar de forma explícita al
+          cambiar el dato.</p>
+          <p class="why"><b>Por qué importa</b>
+          La caché que "funciona en las pruebas" falla justo cuando hay más tráfico, que es cuando esa
+          clave está más caliente y su expiración hace más daño.</p>
+        </div>
+</section>
+
+      <!-- 08 -->
+      <section class="block" id="seguridad">
+        <span class="sec-num">09</span>
+        <h2>Seguridad</h2>
+        <p class="lead">
+          No es una fase al final: es una forma de escribir cada línea que toca datos que vienen de
+          fuera. La regla base: <strong>nunca confíes en la entrada del cliente</strong>.
+        </p>
+
+        <div class="concept">
+          <p class="term">Inyección <span>· SQL, comandos, etc.</span></p>
+          <p>Si construyes una consulta pegando texto del usuario
+          (<code class="inline">"SELECT ... WHERE nombre = '" + entrada + "'"</code>), el usuario
+          puede cerrar la comilla y escribir su propio SQL. La defensa es <strong>consultas
+          parametrizadas</strong>: el driver recibe la consulta y los datos por separado y nunca
+          mezcla. Todo ORM decente lo hace por defecto. Lo mismo aplica a construir comandos del
+          sistema con entrada del usuario.</p>
+        </div>
+        <div class="concept">
+          <p class="term">XSS <span>· cross-site scripting</span></p>
+          <p>Si muestras texto del usuario en una página sin escaparlo, alguien puede meter
+          <code class="inline">&lt;script&gt;</code> que se ejecuta en el navegador de otras víctimas
+          (robar su sesión, por ejemplo). Defensa: escapar toda salida (los motores de plantillas
+          modernos lo hacen solos) y una cabecera <em>Content-Security-Policy</em>.</p>
+        </div>
+        <div class="concept">
+          <p class="term">CSRF &nbsp;·&nbsp; CORS</p>
+          <p><strong>CSRF</strong>: otra web hace que tu navegador envíe una petición a un sitio donde
+          estás logueado, usando tu cookie sin tu permiso. Defensa: <em>tokens CSRF</em> o cookies
+          <em>SameSite</em>. <strong>CORS</strong> es lo contrario y se confunde siempre: es la regla
+          del navegador que <em>bloquea</em> que una web llame a una API de otro dominio salvo que la
+          API lo permita explícitamente con cabeceras. CORS no es una protección tuya, es una del
+          navegador.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Control de acceso roto</p>
+          <p>El fallo más común según OWASP: el endpoint verifica que estás <em>autenticado</em> pero
+          no que ese recurso es <em>tuyo</em>. <code class="inline">GET /facturas/1005</code> te
+          devuelve la factura de otro con solo cambiar el número (<em>IDOR</em>). Cada consulta debe
+          filtrar por el usuario del token, siempre.</p>
+        </div>
+        <div class="concept">
+          <p class="term">OWASP Top 10</p>
+          <p>La lista de referencia de los riesgos más frecuentes en aplicaciones web, actualizada
+          cada pocos años por la OWASP Foundation. Incluye control de acceso roto, fallos
+          criptográficos, inyección, diseño inseguro, mala configuración, componentes vulnerables,
+          fallos de autenticación, fallos de integridad, fallos de registro y monitoreo, y SSRF.
+          Gratis, con guías de mitigación. Léela entera una vez.</p>
+        </div>
+        <div class="concept">
+          <p class="term">TLS / HTTPS &nbsp;·&nbsp; secretos &nbsp;·&nbsp; mínimo privilegio</p>
+          <p><strong>TLS</strong> cifra el canal entre cliente y servidor y verifica la identidad del
+          servidor con un <strong>certificado</strong> (gratis y automático con Let's Encrypt).
+          <strong>Secretos</strong> (claves de API, contraseñas de la base) nunca en el repo: en
+          variables de entorno o en un gestor (Vault, AWS Secrets Manager). <strong>Mínimo
+          privilegio</strong>: cada componente tiene solo los permisos que necesita — el usuario de
+          base de datos de tu app no debería poder borrar tablas.</p>
+        </div>
+      </section>
+
+      <!-- 09 -->
+      <section class="block" id="ciclo">
+        <span class="sec-num">10</span>
+        <h2>El ciclo de vida y el testing</h2>
+        <p class="lead">
+          Cómo nace un software y llega a manos de usuarios. Siete fases; cada vuelta al ciclo es más
+          chica y rápida que la anterior.
+        </p>
+
+        <h3><span class="chip t1">Fase 0</span> Idea y descubrimiento</h3>
+        <p>Problema antes que solución. <strong>Requisitos funcionales</strong> (qué hace) vs
+        <strong>no funcionales</strong> (cuán rápido, cuánta carga, qué disponibilidad — estos
+        definen la arquitectura). <strong>MVP</strong> = la versión mínima que ya sirve.
+        <strong>Historias de usuario</strong>: "Como <em>rol</em>, quiero <em>acción</em>, para
+        <em>beneficio</em>".</p>
+
+        <h3><span class="chip t1">Fase 1</span> Diseño y arquitectura</h3>
+        <p>Cajas y flechas, elección de stack, arquitectura en capas, modelo de datos, contrato de la
+        API antes de implementar, y un <strong>ADR</strong> (documento corto con el <em>porqué</em>)
+        por cada decisión difícil de revertir.</p>
+
+        <h3><span class="chip t1">Fase 2</span> Preparar el terreno</h3>
+        <p>Repo Git, gestión de dependencias, secretos en variables de entorno, y los entornos:
+        <strong>desarrollo</strong> (tu máquina), <strong>staging</strong> (copia de prueba),
+        <strong>producción</strong>.</p>
+
+        <h3><span class="chip t1">Fase 3</span> Construcción</h3>
+        <p>Rama → commits pequeños → <strong>Pull Request</strong> → <strong>code review</strong> →
+        CI en verde → merge. Un <strong>linter</strong> marca errores mientras escribes; un
+        <strong>formatter</strong> unifica el estilo.</p>
+
+        <h3><span class="chip t1">Fase 4</span> Calidad — el testing en detalle</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Tipo</th><th>Qué prueba</th><th>Cantidad</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Unitario</strong></td><td>Una función aislada</td><td>miles, milisegundos</td></tr>
+            <tr><td><strong>Integración</strong></td><td>Varias piezas juntas (el endpoint + la base real)</td><td>cientos</td></tr>
+            <tr><td><strong>End-to-end</strong></td><td>El sistema completo como un humano</td><td>pocos, lentos, frágiles</td></tr>
+            <tr><td><strong>Contract testing</strong></td><td>Que dos servicios sigan respetando su contrato de API</td><td>por integración externa</td></tr>
+            <tr><td><strong>Property-based</strong></td><td>Genera cientos de entradas al azar y verifica una propiedad ("ordenar dos veces = ordenar una")</td><td>para lógica con muchos casos</td></tr>
+            <tr><td><strong>Mutation testing</strong></td><td>Introduce bugs a propósito y verifica que algún test los detecte — mide si tus tests sirven</td><td>ocasional</td></tr>
+          </tbody>
+        </table></div>
+        <p><strong>TDD</strong> (test-driven development): escribes el test primero, lo ves fallar,
+        escribes el código mínimo para pasarlo, refactorizas. <strong>Dobles de prueba</strong>: un
+        <em>stub</em> devuelve respuestas fijas, un <em>mock</em> además verifica que se le llamó como
+        esperabas, un <em>fake</em> es una implementación simplificada de verdad (una base en memoria).
+        La <strong>cobertura</strong> es una señal, no una meta: 100% de líneas ejecutadas no
+        significa 100% de comportamientos verificados.</p>
+
+        <h3><span class="chip t1">Fase 5</span> Despliegue</h3>
+        <p>El <strong>build</strong> produce un artefacto (binario, o los archivos del frontend
+        minimizados). Un <strong>contenedor</strong> lo empaqueta con todo lo que necesita.
+        <strong>CI/CD</strong>: si los tests pasan, se despliega. Estrategias: <em>rolling</em>
+        (servidores de a poco), <em>blue-green</em> (versión nueva completa al lado, se cambia de
+        golpe), <em>canary</em> (5% del tráfico primero). <strong>Feature flags</strong>: interruptores
+        que activan o desactivan una función sin desplegar, para lanzar a un % de usuarios o apagar
+        algo roto al instante. <strong>Infraestructura como código</strong> (Terraform): describes los
+        servidores en archivos y una herramienta los crea.</p>
+
+        <h3><span class="chip t1">Fase 6</span> Operación</h3>
+        <p>Observabilidad (sección siguiente), alertas, escalado, backups probados, y
+        <strong>postmortems</strong> sin culpar a personas tras cada incidente.</p>
+
+        <h3><span class="chip t1">Fase 7</span> Evolución</h3>
+        <p>El feedback genera nuevas ideas → Fase 0. La <strong>deuda técnica</strong> son los atajos
+        que ahora frenan; se paga refactorizando. <strong>Versionado semántico</strong>
+        <code class="inline">MAYOR.MENOR.PARCHE</code>.</p>
+
+        <div class="note">
+          <span class="label">Trunk-based vs GitFlow</span>
+          <p>Dos formas de organizar las ramas. <strong>GitFlow</strong>: ramas de larga vida
+          (develop, release, hotfix) — pesado, para releases con calendario. <strong>Trunk-based</strong>:
+          ramas cortísimas que se fusionan a <code class="inline">main</code> varias veces al día,
+          protegidas por feature flags y CI fuerte. La industria moderna favorece trunk-based; es lo
+          que mide <em>Accelerate</em> como práctica de los equipos de alto rendimiento.</p>
+        </div>
+      </section>
+
+      <!-- 10 -->
+      <section class="block" id="observabilidad">
+        <span class="sec-num">11</span>
+        <h2>Observabilidad y confiabilidad</h2>
+        <p class="lead">
+          Publicar no es el final. Un sistema en producción hay que poder <em>verlo</em> y tener un
+          acuerdo explícito de cuán confiable debe ser.
+        </p>
+
+        <div class="concept">
+          <p class="term">Los tres pilares</p>
+          <p><strong>Logs</strong>: eventos línea por línea — "¿qué pasó a las 14:32?". Deben ser
+          <strong>estructurados</strong> (JSON con campos, no texto libre) para poder filtrarlos.
+          <strong>Métricas</strong>: números en el tiempo (peticiones/seg, latencia, CPU, errores) —
+          "¿está sano ahora?". <strong>Trazas</strong>: el recorrido completo de <em>una</em> petición
+          por todos los servicios — "¿en qué salto se demoró?".</p>
+        </div>
+        <div class="concept">
+          <p class="term">Percentiles, no promedios</p>
+          <p>La latencia promedio miente: si 99 peticiones tardan 10 ms y una tarda 5 s, el promedio
+          es 60 ms y nadie está feliz. Se mira <strong>p50</strong> (la mediana), <strong>p95</strong>
+          y <strong>p99</strong> (el 1% peor). El p99 es lo que sienten tus usuarios más activos.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Métodos RED y USE</p>
+          <p>Qué medir, resumido. <strong>RED</strong> para servicios: <strong>R</strong>ate
+          (peticiones/seg), <strong>E</strong>rrors (cuántas fallan), <strong>D</strong>uration
+          (latencia). <strong>USE</strong> para recursos (CPU, disco, red):
+          <strong>U</strong>tilization, <strong>S</strong>aturation, <strong>E</strong>rrors.</p>
+        </div>
+        <div class="concept">
+          <p class="term">SLI · SLO · SLA · error budget</p>
+          <p><strong>SLI</strong> (indicador): una métrica concreta, "% de peticiones que responden
+          bien en menos de 300 ms". <strong>SLO</strong> (objetivo): la meta interna, "99,9% al mes".
+          <strong>SLA</strong> (acuerdo): la promesa contractual al cliente, con penalización si no se
+          cumple — siempre más laxa que el SLO. <strong>Error budget</strong>: si tu SLO es 99,9%,
+          tienes un 0,1% de "presupuesto" de fallos al mes; mientras no lo agotes, puedes arriesgar
+          lanzando features; si lo agotas, congelas y estabilizas. Idea central de SRE.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Monitoreo de errores &nbsp;·&nbsp; on-call</p>
+          <p>Una herramienta (Sentry) captura cada excepción en producción, la agrupa y dice a
+          cuántos usuarios afectó y en qué línea. <strong>Alertas</strong> conectadas a un turno
+          <strong>on-call</strong>: alguien responde si algo se rompe. Regla: alerta solo sobre
+          síntomas que afectan al usuario, no sobre cada métrica rara — las alertas ruidosas se
+          ignoran.</p>
+        </div>
+      
+  <div class="concept">
+          <p class="term">IDs de correlación <span>· trace context</span></p>
+          <p>Una petición del usuario toca el balanceador, dos servicios y la base. Si cada componente
+          escribe sus logs por su lado, reconstruir "qué pasó con la petición de Ana a las 14:32" es
+          casi imposible. Al entrar la petición se genera un <strong>identificador único</strong> (o se
+          acepta el que ya trae) y se <strong>propaga por todos los saltos</strong> en una cabecera
+          estándar (<code class="inline">traceparent</code>, de W3C Trace Context, o
+          <code class="inline">X-Request-Id</code>). Todos los logs de esa petición llevan ese campo,
+          así que un solo filtro te da la historia completa.</p>
+          <p class="why"><b>Por qué importa</b>
+          Es el pegamento entre los tres pilares: desde una traza saltas a sus logs, desde un error
+          saltas a su traza. Sin esto, la observabilidad en un sistema con más de un servicio no sirve
+          para depurar incidentes reales, solo para hacer gráficos bonitos.</p>
+        </div>
+</section>
+
+      <!-- 11 -->
+      <section class="block" id="tipos">
+        <span class="sec-num">12</span>
+        <h2>Tipos de software y dominios</h2>
+        <p class="lead">
+          La programación no es "hacer webs": es una herramienta que aparece en casi todo. Dos formas
+          de ver el panorama.
+        </p>
+
+        <h3>Las capas — de lo cercano al metal a lo que tú tocas</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Capa</th><th>Qué es</th><th>Ejemplos</th><th>Lenguajes</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Firmware</strong></td><td>Código grabado en un chip</td><td>Tu router, la BIOS</td><td>C, ensamblador</td></tr>
+            <tr><td><strong>Sistema operativo</strong></td><td>Gestiona el hardware</td><td>Linux, Windows, Android</td><td>C, C++, Rust</td></tr>
+            <tr><td><strong>Drivers</strong></td><td>Traducen OS ↔ dispositivo</td><td>El driver de tu GPU</td><td>C, C++</td></tr>
+            <tr><td><strong>Middleware / infra</strong></td><td>Programas que otros programas usan</td><td>PostgreSQL, nginx, Kafka</td><td>C, C++, Go, Java</td></tr>
+            <tr><td><strong>Aplicaciones</strong></td><td>Lo que usa una persona</td><td>Spotify, Excel</td><td>casi cualquiera</td></tr>
+            <tr><td><strong>Scripts</strong></td><td>Automatizan una tarea</td><td>Un backup automático</td><td>Python, Bash</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Los dominios — dónde se aplica</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Dominio</th><th>Qué construyes</th><th>Herramientas</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Web</strong></td><td>Tiendas, redes, paneles</td><td>JS/TS, Python, PHP + frameworks</td></tr>
+            <tr><td><strong>Móvil</strong></td><td>Apps iOS/Android</td><td>Swift, Kotlin · React Native, Flutter</td></tr>
+            <tr><td><strong>Escritorio</strong></td><td>Editores, herramientas offline</td><td>Electron, C#, Rust/Tauri</td></tr>
+            <tr><td><strong>Videojuegos</strong></td><td>De móvil casual a AAA</td><td>Unity (C#), Unreal (C++), Godot</td></tr>
+            <tr><td><strong>Embebidos / IoT</strong></td><td>Sensores, drones, electrodomésticos</td><td>C, C++, Rust, MicroPython</td></tr>
+            <tr><td><strong>Datos / analítica</strong></td><td>Pipelines de limpieza y transformación</td><td>Python (pandas), SQL, Spark</td></tr>
+            <tr><td><strong>Machine learning / IA</strong></td><td>Fraude, recomendación, visión, chatbots</td><td>Python (PyTorch, scikit-learn)</td></tr>
+            <tr><td><strong>DevOps / cloud</strong></td><td>Automatizar despliegue y escalado</td><td>Docker, Kubernetes, Terraform, Go</td></tr>
+            <tr><td><strong>Ciberseguridad</strong></td><td>Buscar fallos o construir defensas</td><td>Python, scripts, herramientas dedicadas</td></tr>
+            <tr><td><strong>Sistemas / bajo nivel</strong></td><td>SO, compiladores, motores de BD</td><td>C, C++, Rust, Zig</td></tr>
+            <tr><td><strong>Cómputo científico</strong></td><td>Simulación, estadística, modelado</td><td>Python, Julia, R, Fortran</td></tr>
+            <tr><td><strong>Gráficos</strong></td><td>Render 3D, efectos, VR</td><td>C++, shaders, Vulkan</td></tr>
+            <tr><td><strong>Blockchain</strong></td><td>Contratos inteligentes</td><td>Solidity, Rust</td></tr>
+            <tr><td><strong>Robótica</strong></td><td>Control de robots</td><td>C++, Python, ROS</td></tr>
+          </tbody>
+        </table></div>
+        <div class="note">
+          <span class="label">La idea clave</span>
+          <p>Casi cualquier área que te interese (fintech, salud, agro, música, legal) tiene una
+          intersección con la programación. No eliges entre "programar" y tu otro interés: se combinan.</p>
+        </div>
+      </section>
+
+      <!-- 12 -->
+      <section class="block" id="opensource">
+        <span class="sec-num">13</span>
+        <h2>Open source y licencias</h2>
+        <p class="lead">
+          <strong>Open source</strong> = el código fuente es público: cualquiera puede leerlo, usarlo,
+          modificarlo y compartirlo. Sostiene casi todo internet.
+        </p>
+
+        <div class="table-scroll"><table>
+          <thead><tr><th>Licencia</th><th>Qué te permite</th><th>Condición</th></tr></thead>
+          <tbody>
+            <tr><td><strong>MIT</strong></td><td>Casi cualquier cosa, incluso software cerrado y comercial</td><td>Mantener el aviso de autoría. La más permisiva y popular.</td></tr>
+            <tr><td><strong>Apache 2.0</strong></td><td>Igual que MIT</td><td>Además protege en temas de patentes.</td></tr>
+            <tr><td><strong>GPL</strong></td><td>Usar y modificar libremente</td><td><em>Copyleft</em>: si distribuyes tu versión, también debe ser open source. Linux la usa.</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Por qué es tan importante</h3>
+        <ol class="body-list">
+          <li><strong>Casi toda la infraestructura de internet es open source</strong> — Linux, nginx,
+          PostgreSQL, Python, Go. Si desaparecieran, internet se detiene.</li>
+          <li><strong>No reinventas la rueda:</strong> instalas piezas ya probadas por millones y te
+          concentras en lo único que tu proyecto tiene de distinto.</li>
+          <li><strong>Transparencia = seguridad:</strong> miles de ojos pueden auditar el código.</li>
+          <li><strong>Aprendizaje sin límite:</strong> todo el código que sostiene la industria está
+          ahí para leerlo.</li>
+          <li><strong>Sin <em>vendor lock-in</em>:</strong> el código es tuyo para siempre.</li>
+          <li><strong>Tu carrera es visible:</strong> un empleador ve tu código real, no solo tu CV.</li>
+        </ol>
+
+        <div class="note rust">
+          <span class="label">El lado B</span>
+          <p><strong>Sostenibilidad:</strong> mucha infraestructura crítica la mantiene gente gratis,
+          a veces una sola persona quemada. <strong>Cadena de suministro:</strong> tu proyecto usa
+          cientos de paquetes indirectos; si a uno le inyectan código malicioso, te afecta (casos
+          <em>event-stream</em>, <em>xz</em>). <strong>"Gratis" tiene dos sentidos:</strong> sin coste
+          vs con libertad — open source apunta al segundo.</p>
+        </div>
+      </section>
+
+      <!-- 13 -->
+      <section class="block" id="git">
+        <span class="sec-num">14</span>
+        <h2>Git, GitHub y de dónde sacar proyectos</h2>
+        <p class="lead">
+          Git guarda el historial en tu máquina. GitHub o GitLab alojan una copia en la nube
+          <strong>más</strong> las herramientas de colaboración y automatización.
+        </p>
+
+        <h3>El entrelazado, paso a paso</h3>
+        <div class="diagram">1. LOCAL   git init                      → creas el repo en tu máquina
+2. LOCAL   git remote add origin <url>   → lo conectas a un repo vacío en GitHub
+3. LOCAL   git push                      → subes el código a la nube
+4. LOCAL   trabajas en ramas, "git push" de cada una
+5. GITHUB  abres un Pull Request         → "propongo fusionar esta rama a main"
+6. GITHUB  code review + CI automático   → alguien revisa, los tests corren solos
+7. GITHUB  merge                         → se fusiona a main
+8. GITHUB  un segundo automatismo despliega</div>
+
+        <div class="table-scroll"><table>
+          <thead><tr><th>Función</th><th>Fase</th><th>Para qué</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Repositorio remoto</strong></td><td>2</td><td>Respaldo + punto común para el equipo</td></tr>
+            <tr><td><strong>Issues</strong></td><td>0 y 7</td><td>Lista de tareas, bugs e ideas (el <em>backlog</em>)</td></tr>
+            <tr><td><strong>Projects / Boards</strong></td><td>0</td><td>Tablero kanban para organizar los issues</td></tr>
+            <tr><td><strong>Pull / Merge Requests</strong></td><td>3</td><td>Proponer y revisar cambios antes de fusionar</td></tr>
+            <tr><td><strong>Actions / GitLab CI</strong></td><td>4 y 5</td><td>CI: tests en cada push. CD: desplegar al hacer merge</td></tr>
+            <tr><td><strong>Secrets</strong></td><td>2 y 5</td><td>Claves que el CI necesita, fuera del código</td></tr>
+            <tr><td><strong>Releases + Tags</strong></td><td>7</td><td>Marcar versiones (<code class="inline">v2.4.1</code>)</td></tr>
+            <tr><td><strong>Dependabot / Renovate</strong></td><td>7</td><td>Avisar cuando una librería tuya tiene un fallo de seguridad</td></tr>
+          </tbody>
+        </table></div>
+
+        <h4>El CI es un archivo dentro de tu repo</h4>
+        <pre><span class="c">name: CI</span>
+on: [push]                          <span class="c"># se dispara en cada push</span>
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4    <span class="c"># baja tu código</span>
+      - run: go test ./...           <span class="c"># corre los tests</span></pre>
+        <p>Si fallan, GitHub pone una ✗ roja en el Pull Request y no te deja fusionar.
+        <strong>Conventional commits</strong> (<code class="inline">feat:</code>,
+        <code class="inline">fix:</code>, <code class="inline">docs:</code>) permiten generar el
+        <em>changelog</em> y la próxima versión automáticamente.</p>
+
+        <h3>GitHub vs GitLab</h3>
+        <p>Usa <strong>GitHub</strong>: es tu portafolio público y donde está casi todo el open
+        source. Los conceptos son idénticos; en GitLab el Pull Request se llama <em>Merge Request</em>.</p>
+
+        <h3>Dónde encontrar proyectos para construir</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><strong>codecrafters-io/build-your-own-x</strong></td><td>"Construye tu propia versión de X": Git, Docker, un shell, una base de datos</td></tr>
+            <tr><td><strong>florinpop17/app-ideas</strong></td><td>Cientos de ideas clasificadas Beginner / Intermediate / Advanced, con historias de usuario</td></tr>
+            <tr><td><strong>practical-tutorials/project-based-learning</strong></td><td>Tutoriales de proyectos completos, agrupados por lenguaje</td></tr>
+            <tr><td><strong>codingchallenges.fyi</strong></td><td>Un reto real por semana (escribe <code class="inline">wc</code>, un load balancer, un Redis)</td></tr>
+            <tr><td><strong>roadmap.sh → Projects</strong></td><td>Ideas ligadas a cada rol (backend, DevOps)</td></tr>
+            <tr><td><strong>public-apis/public-apis</strong></td><td>Lista enorme de APIs gratis, para tener datos reales</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <!-- 14 -->
+      <section class="block" id="portafolio">
+        <span class="sec-num">15</span>
+        <h2>Cómo mostrar el portafolio</h2>
+        <p class="lead">
+          El portafolio es la prueba de que sabes hacer el ciclo completo. Cuatro capas, de adentro
+          hacia afuera.
+        </p>
+
+        <h3>Capa 1 — Cada proyecto, presentable</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Elemento</th><th>Por qué</th></tr></thead>
+          <tbody>
+            <tr><td><strong>README excelente</strong></td><td>El 80% del impacto. Nadie lee tu código; todos leen el README</td></tr>
+            <tr><td><strong>Demo en vivo</strong></td><td>Un botón "ver demo" convierte un repo en un producto</td></tr>
+            <tr><td><strong>Screenshot o GIF</strong></td><td>Se entiende en 2 segundos qué hace</td></tr>
+            <tr><td><strong>CI en verde</strong> (badge)</td><td>Muestra que hay tests y que pasan</td></tr>
+            <tr><td><strong>Commits limpios + algún PR</strong></td><td>Muestra tu proceso, no solo el resultado</td></tr>
+            <tr><td><strong>Licencia MIT</strong></td><td>Señal de que entiendes el open source</td></tr>
+          </tbody>
+        </table></div>
+        <pre><span class="c"># Nombre — una línea de qué es</span>
+[demo en vivo] · [screenshot / GIF]
+
+<span class="c">## El problema que resuelve</span>   2-3 frases.
+<span class="c">## Stack y por qué</span>           con link al ADR.
+<span class="c">## Correrlo localmente</span>       3 comandos.
+<span class="c">## Decisiones y lo que aprendí</span> lo más valioso.</pre>
+
+        <h3>Capa 2 — Tu perfil de GitHub</h3>
+        <ul>
+          <li><strong>README de perfil:</strong> un repo con tu nombre de usuario; su README aparece
+          arriba de tu página.</li>
+          <li><strong>6 repos fijados:</strong> los mejores, no todos.</li>
+          <li><strong>Constancia &gt; volumen:</strong> mejor 4 commits por semana durante meses que
+          200 en un fin de semana.</li>
+        </ul>
+
+        <h3>Capa 3 — Un sitio de una página</h3>
+        <p>Quién eres, 3-4 proyectos con screenshot + link a demo + link a repo + 2 líneas de qué
+        resuelve y stack, contacto. Alojado gratis en GitHub Pages / Vercel / Netlify, con dominio
+        propio (~USD 10/año). Puede ser el proyecto 3 de esta guía.</p>
+
+        <h3>Capa 4 — Escribir sobre lo que hiciste</h3>
+        <p>Un post corto por proyecto: el problema, <strong>una</strong> decisión difícil, qué
+        aprendiste. En dev.to, Hashnode o tu blog. Te diferencia del 90% que solo sube código.</p>
+
+        <div class="note rust">
+          <span class="label">Trabajo de clientes</span>
+          <p>Los proyectos personales y de open source son 100% tuyos para mostrar. El trabajo pagado
+          para un cliente necesita su permiso y a veces anonimizarlo. Para armar portafolio desde
+          cero, los proyectos propios pesan igual o más.</p>
+        </div>
+      </section>
+
+      <!-- 15 -->
+
+<section class="block" id="bd-produccion">
+        <span class="sec-num">16</span>
+        <h2>Bases de datos en producción</h2>
+        <p class="lead">
+          Entre "sé escribir consultas" y "opero una base con datos de gente real" hay un salto que
+          casi ningún curso cubre: backups que de verdad restauran, recuperar a un instante exacto,
+          réplicas, failover sin perder datos, y cambiar el esquema de una tabla de millones de filas
+          sin cortar el servicio. Es la zona que separa a un backend que funciona en tu máquina de uno
+          que aguanta un lunes por la mañana.
+        </p>
+
+        <div class="concept">
+          <p class="term">Backups <span>· lógico vs físico, completo vs incremental</span></p>
+          <p>Un <strong>dump lógico</strong> (<code class="inline">pg_dump</code>,
+          <code class="inline">mysqldump</code>) exporta el contenido como sentencias SQL o un formato
+          propio: es portable entre versiones y arquitecturas, permite restaurar una sola tabla, pero
+          es lento y en bases grandes tarda horas. Un <strong>backup físico</strong> copia los
+          archivos de datos tal cual —a nivel de bloque— con
+          <code class="inline">pg_basebackup</code>, un <em>snapshot</em> del volumen, o herramientas
+          como pgBackRest, Barman o WAL&#8209;G: es rápido, restaura la instancia entera y es la base
+          sobre la que se construye el PITR, a cambio de quedar atado a la versión y la plataforma.</p>
+          <p>Un backup <strong>completo</strong> copia todo; uno <strong>incremental</strong> o
+          <strong>diferencial</strong> solo lo que cambió desde el anterior (bloques modificados, o el
+          registro de cambios). Ocupa menos y acorta la ventana de copia, a costa de una restauración
+          que encadena varios archivos. Y la regla <strong>3&#8209;2&#8209;1</strong>: tres copias, en
+          dos medios, una fuera del sitio. Un backup en el mismo disco, región o cuenta que la base no
+          es un backup: un borrado accidental o un compromiso de la cuenta se lo lleva con todo.</p>
+          <p class="why"><b>Cómo se verifica</b>
+          Un backup no probado no existe. El <code class="inline">pg_dump</code> que falla a la mitad
+          y nadie mira el código de salida; el <em>snapshot</em> de un volumen tomado con la base
+          escribiendo, que produce una imagen incoherente. La única prueba es el <strong>restore
+          drill</strong>: restaurar el backup en una máquina limpia, arrancar la base, correr
+          comprobaciones de integridad y <em>cronometrar</em>. Trimestral como mínimo. El número que
+          sale de ahí es tu tiempo de recuperación real, no el del papel.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">RPO &nbsp;·&nbsp; RTO</p>
+          <p><strong>RPO</strong> (<em>recovery point objective</em>): cuántos datos te puedes permitir
+          perder, medido en tiempo. Si el único backup es de cada noche, tu RPO es de hasta 24 horas de
+          trabajo. Con archivado continuo del registro de cambios baja a segundos.
+          <strong>RTO</strong> (<em>recovery time objective</em>): cuánto puede estar caído el
+          servicio mientras recuperas. Depende del tamaño de la base, del tipo de backup, del ancho de
+          banda de restauración y —sobre todo— de si el procedimiento está automatizado y practicado o
+          se improvisa a las 3 de la mañana.</p>
+          <p class="why"><b>De dónde salen</b>
+          Los dos números los pone el negocio, no la infraestructura: "perder una hora de pedidos"
+          cuesta una cifra concreta, y a partir de ella se decide cuánto invertir. Prometer RPO&nbsp;0
+          y RTO de minutos es caro (réplicas síncronas, failover automático, drills frecuentes); para
+          un proyecto interno puede bastar "perdemos como mucho un día y volvemos en cuatro horas".
+          Lo que no vale es no haberlo decidido.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">PITR <span>· recuperación a un punto en el tiempo</span></p>
+          <p>La idea: un <strong>backup base</strong> físico tomado en un instante T0, más el flujo
+          continuo de <em>todos</em> los cambios posteriores —el <strong>WAL</strong>
+          (<em>write-ahead log</em>) en PostgreSQL, el <strong>binlog</strong> en MySQL— archivado a un
+          almacenamiento aparte. Para recuperar el estado que había a las 14:32:07 tomas el backup
+          base más reciente anterior a esa hora y <strong>reproduces</strong> el registro de cambios
+          hasta el instante exacto (<code class="inline">recovery_target_time</code>).</p>
+          <p>Para qué sirve de verdad: alguien corrió <code class="inline">DELETE FROM facturas</code>
+          sin <code class="inline">WHERE</code> a las 14:30. Con PITR restauras a las 14:29:59 y pierdes
+          un minuto. Sin PITR solo tienes el backup de anoche y pierdes el día entero. Necesitas
+          <strong>las dos piezas</strong>: el backup base solo te lleva a T0; el WAL por sí solo no
+          sirve sin una base desde donde aplicarlo. Por eso se archivan juntos y se prueban juntos.</p>
+          <p class="why"><b>La trampa silenciosa</b>
+          El archivado tiene que estar sano. Si el comando que copia el WAL al almacén falla sin que
+          nadie lo note, pasan dos cosas malas: PostgreSQL acumula WAL en el disco de la primaria
+          hasta llenarlo (y entonces la base se detiene), y tu ventana de PITR deja de avanzar
+          —crees que puedes recuperar a "hace 5 minutos" y en realidad solo llegas a anteayer.
+          Monitorear el retraso de archivado es obligatorio, no opcional. El WAL es también lo que da
+          la <strong>D</strong> de <a href="#datos">ACID</a> y lo que alimenta la replicación.</p>
+        </div>
+
+        <div class="diagram">domingo 03:00        WAL archivado de forma continua a un almacen aparte
+backup base (T0) ─────────────────────────────────────────────▶  ahora
+   │
+   ▼
+═══╪═══════╪═══════╪═══════╪═══════╪═══════╪═══════╪═══════════════
+  T0      lun     mar     mié    jue ▲    vie     sáb
+                                    │
+       recovery_target_time = "jueves 14:29:59"  (justo antes
+       del DELETE sin WHERE)
+
+restaurar  =  copiar el backup base (T0)  +  reproducir el WAL
+              archivado, transaccion a transaccion, hasta el objetivo</div>
+
+        <div class="concept">
+          <p class="term">Réplicas <span>· streaming replication</span></p>
+          <p>La primaria envía su flujo de WAL a una o más <strong>réplicas</strong> que lo aplican y
+          quedan como copia casi en vivo. Sirve para cuatro cosas: escalar lecturas (<em>read
+          replicas</em>), tolerancia a fallos (una réplica es candidata a primaria), tomar backups sin
+          cargar a la primaria, y poner datos geográficamente cerca de los usuarios.</p>
+          <p><strong>Replicación física</strong>: copia bloque a bloque, toda la instancia idéntica
+          (el <em>streaming</em> nativo de PostgreSQL, MySQL con GTID). <strong>Replicación
+          lógica</strong>: decodifica el WAL a cambios de fila y los reproduce; permite replicar entre
+          versiones distintas, solo un subconjunto de tablas, o hacia otro sistema —es la base del
+          <em>change data capture</em> hacia un almacén analítico.</p>
+          <p><strong>Asíncrona</strong> (lo normal): la primaria confirma el <em>commit</em> al
+          cliente sin esperar a las réplicas. Rápida, pero si la primaria muere antes de propagar,
+          esas últimas transacciones se pierden —el RPO deja de ser cero. <strong>Síncrona</strong>:
+          la primaria espera el acuse de al menos una réplica antes de confirmar; RPO cero para lo
+          confirmado, a costa de sumar la latencia de red a cada escritura y del riesgo de que, si la
+          réplica síncrona se cae, las escrituras se bloqueen (por eso se tienen dos o más
+          candidatas). <strong>Quórum</strong>: "espera el acuse de cualquier 2 de estas 3" —el mismo
+          principio de mayoría que en <a href="#distribuidos">sistemas distribuidos</a>, equilibrando
+          durabilidad y disponibilidad.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Replication lag <span>· y la trampa de leer de una réplica</span></p>
+          <p>El <strong>lag</strong> es cuánto va por detrás una réplica respecto a la primaria, en
+          tiempo o en bytes de WAL pendientes. Causas típicas: un pico de escrituras que la réplica
+          aplica con menos paralelismo del que la primaria usó para generarlas; una consulta larga en
+          la réplica que entra en conflicto con la aplicación del WAL; red saturada; disco de la
+          réplica más lento. Se mide desde la primaria con <code class="inline">pg_stat_replication</code>
+          o en la réplica con <code class="inline">pg_last_xact_replay_timestamp()</code>, y se expone
+          como métrica con alerta.</p>
+          <p class="why"><b>El bug que genera</b>
+          Mandas la lectura a una <em>read replica</em> justo después de una escritura y no ves tu
+          propio cambio: "creé el usuario y el panel dice que no existe". Es <a href="#distribuidos">consistencia
+          eventual</a> mordiendo. Patrones para evitarlo: leer de la primaria durante unos segundos
+          tras escribir (<em>read-your-writes</em>), fijar la sesión del usuario a la primaria un rato,
+          o esperar a que la réplica alcance el punto del WAL de tu <em>commit</em> antes de leer de
+          ella. Regla simple: a una réplica solo mandas lecturas que toleran datos de hace un
+          instante (informes, listados, búsquedas), nunca la lectura que confirma una escritura que
+          acabas de hacer.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Failover y promoción <span>· split-brain, fencing</span></p>
+          <p><strong>Failover</strong> es promover una réplica a primaria cuando la primaria cae.
+          <strong>Manual</strong>: un humano confirma que está muerta y ejecuta la promoción —seguro
+          pero lento, minutos. <strong>Automático</strong>: un supervisor lo detecta y promueve en
+          segundos, a cambio del riesgo de promover por un falso positivo (la primaria no estaba
+          muerta, solo aislada de la red un momento).</p>
+          <p>El <strong>split-brain</strong> es el peor fallo posible de una base: dos nodos se creen
+          primaria a la vez y ambos aceptan escrituras, y los datos divergen de forma irreparable. Se
+          evita con tres capas: un <strong>consenso</strong> sobre un almacén externo (etcd, Consul,
+          ZooKeeper) que actúa de árbitro y solo deja una primaria; un <strong>quórum</strong> de
+          nodos, para que un nodo aislado en minoría nunca se autopromueva; y <strong>fencing</strong>
+          / STONITH (<em>shoot the other node in the head</em>): aislar de verdad a la vieja primaria
+          —matar su proceso, quitarle la IP virtual, un <em>watchdog</em> por hardware— <em>antes</em>
+          de promover a la sustituta.</p>
+          <p class="why"><b>Qué pasa con las conexiones y las herramientas</b>
+          En un failover, todas las conexiones a la vieja primaria se cortan y las transacciones en
+          vuelo se pierden: la aplicación ve errores hasta que el pool reconecta, y tiene que
+          reintentar las operaciones (idempotentes, si no las duplicará). Un proxy que abstrae el
+          <em>endpoint</em> (RDS Proxy, HAProxy con <em>health checks</em>, el DNS que Patroni
+          reapunta) acorta el corte. Herramientas: <strong>Patroni</strong> (PostgreSQL + etcd, el
+          estándar de facto), <strong>pg_auto_failover</strong> (nodo monitor + testigo),
+          <strong>orchestrator</strong> (MySQL, creado en GitHub), y los servicios gestionados
+          —<strong>RDS Multi&#8209;AZ</strong>, <strong>Aurora</strong>, Cloud SQL— que hacen el
+          failover en decenas de segundos sin que administres el consenso.</p>
+        </div>
+
+        <div class="note rust">
+          <span class="label">Locks: el peligro real de una migración</span>
+          <p>En PostgreSQL, muchas sentencias <code class="inline">ALTER TABLE</code> toman un lock
+          <em>ACCESS EXCLUSIVE</em> sobre la tabla. El detalle que tumba producción: ese
+          <code class="inline">ALTER</code> se pone en cola detrás de cualquier transacción abierta
+          sobre la tabla —incluida una consulta de informe de diez minutos o un <em>autovacuum</em>—
+          y, mientras espera, <strong>todas las consultas nuevas, incluidos los</strong>
+          <code class="inline">SELECT</code>, se encolan detrás de él. Una migración "instantánea" con
+          una transacción lenta por delante congela la tabla entera durante minutos.</p>
+          <p>Defensa: <code class="inline">SET lock_timeout = '2s'</code> antes de cada sentencia DDL
+          para que falle rápido en vez de bloquear en cadena; aplica los cambios en pasos pequeños;
+          crea índices siempre con <code class="inline">CREATE INDEX CONCURRENTLY</code>; y nunca
+          corras una migración a la vez que un proceso por lotes o una ventana de mucho tráfico.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Connection pooling <span>· por qué y con qué</span></p>
+          <p>PostgreSQL asigna <strong>un proceso del sistema operativo por conexión</strong>, no un
+          hilo. Cada conexión consume memoria y el planificador de la CPU se resiente con miles. Pasado
+          un punto —del orden de unos cientos de conexiones activas— el rendimiento total <em>baja</em>
+          aunque la CPU no esté saturada. MySQL usa hilos y aguanta más, pero también tiene techo. Por
+          eso se pone un <strong>pooler</strong> externo que mantiene unas pocas conexiones reales a la
+          base y multiplexa sobre ellas muchas conexiones de aplicación.</p>
+          <p><strong>PgBouncer</strong>, sus modos: <strong>session</strong> —una conexión de servidor
+          por cliente mientras dura su sesión; casi no multiplexa, solo limita el total.
+          <strong>transaction</strong> —la conexión de servidor se presta solo durante una transacción
+          y vuelve al pool en el <code class="inline">COMMIT</code>; es el modo útil (diez mil clientes
+          sobre veinte conexiones reales), pero rompe lo que depende de estado de sesión:
+          <code class="inline">SET</code>, <em>advisory locks</em>, <code class="inline">LISTEN/NOTIFY</code>,
+          cursores <code class="inline">WITH HOLD</code>, y los <em>prepared statements</em>
+          —soportados desde PgBouncer 1.21 activando <code class="inline">max_prepared_statements</code>.
+          <strong>statement</strong> —devuelve la conexión tras cada sentencia; prohíbe transacciones
+          de varias sentencias; nicho.</p>
+          <p class="why"><b>Tamaño del pool y serverless</b>
+          El pool no se hace grande "por si acaso": un pool enorme traslada la contención a la base.
+          Un punto de partida razonable es del orden de unas decenas de conexiones —cercano al número
+          de núcleos de la base—, con la regla de que si las peticiones hacen cola, mejor que la cola
+          esté en el pooler (visible y barata) que en la base. En <strong>serverless</strong> (Lambda,
+          funciones en el borde) cada instancia quiere su conexión y escalan a cientos en un pico: un
+          pooler en modo <em>transaction</em> delante (RDS Proxy, PgBouncer, Supavisor, o el
+          <em>endpoint</em> agrupado del proveedor) deja de ser opcional. Ver también
+          <a href="#datos">el pool de conexiones</a> y <a href="#capas">las capas de los datos</a>.</p>
+        </div>
+
+        <div class="diagram">   app   app   app          (200 conexiones de aplicacion)
+     \    |    /
+      \   |   /
+   ┌────────────┐   pool de ~25 conexiones reales · modo transaction
+   │ PgBouncer  │
+   └─────┬──────┘
+         │  escrituras  +  lecturas que deben ver el ultimo dato
+         ▼
+   ┌────────────┐   archive_command
+   │  PRIMARIA  │ ───────────────▶  WAL → almacen de objetos   (base del PITR)
+   └─────┬──────┘
+         │  streaming replication   (lag tipico: 10-200 ms)
+         ├──────────────▶  ┌───────────┐
+         │                 │ REPLICA 1 │   lecturas que toleran
+         └──────────────▶  ├───────────┤   datos de hace un instante
+                           │ REPLICA 2 │
+                           └───────────┘
+
+   Patroni + etcd vigilan la PRIMARIA; si cae, eligen una replica,
+   la promueven y reapuntan el endpoint (con fencing de la vieja).</div>
+
+        <div class="concept">
+          <p class="term">Migraciones sin downtime <span>· expand / contract</span></p>
+          <p>También llamado <em>parallel change</em>. La regla: nunca cambias el esquema y el código
+          a la vez; divides el cambio en fases donde <strong>en todo momento el esquema es compatible
+          con la versión de código anterior y con la siguiente</strong>.</p>
+          <p><strong>Expand</strong> — añades lo nuevo sin tocar lo viejo: una columna nullable, una
+          tabla, un índice. El código en producción los ignora.
+          <strong>Migrate / backfill</strong> — despliegas el código nuevo, que empieza a escribir en
+          los dos sitios (o un <em>trigger</em> lo hace), y un proceso rellena las filas históricas
+          <strong>por lotes</strong> —mil a diez mil filas, <em>commit</em>, pausa, repetir— nunca un
+          <code class="inline">UPDATE</code> único de cincuenta millones de filas que toma un lock
+          larguísimo y genera un WAL gigante.
+          <strong>Contract</strong> — cuando el código nuevo está desplegado en todas partes y el
+          <em>backfill</em> terminó, quitas lo viejo: la columna, el <em>trigger</em>, el código de
+          doble escritura.</p>
+          <p>Casos concretos: una columna <strong>NOT NULL</strong> nueva no se añade directa (valida
+          toda la tabla bajo lock) sino nullable → <em>backfill</em> → restricción
+          <code class="inline">CHECK ... NOT VALID</code> → <code class="inline">VALIDATE CONSTRAINT</code>
+          (lock suave). Un <strong>índice</strong> siempre con
+          <code class="inline">CREATE INDEX CONCURRENTLY</code> (no bloquea escrituras, tarda más, y si
+          falla deja un índice inválido que hay que borrar). <strong>Renombrar</strong> una columna es
+          <em>expand/contract</em> puro —un <code class="inline">RENAME</code> directo rompe el código
+          viejo al instante. <strong>Cambiar el tipo</strong> de una clave que se está agotando
+          (<code class="inline">int</code> → <code class="inline">bigint</code>): columna nueva, doble
+          escritura, <em>backfill</em> por lotes, intercambio. Herramientas que automatizan esto:
+          <strong>pgroll</strong> (PostgreSQL, sirve varias versiones del esquema como vistas),
+          <strong>gh-ost</strong> y <strong>pt-online-schema-change</strong> (MySQL, tabla sombra con
+          <em>triggers</em>).</p>
+          <p class="why"><b>Feature flags para el esquema</b>
+          El paso de "leer de la columna vieja" a "leer de la nueva" se controla con un
+          <a href="#ciclo">feature flag</a>, no con un despliegue: si algo va mal, lo apagas en
+          segundos sin revertir la migración. Y siempre
+          <code class="inline">lock_timeout</code> + <code class="inline">statement_timeout</code> en
+          la sesión que corre la migración. Enlaza con <a href="#conceptos">migraciones</a> como
+          concepto base.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Particionado en caliente <span>· por rango, lista, hash</span></p>
+          <p>Partir una tabla lógica en varias tablas físicas por una clave. <strong>Por rango</strong>
+          (una partición por mes, lo más común, para datos con ciclo de vida). <strong>Por lista</strong>
+          (por país, por <em>tenant</em>). <strong>Por hash</strong> (repartir de forma uniforme cuando
+          no hay una clave de rango natural).</p>
+          <p><strong>Cuándo</strong>: cuando la tabla es tan grande que el mantenimiento duele —el
+          <code class="inline">VACUUM</code> tarda horas, los índices no caben en memoria, borrar datos
+          viejos con <code class="inline">DELETE</code> genera <em>bloat</em>. Con particiones, "borrar
+          el mes pasado" es un <code class="inline">DETACH</code> o <code class="inline">DROP</code>
+          instantáneo. Regla de dedo: por encima de decenas de millones de filas, o siempre que haya
+          una política de retención por fecha.</p>
+          <p class="why"><b>Pruning y el error clásico</b>
+          El <em>partition pruning</em> hace que el planificador salte las particiones que la consulta
+          no necesita —pero <strong>solo si la clave de partición está en el</strong>
+          <code class="inline">WHERE</code>. Particionar por fecha y luego filtrar solo por
+          <code class="inline">user_id</code> recorre todas las particiones igual. Particionar una
+          tabla que <em>ya</em> es grande sin cortar el servicio es un proyecto —tabla particionada
+          nueva al lado, copia por lotes, doble escritura, intercambio de nombres— no un
+          <code class="inline">ALTER</code>. La extensión <strong>pg_partman</strong> crea y rota
+          particiones sola. Y particionado no es <em>sharding</em>: las particiones viven en la misma
+          instancia.</p>
+        </div>
+
+        <div class="concept">
+          <p class="term">Escalar la base <span>· el orden correcto</span></p>
+          <p><strong>1 · Vertical</strong> — una máquina más grande. Siempre lo primero: barato en
+          esfuerzo y llega lejos (hoy hay instancias de cientos de núcleos y terabytes de RAM). Techo:
+          existe una máquina máxima, y la escritura sigue en un solo nodo.
+          <strong>2 · Read replicas</strong> — si el grueso del tráfico son lecturas, repártelas.
+          Barato; no ayuda a las escrituras y trae el problema del lag.
+          <strong>3 · Caché</strong> (Redis) delante para las lecturas calientes —a menudo evita los
+          dos pasos siguientes durante años.
+          <strong>4 · Sharding</strong> — repartir los datos entre instancias por una clave
+          (<em>tenant</em>, usuario). Escala escrituras de verdad, a cambio de consultas
+          <em>cross-shard</em> difíciles, transacciones distribuidas, rebalanceo, y una clave que si
+          eliges mal duele años. Último recurso.
+          <strong>5 · Motores que shardean por ti</strong> — <strong>Citus</strong> (extensión de
+          PostgreSQL que distribuye tablas entre nodos <em>worker</em>) o <strong>Vitess</strong>
+          (MySQL, el que mueve YouTube): te quitan parte del dolor operativo, no la complejidad
+          conceptual.</p>
+          <p class="why"><b>Connection storm</b>
+          Cuando la base se reinicia o hace failover, todas las aplicaciones reconectan a la vez y la
+          avalancha de <em>handshakes</em> la vuelve a tumbar —el "rebaño atronador" aplicado a
+          conexiones. Se mitiga con <a href="#distribuidos">backoff y jitter</a> en el driver, un
+          límite de conexiones nuevas por segundo en el pooler, y arranque escalonado de los servicios
+          de aplicación.</p>
+        </div>
+
+        <div class="note">
+          <span class="label">Checklist · ¿esta base está lista para producción?</span>
+          <p>Antes de que reciba datos de gente real, deberías poder marcar todo esto:</p>
+          <p>▸ Backups automáticos <em>y</em> una restauración probada de verdad este trimestre, con el
+          tiempo de recuperación cronometrado. &nbsp; ▸ Archivado de WAL / binlog sano y monitoreado
+          —PITR real, no solo el <em>dump</em> nocturno. &nbsp; ▸ RPO y RTO escritos y acordados con el
+          negocio. &nbsp; ▸ Al menos una réplica en otra zona, y un failover probado (aunque sea
+          manual y documentado en un <em>runbook</em>). &nbsp; ▸ Un pooler de conexiones delante, con
+          el pool dimensionado y métricas de espera. &nbsp; ▸ Procedimiento de migraciones escrito:
+          <code class="inline">lock_timeout</code>, índices <code class="inline">CONCURRENTLY</code>,
+          <em>expand/contract</em>. &nbsp; ▸ Métricas con alerta: conexiones, lag de réplica, lag de
+          archivado, ratio de acierto de caché, consultas lentas
+          (<code class="inline">pg_stat_statements</code>), edad de la transacción más antigua, y
+          espacio en disco (alerta al 70%). &nbsp; ▸ Un <code class="inline">statement_timeout</code>
+          global para que una consulta desbocada no se lleve todo por delante. &nbsp; ▸ Credenciales
+          rotables; el usuario de la aplicación no es superusuario.</p>
+        </div>
+      </section>
+
+      <section class="block" id="curriculo">
+        <span class="sec-num">17</span>
+        <h2>Currículo: libros y cursos</h2>
+        <p class="lead">
+          Un camino ordenado. No los leas todos ni en orden estricto: elige uno por etapa según lo
+          que te toque construir. <span class="rl-tag free">gratis</span> es libre o legalmente
+          gratuito online; <span class="rl-tag paid">pago</span> cuesta;
+          <span class="rl-tag lvl">nivel</span> indica dificultad.
+        </p>
+
+        <div class="stage">
+          <h4>Etapa 0 · Cómo pensar como ingeniero</h4>
+          <p>Antes de la técnica: hábitos y criterio.</p>
+          <div class="book"><span class="t">The Pragmatic Programmer</span> — <span class="a">Hunt &amp; Thomas</span> <span class="rl-tag lvl">intermedio</span><span class="d">El libro de hábitos de la profesión. Uno de los pocos que casi todos han leído. En <a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/" target="_blank" rel="noopener">pragprog.com</a>.</span></div>
+          <div class="book"><span class="t">A Philosophy of Software Design</span> — <span class="a">John Ousterhout</span> <span class="rl-tag lvl">principiante</span><span class="d">Corto y afilado: qué es la complejidad y cómo pelearla. El mejor primer libro sobre diseño. En <a href="https://web.stanford.edu/~ouster/cgi-bin/aposd.php" target="_blank" rel="noopener">la página del autor en Stanford</a>.</span></div>
+          <div class="book"><span class="t">The Mythical Man-Month</span> — <span class="a">Fred Brooks</span> <span class="rl-tag lvl">opcional</span><span class="d">De 1975 y todavía cierto: por qué añadir gente a un proyecto atrasado lo atrasa más. En <a href="https://www.informit.com/store/mythical-man-month-the-anniversary-edition-essays-9780201835953" target="_blank" rel="noopener">informit.com</a>.</span></div>
+          <div class="book"><span class="t">CS50</span> — <span class="a">Harvard, curso</span> <span class="rl-tag free">gratis</span><span class="d">La mejor introducción general a la computación. Empieza aquí si vienes de cero. En <a href="https://cs50.harvard.edu/x/" target="_blank" rel="noopener">cs50.harvard.edu</a>; también ofrece certificado verificado de Harvard vía edX.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 1 · Fundamentos de ciencias de la computación</h4>
+          <p>Cómo funciona un computador de verdad. La base que separa a quien copia código de quien entiende.</p>
+          <div class="book"><span class="t">Code: The Hidden Language of Computer Hardware and Software</span> — <span class="a">Charles Petzold</span> <span class="rl-tag lvl">principiante</span><span class="d">Construye un computador conceptualmente desde interruptores y relés. Lectura fascinante, cero matemática. En <a href="https://charlespetzold.com/code/" target="_blank" rel="noopener">la página del autor</a>.</span></div>
+          <div class="book"><span class="t">Structure and Interpretation of Computer Programs (SICP)</span> — <span class="a">Abelson &amp; Sussman</span> <span class="rl-tag free">gratis</span> <span class="rl-tag lvl">difícil</span><span class="d">El clásico del MIT sobre qué es realmente programar. Duro y transformador. Texto libre en <a href="https://mitpress.mit.edu/sites/default/files/sicp/full-text/book/book.html" target="_blank" rel="noopener">mitpress.mit.edu</a>.</span></div>
+          <div class="book"><span class="t">Computer Systems: A Programmer's Perspective (CS:APP)</span> — <span class="a">Bryant &amp; O'Hallaron</span> <span class="rl-tag lvl">intermedio</span><span class="d">Cómo tu código se convierte en algo que la máquina ejecuta: memoria, ensamblador, procesos, enlazado. En <a href="https://csapp.cs.cmu.edu/" target="_blank" rel="noopener">csapp.cs.cmu.edu</a>.</span></div>
+          <div class="book"><span class="t">teachyourselfcs.com</span> — <span class="a">meta-currículo</span> <span class="rl-tag free">gratis</span><span class="d">Nueve materias que todo ingeniero debería saber, con el mejor libro y curso de cada una. Úsalo como mapa. En <a href="https://teachyourselfcs.com" target="_blank" rel="noopener">teachyourselfcs.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 2 · Un lenguaje a fondo</h4>
+          <p>Elige uno y domínalo de verdad antes de coleccionar más.</p>
+          <div class="book"><span class="t">Fluent Python</span> — <span class="a">Luciano Ramalho</span> <span class="rl-tag lvl">intermedio</span><span class="d">Si eliges Python. Lo que separa saber la sintaxis de escribir Python idiomático. En <a href="https://www.oreilly.com/library/view/fluent-python-2nd/9781492056348/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">The Go Programming Language</span> — <span class="a">Donovan &amp; Kernighan</span> <span class="rl-tag lvl">intermedio</span><span class="d">Si eliges Go. Escrito por uno de los autores de C; conciso y completo. En <a href="https://www.gopl.io/" target="_blank" rel="noopener">gopl.io</a>.</span></div>
+          <div class="book"><span class="t">Eloquent JavaScript</span> — <span class="a">Marijn Haverbeke</span> <span class="rl-tag free">gratis</span><span class="d">Si eliges JS/TS. Y luego la serie <em>You Don't Know JS</em> (gratis) para las partes raras. En <a href="https://eloquentjavascript.net/" target="_blank" rel="noopener">eloquentjavascript.net</a>.</span></div>
+          <div class="book"><span class="t">The Rust Programming Language ("el libro")</span> — <span class="a">Klabnik &amp; Nichols</span> <span class="rl-tag free">gratis</span><span class="d">Si eliges Rust. El libro oficial, muy bien escrito. En <a href="https://doc.rust-lang.org/book/" target="_blank" rel="noopener">doc.rust-lang.org</a>.</span></div>
+          <div class="book"><span class="t">Crafting Interpreters</span> — <span class="a">Robert Nystrom</span> <span class="rl-tag free">gratis</span><span class="d">Construyes dos intérpretes de un lenguaje completo. La mejor forma de entender cómo funcionan los lenguajes. En <a href="https://craftinginterpreters.com/" target="_blank" rel="noopener">craftinginterpreters.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 3 · Algoritmos y estructuras de datos</h4>
+          <p>Para entrevistas y para no escribir código O(n²) sin saberlo.</p>
+          <div class="book"><span class="t">Grokking Algorithms</span> — <span class="a">Aditya Bhargava</span> <span class="rl-tag lvl">principiante</span><span class="d">Ilustrado, amable, corto. El mejor punto de entrada. En <a href="https://www.manning.com/books/grokking-algorithms-second-edition" target="_blank" rel="noopener">manning.com</a>.</span></div>
+          <div class="book"><span class="t">The Algorithm Design Manual</span> — <span class="a">Steven Skiena</span> <span class="rl-tag lvl">intermedio</span><span class="d">Práctico, con "historias de guerra" reales. El que recomienda teachyourselfcs. En <a href="https://www.algorist.com/" target="_blank" rel="noopener">algorist.com</a>.</span></div>
+          <div class="book"><span class="t">Introduction to Algorithms (CLRS)</span> — <span class="a">Cormen et al</span> <span class="rl-tag lvl">referencia</span><span class="d">La referencia exhaustiva. Se consulta, no se lee de corrido. En <a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/" target="_blank" rel="noopener">mitpress.mit.edu</a>.</span></div>
+          <div class="book"><span class="t">Algorithms, Part I &amp; II</span> — <span class="a">Princeton / Sedgewick, Coursera</span> <span class="rl-tag free">gratis</span><span class="d">Curso excelente. Alternativa en video: Berkeley CS61B. En <a href="https://algs4.cs.princeton.edu/" target="_blank" rel="noopener">algs4.cs.princeton.edu</a>, con enlaces a las dos partes en Coursera.</span></div>
+          <div class="book"><span class="t">Práctica</span> — <span class="a">Exercism, LeetCode, Advent of Code</span> <span class="rl-tag free">gratis</span><span class="d">Exercism para aprender un lenguaje; LeetCode para entrevistas; Advent of Code por diversión. En <a href="https://exercism.org" target="_blank" rel="noopener">exercism.org</a>, <a href="https://leetcode.com" target="_blank" rel="noopener">leetcode.com</a> y <a href="https://adventofcode.com" target="_blank" rel="noopener">adventofcode.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 4 · Redes y cómo funciona la web</h4>
+          <div class="book"><span class="t">Computer Networking: A Top-Down Approach</span> — <span class="a">Kurose &amp; Ross</span> <span class="rl-tag lvl">intermedio</span><span class="d">El estándar. Empieza por la web (que ya conoces) y baja hasta los cables. En <a href="https://gaia.cs.umass.edu/kurose_ross/" target="_blank" rel="noopener">gaia.cs.umass.edu</a>.</span></div>
+          <div class="book"><span class="t">High Performance Browser Networking</span> — <span class="a">Ilya Grigorik</span> <span class="rl-tag free">gratis</span><span class="d">TCP, TLS, HTTP/2 y 3 explicados con foco en rendimiento real. Gratis online. En <a href="https://hpbn.co/" target="_blank" rel="noopener">hpbn.co</a>.</span></div>
+          <div class="book"><span class="t">Stanford CS144: Computer Networking</span> — <span class="a">curso</span> <span class="rl-tag free">gratis</span><span class="d">Construyes una implementación funcional de TCP. Intenso y muy formativo. En <a href="https://cs144.stanford.edu/" target="_blank" rel="noopener">cs144.stanford.edu</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 5 · Sistemas operativos</h4>
+          <div class="book"><span class="t">Operating Systems: Three Easy Pieces (OSTEP)</span> — <span class="a">Arpaci-Dusseau</span> <span class="rl-tag free">gratis</span><span class="d">Procesos, hilos, memoria virtual, concurrencia, sistemas de archivos. Claro y gratuito. El libro de SO recomendado. En <a href="https://pages.cs.wisc.edu/~remzi/OSTEP/" target="_blank" rel="noopener">pages.cs.wisc.edu/~remzi/OSTEP</a>.</span></div>
+          <div class="book"><span class="t">Berkeley CS162</span> / <span class="t">MIT 6.1810</span> — <span class="a">cursos</span> <span class="rl-tag free">gratis</span><span class="d">Con laboratorios donde escribes partes de un kernel. En <a href="https://cs162.org/" target="_blank" rel="noopener">cs162.org</a> (Berkeley) y <a href="https://pdos.csail.mit.edu/6.1810/" target="_blank" rel="noopener">pdos.csail.mit.edu/6.1810</a> (MIT).</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 6 · Bases de datos</h4>
+          <p>La parte más difícil de cambiar y el cuello de botella más común.</p>
+          <div class="book"><span class="t">Designing Data-Intensive Applications, 2ª ed.</span> — <span class="a">Kleppmann &amp; Riccomini</span> <span class="rl-tag lvl">intermedio</span><span class="d">El libro. Replicación, particionado, transacciones, consistencia, procesamiento de streams. La 2ª edición (febrero 2026) actualiza todo a la era cloud. Si lees uno solo de esta guía, este. En <a href="https://dataintensive.net/" target="_blank" rel="noopener">dataintensive.net</a>.</span></div>
+          <div class="book"><span class="t">Database Internals</span> — <span class="a">Alex Petrov</span> <span class="rl-tag lvl">avanzado</span><span class="d">Cómo funcionan por dentro: árboles B, LSM-trees, el motor de almacenamiento, el de consenso. En <a href="https://www.oreilly.com/library/view/database-internals/9781492040347/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">SQL Performance Explained</span> / <span class="t">use-the-index-luke.com</span> — <span class="a">Markus Winand</span> <span class="rl-tag free">gratis</span><span class="d">Todo sobre índices. La web es gratis; corta y de altísimo impacto. En <a href="https://use-the-index-luke.com/" target="_blank" rel="noopener">use-the-index-luke.com</a>.</span></div>
+          <div class="book"><span class="t">CMU 15-445: Intro to Database Systems</span> — <span class="a">Andy Pavlo, curso</span> <span class="rl-tag free">gratis</span><span class="d">Videos, apuntes y tareas con autograder abierto. Construyes un motor de base de datos. En <a href="https://15445.courses.cs.cmu.edu" target="_blank" rel="noopener">15445.courses.cs.cmu.edu</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 7 · Diseño de APIs y backend web</h4>
+          <div class="book"><span class="t">The Design of Web APIs</span> — <span class="a">Arnaud Lauret</span> <span class="rl-tag lvl">principiante</span><span class="d">Cómo diseñar una API que otros disfruten usar. Práctico y concreto. En <a href="https://www.manning.com/books/the-design-of-web-apis" target="_blank" rel="noopener">manning.com</a>.</span></div>
+          <div class="book"><span class="t">API Design Patterns</span> — <span class="a">JJ Geewax</span> <span class="rl-tag lvl">intermedio</span><span class="d">Patrones concretos: paginación, filtrado, operaciones largas, versionado. De un ingeniero de Google. En <a href="https://www.manning.com/books/api-design-patterns" target="_blank" rel="noopener">manning.com</a>.</span></div>
+          <div class="book"><span class="t">Web Scalability for Startup Engineers</span> — <span class="a">Artur Ejsmont</span> <span class="rl-tag lvl">intermedio</span><span class="d">El puente entre "hago un CRUD" y "esto aguanta tráfico": caché, colas, balanceo, sin estado.</span></div>
+          <div class="book"><span class="t">fullstackopen</span> — <span class="a">Universidad de Helsinki</span> <span class="rl-tag free">gratis</span><span class="d">Curso moderno y muy completo de full-stack (React + Node). También <em>boot.dev</em> <span class="rl-tag paid">pago</span> para backend en Go/Python. En <a href="https://fullstackopen.com/es/" target="_blank" rel="noopener">fullstackopen.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 8 · Arquitectura de software</h4>
+          <div class="book"><span class="t">Fundamentals of Software Architecture</span> — <span class="a">Mark Richards &amp; Neal Ford</span> <span class="rl-tag lvl">intermedio</span><span class="d">El panorama: estilos arquitectónicos, características, cómo se decide. Buen punto de partida. En <a href="https://www.oreilly.com/library/view/fundamentals-of-software-architecture/9781098175474/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Software Architecture: The Hard Parts</span> — <span class="a">Ford, Richards et al</span> <span class="rl-tag lvl">avanzado</span><span class="d">Cómo evaluar compromisos en sistemas distribuidos cuando no hay respuesta correcta. En <a href="https://www.oreilly.com/library/view/software-architecture-the-hard-parts/9781492086840/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Refactoring, 2ª ed.</span> — <span class="a">Martin Fowler</span> <span class="rl-tag lvl">intermedio</span><span class="d">Catálogo de transformaciones seguras para mejorar código sin cambiar su comportamiento. En <a href="https://martinfowler.com/books/refactoring.html" target="_blank" rel="noopener">martinfowler.com</a>.</span></div>
+          <div class="book"><span class="t">Domain-Driven Design Distilled</span> — <span class="a">Vaughn Vernon</span> <span class="rl-tag lvl">principiante</span><span class="d">DDD en 150 páginas. Entrada mucho mejor que el libro original de Evans (denso, azul, de 2003). En <a href="https://www.oreilly.com/library/view/domain-driven-design-distilled/9780134434421/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Head First Design Patterns</span> — <span class="a">Freeman et al</span> <span class="rl-tag lvl">principiante</span><span class="d">Los patrones de la "banda de los cuatro" de forma digerible. La referencia seca es <em>Design Patterns</em> (GoF). En <a href="https://www.oreilly.com/library/view/head-first-design-patterns/9781492077992/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 9 · Sistemas distribuidos</h4>
+          <div class="book"><span class="t">Understanding Distributed Systems</span> — <span class="a">Roberto Vitillo</span> <span class="rl-tag lvl">intermedio</span><span class="d">Introducción moderna y accesible: comunicación, coordinación, escalabilidad, resiliencia. En <a href="https://understandingdistributed.systems/" target="_blank" rel="noopener">understandingdistributed.systems</a>.</span></div>
+          <div class="book"><span class="t">Building Microservices, 2ª ed.</span> — <span class="a">Sam Newman</span> <span class="rl-tag lvl">intermedio</span><span class="d">El libro de referencia si vas por ese camino — incluido cuándo NO ir. En <a href="https://samnewman.io/books/building_microservices_2nd_edition/" target="_blank" rel="noopener">samnewman.io</a>.</span></div>
+          <div class="book"><span class="t">MIT 6.5840 (ex 6.824): Distributed Systems</span> — <span class="a">curso</span> <span class="rl-tag free">gratis</span><span class="d">El curso legendario. Labs en Go: implementas Raft y un almacén clave-valor tolerante a fallos. En <a href="https://pdos.csail.mit.edu/6.824/" target="_blank" rel="noopener">pdos.csail.mit.edu/6.824</a>.</span></div>
+          <div class="book"><span class="t">Jepsen</span> — <span class="a">aphyr.com, análisis</span> <span class="rl-tag free">gratis</span><span class="d">Análisis reales de cómo las bases de datos famosas rompen sus promesas de consistencia bajo fallos. En <a href="https://jepsen.io/" target="_blank" rel="noopener">jepsen.io</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 10 · DevOps, CI/CD e infraestructura</h4>
+          <div class="book"><span class="t">The Phoenix Project</span> — <span class="a">Gene Kim et al</span> <span class="rl-tag lvl">principiante</span><span class="d">Una novela sobre una empresa arreglando su TI. Se lee en un fin de semana y explica el "por qué" de DevOps. En <a href="https://itrevolution.com/product/the-phoenix-project/" target="_blank" rel="noopener">itrevolution.com</a>.</span></div>
+          <div class="book"><span class="t">The DevOps Handbook</span> / <span class="t">Accelerate</span> — <span class="a">Kim, Forsgren, Humble</span> <span class="rl-tag lvl">intermedio</span><span class="d"><em>Accelerate</em> trae la evidencia: qué prácticas correlacionan con equipos de alto rendimiento (las cuatro métricas DORA). En <a href="https://itrevolution.com/product/the-devops-handbook-second-edition/" target="_blank" rel="noopener">itrevolution.com</a> y <a href="https://itrevolution.com/product/accelerate/" target="_blank" rel="noopener">itrevolution.com/accelerate</a>.</span></div>
+          <div class="book"><span class="t">Continuous Delivery</span> — <span class="a">Humble &amp; Farley</span> <span class="rl-tag lvl">intermedio</span><span class="d">El libro fundacional del despliegue automatizado. En <a href="https://continuousdelivery.com/" target="_blank" rel="noopener">continuousdelivery.com</a>.</span></div>
+          <div class="book"><span class="t">The Linux Command Line</span> — <span class="a">William Shotts</span> <span class="rl-tag free">gratis</span><span class="d">La terminal a fondo. Innegociable para backend. También <em>Pro Git</em> (gratis) para Git de verdad. En <a href="https://linuxcommand.org/tlcl.php" target="_blank" rel="noopener">linuxcommand.org</a> y <a href="https://git-scm.com/book" target="_blank" rel="noopener">git-scm.com/book</a>.</span></div>
+          <div class="book"><span class="t">Docker Deep Dive</span> — <span class="a">Nigel Poulton</span> <span class="rl-tag lvl">principiante</span><span class="d">Contenedores desde cero. Luego <em>Kubernetes Up &amp; Running</em> si el trabajo lo pide. En <a href="https://nigelpoulton.com/books" target="_blank" rel="noopener">nigelpoulton.com</a>.</span></div>
+          <div class="book"><span class="t">roadmap.sh/devops</span> — <span class="a">ruta interactiva</span> <span class="rl-tag free">gratis</span><span class="d">Mapa de qué aprender y en qué orden. También la ruta <em>backend</em>. En <a href="https://roadmap.sh/devops" target="_blank" rel="noopener">roadmap.sh/devops</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 11 · Confiabilidad y operación</h4>
+          <div class="book"><span class="t">Site Reliability Engineering</span> + <span class="t">The SRE Workbook</span> — <span class="a">Google</span> <span class="rl-tag free">gratis</span><span class="d">Cómo Google opera a escala: SLO, error budgets, eliminar trabajo manual, postmortems sin culpa. Gratis online. En <a href="https://sre.google/sre-book/table-of-contents/" target="_blank" rel="noopener">sre.google</a>.</span></div>
+          <div class="book"><span class="t">Release It!</span> — <span class="a">Michael Nygard</span> <span class="rl-tag lvl">intermedio</span><span class="d">Patrones de estabilidad (circuit breaker, bulkhead, timeout) y antipatrones que tumban sistemas. Muy citado. En <a href="https://pragprog.com/titles/mnee2/release-it-second-edition/" target="_blank" rel="noopener">pragprog.com</a>.</span></div>
+          <div class="book"><span class="t">Observability Engineering</span> — <span class="a">Charity Majors et al</span> <span class="rl-tag lvl">intermedio</span><span class="d">Qué es observabilidad de verdad (más allá de los tres pilares) y cómo instrumentar. Ebook gratis en <a href="https://www.honeycomb.io/observability-engineering-oreilly-book" target="_blank" rel="noopener">honeycomb.io</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 12 · Seguridad</h4>
+          <div class="book"><span class="t">OWASP Top 10</span> + <span class="t">OWASP Cheat Sheet Series</span> — <span class="a">OWASP Foundation</span> <span class="rl-tag free">gratis</span><span class="d">Los riesgos más frecuentes y cómo mitigarlos, con hojas de trucos por tema. Lectura obligatoria. En <a href="https://owasp.github.io/www-project-top-ten/" target="_blank" rel="noopener">owasp.github.io/www-project-top-ten</a> y <a href="https://cheatsheetseries.owasp.org" target="_blank" rel="noopener">cheatsheetseries.owasp.org</a>.</span></div>
+          <div class="book"><span class="t">PortSwigger Web Security Academy</span> — <span class="a">curso práctico</span> <span class="rl-tag free">gratis</span><span class="d">Laboratorios reales donde explotas cada vulnerabilidad. La mejor forma de entenderlas. En <a href="https://portswigger.net/web-security" target="_blank" rel="noopener">portswigger.net</a>; con práctica suficiente prepara para la certificación Burp Suite Certified Practitioner (BSCP).</span></div>
+          <div class="book"><span class="t">The Web Application Hacker's Handbook</span> — <span class="a">Stuttard &amp; Pinto</span> <span class="rl-tag lvl">avanzado</span><span class="d">El clásico de seguridad web. Algo viejo pero los fundamentos siguen. En <a href="https://www.wiley.com/en-us/The+Web+Application+Hacker%27s+Handbook%3A+Finding+and+Exploiting+Security+Flaws%2C+2nd+Edition-p-9781118026472" target="_blank" rel="noopener">wiley.com</a>.</span></div>
+          <div class="book"><span class="t">Security Engineering, 3ª ed.</span> — <span class="a">Ross Anderson</span> <span class="rl-tag free">gratis</span> <span class="rl-tag lvl">referencia</span><span class="d">1000 páginas sobre seguridad de sistemas en general. Gratis online. Se consulta por capítulos. En <a href="https://www.cl.cam.ac.uk/~rja14/book.html" target="_blank" rel="noopener">cl.cam.ac.uk/~rja14</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 13 · Testing y trabajo con código existente</h4>
+          <div class="book"><span class="t">Test-Driven Development by Example</span> — <span class="a">Kent Beck</span> <span class="rl-tag lvl">principiante</span><span class="d">TDD explicado por su creador, con ejemplos completos. Corto. En <a href="https://www.informit.com/store/test-driven-development-by-example-9780321146533" target="_blank" rel="noopener">informit.com</a>.</span></div>
+          <div class="book"><span class="t">Unit Testing: Principles, Practices, and Patterns</span> — <span class="a">Vladimir Khorikov</span> <span class="rl-tag lvl">intermedio</span><span class="d">Qué hace bueno a un test y por qué muchos tests son peor que ninguno. Muy práctico. En <a href="https://www.manning.com/books/unit-testing" target="_blank" rel="noopener">manning.com</a>.</span></div>
+          <div class="book"><span class="t">Working Effectively with Legacy Code</span> — <span class="a">Michael Feathers</span> <span class="rl-tag lvl">intermedio</span><span class="d">Cómo meter tests y cambiar código que no los tiene. Lo que harás el 80% del tiempo en un trabajo real. En <a href="https://www.informit.com/store/working-effectively-with-legacy-code-9780131177055" target="_blank" rel="noopener">informit.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 14 · Meta: cómo trabaja la industria</h4>
+          <div class="book"><span class="t">Software Engineering at Google</span> — <span class="a">Winters, Manshreck, Wright</span> <span class="rl-tag free">gratis</span><span class="d">Cómo se hace ingeniería a gran escala y a largo plazo: revisión de código, testing, versionado, cultura. Gratis en <a href="https://abseil.io/resources/swe-book" target="_blank" rel="noopener">abseil.io</a>.</span></div>
+          <div class="book"><span class="t">The Pragmatic Engineer</span> — <span class="a">Gergely Orosz, newsletter/libro</span> <span class="rl-tag paid">pago</span><span class="d">La mejor fuente sobre cómo funcionan por dentro los equipos de ingeniería y las carreras en tech. En <a href="https://newsletter.pragmaticengineer.com" target="_blank" rel="noopener">newsletter.pragmaticengineer.com</a>.</span></div>
+          <div class="book"><span class="t">The Staff Engineer's Path</span> — <span class="a">Tanya Reilly</span> <span class="rl-tag lvl">avanzado</span><span class="d">Para más adelante: crecer como ingeniero sin volverse manager. En <a href="https://noidea.dog/staff" target="_blank" rel="noopener">noidea.dog/staff</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Currículos completos ya armados <span class="rl-tag free">gratis</span></h4>
+          <div class="book"><span class="t">OSSU Computer Science</span> — <span class="a">github.com/ossu/computer-science</span><span class="d">Una carrera de CS completa hecha solo con cursos gratuitos, ordenada y con comunidad. En <a href="https://github.com/ossu/computer-science" target="_blank" rel="noopener">github.com/ossu/computer-science</a>.</span></div>
+          <div class="book"><span class="t">The Odin Project</span><span class="d">Ruta full-stack de cero a empleable, con proyectos revisados por pares. Muy sólida para web. En <a href="https://www.theodinproject.com" target="_blank" rel="noopener">theodinproject.com</a>.</span></div>
+          <div class="book"><span class="t">teachyourselfcs.com</span><span class="d">El mapa de las 9 materias núcleo. Menos "hacer", más "entender". En <a href="https://teachyourselfcs.com" target="_blank" rel="noopener">teachyourselfcs.com</a>.</span></div>
+          <div class="book"><span class="t">roadmap.sh</span><span class="d">Rutas visuales por rol (backend, frontend, devops, etc.) con recursos enlazados. En <a href="https://roadmap.sh" target="_blank" rel="noopener">roadmap.sh</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Para seguir todo el tiempo <span class="rl-tag free">gratis</span></h4>
+          <div class="book"><span class="t">ByteByteGo</span> — <span class="a">Alex Xu</span><span class="d">System design explicado con diagramas. También su libro <em>System Design Interview</em> <span class="rl-tag paid">pago</span>. En <a href="https://bytebytego.com" target="_blank" rel="noopener">bytebytego.com</a>.</span></div>
+          <div class="book"><span class="t">martinfowler.com</span><span class="d">Artículos de referencia sobre arquitectura, refactoring, microservicios, CI/CD. En <a href="https://martinfowler.com" target="_blank" rel="noopener">martinfowler.com</a>.</span></div>
+          <div class="book"><span class="t">Julia Evans — jvns.ca</span> y <span class="t">wizardzines.com</span><span class="d">Explicaciones cortas y dibujadas de cosas de sistemas (DNS, TCP, debugging, contenedores). Ideales para autodidactas. En <a href="https://jvns.ca" target="_blank" rel="noopener">jvns.ca</a> y <a href="https://wizardzines.com" target="_blank" rel="noopener">wizardzines.com</a>.</span></div>
+          <div class="book"><span class="t">Dan Luu — danluu.com</span><span class="d">Ensayos profundos y basados en datos sobre rendimiento, confiabilidad y la industria. En <a href="https://danluu.com" target="_blank" rel="noopener">danluu.com</a>.</span></div>
+          <div class="book"><span class="t">High Scalability</span> y <span class="t">the morning paper</span><span class="d">Arquitecturas reales de empresas grandes; resúmenes de papers académicos importantes. En <a href="https://highscalability.com" target="_blank" rel="noopener">highscalability.com</a> y <a href="https://blog.acolyer.org" target="_blank" rel="noopener">blog.acolyer.org</a>.</span></div>
+        </div>
+      
+<div class="stage">
+          <h4>Etapa 15 · Bases de datos en producción</h4>
+          <p>El hueco entre "diseño el esquema" y "opero la base": backups probados, PITR, réplicas,
+          failover y cambios de esquema sin cortar el servicio.</p>
+          <div class="book"><span class="t">Database Reliability Engineering</span> — <span class="a">Laine Campbell &amp; Charity Majors</span> <span class="rl-tag lvl">intermedio</span><span class="d">Operar bases como disciplina: backups y su verificación, replicación, cambios de esquema seguros, capacidad. El puente exacto entre esta guía y el día a día. Léelo cuando ya tengas una base con datos de otras personas. En <a href="https://www.oreilly.com/library/view/database-reliability-engineering/9781491926215/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">PostgreSQL 14 Internals</span> — <span class="a">Egor Rogov</span> <span class="rl-tag free">gratis</span><span class="d">PDF gratuito de Postgres Professional. MVCC, el buffer y el WAL, locks, ejecución de consultas, tipos de índice. Para entender <em>por qué</em> el WAL es la base del PITR y de la replicación. Es la edición más reciente de la serie. En <a href="https://postgrespro.com/community/books/internals" target="_blank" rel="noopener">postgrespro.com</a>.</span></div>
+          <div class="book"><span class="t">High Performance MySQL, 4ª ed.</span> — <span class="a">Silvia Botros &amp; Jeremy Tinley</span> <span class="rl-tag lvl">intermedio</span><span class="d">Si tu mundo es MySQL. La 4ª edición (2021) gira hacia la operación en la nube: replicación, sharding con Vitess, observabilidad, esquema en producción. En <a href="https://www.oreilly.com/library/view/high-performance-mysql/9781492080503/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">PostgreSQL — documentación oficial</span> — <span class="a">capítulos «Backup and Restore», «WAL», «High Availability»</span> <span class="rl-tag free">gratis</span><span class="d">Densa, pero es la fuente. Léela cuando vayas a configurar archivado de WAL o una réplica de verdad, no antes. En <a href="https://www.postgresql.org/docs/current/backup.html" target="_blank" rel="noopener">postgresql.org/docs</a>.</span></div>
+          <div class="book"><span class="t">Patroni</span> y <span class="t">PgBouncer</span> — <span class="a">documentación de cada proyecto</span> <span class="rl-tag free">gratis</span><span class="d">Las dos herramientas que casi seguro usarás con PostgreSQL en producción: failover con consenso y pooling de conexiones. La guía de Patroni explica bien split-brain y fencing. En <a href="https://patroni.readthedocs.io/" target="_blank" rel="noopener">patroni.readthedocs.io</a> y <a href="https://www.pgbouncer.org/" target="_blank" rel="noopener">pgbouncer.org</a>.</span></div>
+          <div class="book"><span class="t">pgroll y el patrón expand/contract</span> — <span class="a">Xata, blog y documentación</span> <span class="rl-tag free">gratis</span><span class="d">Migraciones sin downtime explicadas con ejemplos ejecutables, y una herramienta que automatiza el ciclo para PostgreSQL sirviendo varias versiones del esquema a la vez. En <a href="https://pgroll.com/" target="_blank" rel="noopener">pgroll.com</a>.</span></div>
+          <div class="book"><span class="t">Postgres Weekly</span> y <span class="t">Planet PostgreSQL</span> — <span class="a">boletines</span> <span class="rl-tag free">gratis</span><span class="d">Para no quedarte atrás: cada versión anual cambia cosas de operación (índices, particionado, VACUUM, replicación). Un correo semanal basta. En <a href="https://postgresweekly.com/" target="_blank" rel="noopener">postgresweekly.com</a> y <a href="https://planet.postgresql.org/" target="_blank" rel="noopener">planet.postgresql.org</a>.</span></div>
+        </div>
+
+</section>
+
+      <!-- 16 -->
+      <section class="block" id="proyectos">
+        <span class="sec-num">18</span>
+        <h2>Tres proyectos de punta a punta</h2>
+        <p class="lead">
+          El mismo ciclo de siete fases, tres lenguajes, tres tipos de framework. Fíjate en cuánto
+          cambia la experiencia según cuánto te da el framework.
+        </p>
+
+        <div class="project">
+          <div class="project-head">
+            <p class="stack">Go + Chi + PostgreSQL · framework micro</p>
+            <h3>Acortador de URLs con analíticas</h3>
+            <p>Recibe una URL larga, devuelve un código corto. Al visitar el código, redirige. Cuenta visitas.</p>
+          </div>
+          <div class="project-body">
+            <div class="phase"><span class="pn">Fase 0</span><span class="pt">Idea</span><span class="pd">Funcional: crear enlace, redirigir, ver conteo. No funcional: la redirección se usa muchísimo → rápida; el código único e impredecible.</span></div>
+            <div class="phase"><span class="pn">Fase 1</span><span class="pt">Arquitectura</span><span class="pd">Monolito. Tabla <code>links(id, codigo, url_larga, visitas, creado)</code>. API: <code>POST /links</code>, <code>GET /{codigo}</code> (301). ADR: código de 7 caracteres aleatorios base62, no secuencial. Caché en memoria para los más visitados.</span></div>
+            <div class="phase"><span class="pn">Fase 2</span><span class="pt">Terreno</span><span class="pd">Repo Git, <code>go mod init</code>, PostgreSQL local con Docker, variable <code>DATABASE_URL</code>.</span></div>
+            <div class="phase"><span class="pn">Fase 3</span><span class="pt">Construcción</span><span class="pd">Rama, handler con Chi, consultas con <code>database/sql</code>, migración <code>001_crear_links.sql</code>. PR + review.</span></div>
+            <div class="phase"><span class="pn">Fase 4</span><span class="pt">Calidad</span><span class="pd">Unitario del generador de códigos (largo, sin repetir). Integración del endpoint contra un PostgreSQL de prueba. CI: <code>go test ./...</code>.</span></div>
+            <div class="phase"><span class="pn">Fase 5</span><span class="pt">Despliegue</span><span class="pd"><code>go build</code> → binario único. Dockerfile de dos líneas. Deploy a un VPS o Fly.io. Dominio + HTTPS automático.</span></div>
+            <div class="phase"><span class="pn">Fase 6</span><span class="pt">Operación</span><span class="pd">Log de cada redirección. Métrica de latencia p95. Alerta si los 5xx superan el 1%. Backup diario.</span></div>
+            <div class="phase"><span class="pn">Fase 7</span><span class="pt">Evolución</span><span class="pd">Enlaces con expiración, códigos personalizados → Fase 0.</span></div>
+            <p class="learn"><b>Qué aprendes</b>HTTP sin magia, diseño de esquema, migraciones, caché, diseño sin estado, binario + Docker. El ciclo entero con mínima fricción.</p>
+          </div>
+        </div>
+
+        <div class="project">
+          <div class="project-head">
+            <p class="stack">Python + FastAPI + PostgreSQL · micro, API-first</p>
+            <h3>API de gastos personales</h3>
+            <p>Registrar gastos, categorizarlos, ver totales por mes. Con usuarios: cada quien ve solo lo suyo. La consume una app móvil.</p>
+          </div>
+          <div class="project-body">
+            <div class="phase"><span class="pn">Fase 0</span><span class="pt">Idea</span><span class="pd">Historias: "registrar un gasto con monto, categoría y fecha", "ver mi total del mes". No funcional: datos privados por usuario; cliente móvil → contrato claro y documentado.</span></div>
+            <div class="phase"><span class="pn">Fase 1</span><span class="pt">Arquitectura</span><span class="pd">Monolito API-first. Tablas <code>usuarios</code>, <code>gastos</code>. Auth JWT. Endpoints REST + <code>/gastos/resumen?mes=</code>. Validación Pydantic. ADR: JWT stateless sobre sesiones, para no depender de cookies.</span></div>
+            <div class="phase"><span class="pn">Fase 2</span><span class="pt">Terreno</span><span class="pd">Repo, <code>venv</code>, <code>requirements.txt</code>, PostgreSQL en Docker, <code>.env</code> con <code>SECRET_KEY</code>, Alembic para migraciones.</span></div>
+            <div class="phase"><span class="pn">Fase 3</span><span class="pt">Construcción</span><span class="pd">Modelos SQLAlchemy, esquemas Pydantic. Dependencia <code>get_current_user</code> que valida el token (inyección de dependencias). Cada consulta filtra por el <code>usuario_id</code> del token.</span></div>
+            <div class="phase"><span class="pn">Fase 4</span><span class="pt">Calidad</span><span class="pd">Unitarios del resumen. Integración con <code>TestClient</code>. Test de seguridad: el usuario A no puede leer los gastos de B (404). CI: <code>pytest</code> + <code>ruff</code>.</span></div>
+            <div class="phase"><span class="pn">Fase 5</span><span class="pt">Despliegue</span><span class="pd">Docker. Deploy a Render/Fly/Railway o VPS con Uvicorn + Nginx. <code>alembic upgrade head</code> al arrancar. HTTPS.</span></div>
+            <div class="phase"><span class="pn">Fase 6</span><span class="pt">Operación</span><span class="pd">Sentry. Logs JSON. Métrica de latencia. Las docs OpenAPI en <code>/docs</code> las usa el equipo móvil.</span></div>
+            <div class="phase"><span class="pn">Fase 7</span><span class="pt">Evolución</span><span class="pd">Exportar a CSV, presupuestos por categoría con alertas → Fase 0.</span></div>
+            <p class="learn"><b>Qué aprendes</b>REST de verdad, autenticación y autorización, JWT, validación con esquemas, migraciones con Alembic, async, tests de seguridad, el "contrato" de una API.</p>
+          </div>
+        </div>
+
+        <div class="project">
+          <div class="project-head">
+            <p class="stack">PHP + Laravel + MySQL · full-stack (MVC)</p>
+            <h3>Blog con panel de administración</h3>
+            <p>Un blog público más un panel privado donde el autor —que no es técnico— crea, edita y borra posts y sube imágenes.</p>
+          </div>
+          <div class="project-body">
+            <div class="phase"><span class="pn">Fase 0</span><span class="pt">Idea</span><span class="pd">Historias: "leer artículos", "publicar sin tocar código". No funcional: SEO (URLs limpias <code>/blog/mi-titulo</code>); el autor no programa.</span></div>
+            <div class="phase"><span class="pn">Fase 1</span><span class="pt">Arquitectura</span><span class="pd">Full-stack MVC, monolito. Laravel renderiza HTML en el servidor (Blade). Tablas <code>users</code>, <code>posts</code>. Rutas públicas y <code>/admin</code> protegidas. ORM Eloquent. Auth de sesión (cookies) — aquí sí conviene sesión, es web con navegador.</span></div>
+            <div class="phase"><span class="pn">Fase 2</span><span class="pt">Terreno</span><span class="pd">Repo, Composer, <code>.env</code> con MySQL, Laravel Sail (Docker), <code>php artisan migrate</code>.</span></div>
+            <div class="phase"><span class="pn">Fase 3</span><span class="pt">Construcción</span><span class="pd">Migraciones con <code>artisan make:migration</code>. Modelos Eloquent con <code>User hasMany Post</code>. Controladores, vistas Blade, middleware <code>auth</code> en <code>/admin</code>. El <code>slug</code> se genera del título solo.</span></div>
+            <div class="phase"><span class="pn">Fase 4</span><span class="pt">Calidad</span><span class="pd">Tests de feature (Pest): "un visitante ve los posts publicados", "un no autenticado no entra a <code>/admin</code>". CI: <code>php artisan test</code> + Pint.</span></div>
+            <div class="phase"><span class="pn">Fase 5</span><span class="pt">Despliegue</span><span class="pd">VPS con PHP-FPM + Nginx, o Laravel Forge. <code>php artisan migrate --force</code> en el deploy. Assets con Vite. HTTPS.</span></div>
+            <div class="phase"><span class="pn">Fase 6</span><span class="pt">Operación</span><span class="pd">Logs de Laravel. Sentry. Monitoreo de uptime. Backup diario de MySQL.</span></div>
+            <div class="phase"><span class="pn">Fase 7</span><span class="pt">Evolución</span><span class="pd">Comentarios, categorías, borradores programados → Fase 0.</span></div>
+            <p class="learn"><b>Qué aprendes</b>El modelo MVC, ORM y relaciones, plantillas del lado servidor, sesiones vs tokens, el flujo "con pilas incluidas" donde el framework ya resolvió auth, migraciones y panel.</p>
+          </div>
+        </div>
+
+        <div class="note">
+          <span class="label">La comparación</span>
+          <p>Las siete fases son siempre las mismas. Lo que cambia es cuánto te da el framework: en Go
+          escribes el router y casi todo; en FastAPI tienes validación y docs gratis pero pones ORM y
+          login; en Laravel el ORM, las migraciones, el login y el panel ya vienen. Menos código no
+          es siempre mejor — es menos control y más "magia" que entender cuando algo falla.</p>
+        </div>
+      </section>
+
+      <!-- 17 -->
+      <section class="block" id="ruta">
+        <span class="sec-num">19</span>
+        <h2>Plan de estudio de 12 meses</h2>
+        <p class="lead">
+          Una ruta posible para alguien que aprende conceptos, no un lenguaje, y con un trabajo o
+          proyectos en paralelo. Ajústala: lo que importa es el orden, no el calendario.
+        </p>
+
+        <div class="table-scroll"><table>
+          <thead><tr><th>Meses</th><th>Foco</th><th>Material</th><th>Entregable</th></tr></thead>
+          <tbody>
+            <tr><td><strong>1-2</strong></td><td>Fundamentos + un lenguaje</td><td>CS50, <em>A Philosophy of Software Design</em>, el libro de tu lenguaje. Exercism a diario.</td><td>10-15 ejercicios resueltos; un CLI pequeño</td></tr>
+            <tr><td><strong>3-4</strong></td><td>La web por dentro + primer backend</td><td>Secciones 3 a 5 de esta guía, <em>The Design of Web APIs</em>, <em>The Linux Command Line</em>, <em>Pro Git</em>.</td><td><strong>Proyecto 1</strong> (acortador de URLs) completo, con README y demo</td></tr>
+            <tr><td><strong>5-6</strong></td><td>Bases de datos</td><td>CMU 15-445 (primera mitad), <em>use-the-index-luke</em>, sección 6.</td><td><strong>Proyecto 2</strong> (API de gastos) con auth, tests de seguridad y migraciones</td></tr>
+            <tr><td><strong>7</strong></td><td>Testing y calidad</td><td><em>Unit Testing</em> (Khorikov), <em>TDD by Example</em>. Añade tests a los proyectos 1 y 2.</td><td>Cobertura razonable + CI en verde en ambos repos</td></tr>
+            <tr><td><strong>8-9</strong></td><td>Arquitectura + un framework full-stack</td><td><em>Fundamentals of Software Architecture</em>, fullstackopen o boot.dev.</td><td><strong>Proyecto 3</strong> (blog + panel), que además es tu sitio de portafolio</td></tr>
+            <tr><td><strong>10</strong></td><td>Despliegue y operación</td><td><em>The Phoenix Project</em>, <em>Docker Deep Dive</em>, el capítulo de SLO del libro de SRE, sección 11.</td><td>Los 3 proyectos con CI/CD real, monitoreo con Sentry y alertas</td></tr>
+            <tr><td><strong>11</strong></td><td>Seguridad</td><td>OWASP Top 10 completa, PortSwigger Web Security Academy.</td><td>Auditar los 3 proyectos contra el Top 10 y arreglar lo que aparezca</td></tr>
+            <tr><td><strong>12</strong></td><td>Sistemas distribuidos + portafolio</td><td><em>Designing Data-Intensive Applications</em> (capítulos 1-6), <em>Understanding Distributed Systems</em>.</td><td>Sitio de portafolio pulido + un post por proyecto + perfil de GitHub ordenado</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Reglas para que funcione</h3>
+        <ol class="body-list">
+          <li><strong>Un proyecto terminado</strong> —desplegado, con README, con tests— enseña más
+          que diez tutoriales a medias. La columna "entregable" es la que importa.</li>
+          <li><strong>Lee menos, construye más.</strong> Cada libro de la lista es para consultar
+          mientras construyes algo concreto, no para leer de corrido antes de empezar.</li>
+          <li><strong>Los conceptos (secciones 3 a 11) importan más que la sintaxis</strong>, y la
+          arquitectura importa más que el framework.</li>
+          <li><strong>La tecnología "correcta" es la que puedes mantener.</strong> Para casi todo
+          proyecto real, eso decide más que cualquier comparación técnica.</li>
+        </ol>
+      </section>
+
+      <!-- RECURSOS -->
+      <section class="block" id="recursos">
+        <span class="sec-num">20</span>
+        <h2>Recursos y enlaces</h2>
+        <p class="lead">
+          Directorio de dónde sacar cada cosa: rutas, documentación, cursos, práctica, comunidades
+          y gente a seguir. Todo enlace es libre salvo que diga <span class="rl-tag paid">pago</span>.
+        </p>
+
+        <h3>Rutas y currículos</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://roadmap.sh" target="_blank" rel="noopener">roadmap.sh</a></td><td>Rutas visuales por rol (backend, frontend, DevOps, system design…) con recursos enlazados en cada paso</td></tr>
+            <tr><td><a href="https://teachyourselfcs.com" target="_blank" rel="noopener">teachyourselfcs.com</a></td><td>Las 9 materias núcleo de CS con el mejor libro y curso de cada una</td></tr>
+            <tr><td><a href="https://github.com/ossu/computer-science" target="_blank" rel="noopener">ossu/computer-science</a></td><td>Una carrera de CS completa hecha solo con cursos gratuitos, ordenada</td></tr>
+            <tr><td><a href="https://www.theodinproject.com" target="_blank" rel="noopener">The Odin Project</a></td><td>Ruta full-stack de cero a empleable, con proyectos revisados por pares</td></tr>
+            <tr><td><a href="https://fullstackopen.com/es/" target="_blank" rel="noopener">Full Stack Open</a></td><td>Curso moderno de full-stack (React + Node) de la Universidad de Helsinki, en español</td></tr>
+            <tr><td><a href="https://www.boot.dev" target="_blank" rel="noopener">boot.dev</a> <span class="rl-tag paid">pago</span></td><td>Ruta de backend práctica en Go y Python, con ejercicios en el navegador</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Documentación — ir siempre a la oficial</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://developer.mozilla.org" target="_blank" rel="noopener">MDN Web Docs</a></td><td>La referencia de la web: HTML, CSS, JavaScript, HTTP, APIs del navegador</td></tr>
+            <tr><td><a href="https://devdocs.io" target="_blank" rel="noopener">DevDocs</a></td><td>Documentación de cientos de lenguajes y librerías en un solo lugar, con búsqueda y modo offline</td></tr>
+            <tr><td><a href="https://www.postgresql.org/docs/" target="_blank" rel="noopener">PostgreSQL docs</a></td><td>De las mejores documentaciones que existen; el tutorial y la parte de índices valen oro</td></tr>
+            <tr><td><a href="https://go.dev/doc/" target="_blank" rel="noopener">go.dev/doc</a> · <a href="https://docs.python.org/3/" target="_blank" rel="noopener">docs.python.org</a> · <a href="https://nodejs.org/docs/latest/api/" target="_blank" rel="noopener">nodejs.org/api</a></td><td>Las docs oficiales de los runtimes más comunes de backend</td></tr>
+            <tr><td><a href="https://devhints.io" target="_blank" rel="noopener">devhints.io</a></td><td>Cheatsheets de una página para docenas de herramientas</td></tr>
+            <tr><td><a href="https://roadmap.sh/best-practices" target="_blank" rel="noopener">roadmap.sh/best-practices</a></td><td>Checklists de buenas prácticas (backend, API security, código, frontend performance)</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Cursos universitarios (gratis)</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://cs50.harvard.edu/x/" target="_blank" rel="noopener">CS50</a></td><td>Harvard. La mejor introducción general a la computación</td></tr>
+            <tr><td><a href="https://ocw.mit.edu" target="_blank" rel="noopener">MIT OpenCourseWare</a></td><td>Cursos completos del MIT con apuntes, tareas y a veces video</td></tr>
+            <tr><td><a href="https://15445.courses.cs.cmu.edu" target="_blank" rel="noopener">CMU 15-445</a></td><td>Intro a bases de datos con Andy Pavlo — videos, apuntes y autograder abierto</td></tr>
+            <tr><td><a href="https://pdos.csail.mit.edu/6.824/" target="_blank" rel="noopener">MIT 6.5840 (6.824)</a></td><td>Sistemas distribuidos. Labs en Go: implementas Raft</td></tr>
+            <tr><td><a href="https://github.com/Developer-Y/cs-video-courses" target="_blank" rel="noopener">Developer-Y/cs-video-courses</a></td><td>Índice enorme de cursos de CS en video, por materia</td></tr>
+            <tr><td><a href="https://ossu.firebaseapp.com" target="_blank" rel="noopener">OSSU</a> · <a href="https://www.edx.org" target="_blank" rel="noopener">edX</a> · <a href="https://www.coursera.org" target="_blank" rel="noopener">Coursera</a></td><td>Agregadores; en edX/Coursera puedes auditar la mayoría gratis</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Práctica: ejercicios, retos y proyectos</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://exercism.org" target="_blank" rel="noopener">Exercism</a></td><td>Ejercicios con mentoría humana gratis, en 70+ lenguajes. Para aprender un lenguaje nuevo</td></tr>
+            <tr><td><a href="https://leetcode.com" target="_blank" rel="noopener">LeetCode</a></td><td>Problemas de algoritmos para entrevistas técnicas</td></tr>
+            <tr><td><a href="https://adventofcode.com" target="_blank" rel="noopener">Advent of Code</a></td><td>25 retos cada diciembre; buenos para practicar cualquier lenguaje por diversión</td></tr>
+            <tr><td><a href="https://codingchallenges.fyi" target="_blank" rel="noopener">Coding Challenges</a></td><td>Un reto de sistemas por semana: escribe tu propio <code class="inline">wc</code>, un load balancer, un Redis</td></tr>
+            <tr><td><a href="https://github.com/codecrafters-io/build-your-own-x" target="_blank" rel="noopener">build-your-own-x</a></td><td>"Construye tu propia versión de X" (Git, Docker, un shell, una base de datos) con tutoriales</td></tr>
+            <tr><td><a href="https://github.com/practical-tutorials/project-based-learning" target="_blank" rel="noopener">project-based-learning</a></td><td>Tutoriales de proyectos completos, agrupados por lenguaje</td></tr>
+            <tr><td><a href="https://github.com/florinpop17/app-ideas" target="_blank" rel="noopener">app-ideas</a></td><td>Cientos de ideas de apps clasificadas por dificultad, con historias de usuario</td></tr>
+            <tr><td><a href="https://pgexercises.com" target="_blank" rel="noopener">PGExercises</a></td><td>Ejercicios de SQL contra una base real, del básico al avanzado</td></tr>
+            <tr><td><a href="https://github.com/public-apis/public-apis" target="_blank" rel="noopener">public-apis</a></td><td>Lista enorme de APIs gratis para alimentar tus proyectos con datos reales</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>System design y arquitectura</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://github.com/donnemartin/system-design-primer" target="_blank" rel="noopener">system-design-primer</a></td><td>El repo de referencia para aprender y prepararse en diseño de sistemas</td></tr>
+            <tr><td><a href="https://bytebytego.com" target="_blank" rel="noopener">ByteByteGo</a></td><td>System design explicado con diagramas; la newsletter tiene mucho contenido gratis</td></tr>
+            <tr><td><a href="https://github.com/binhnguyennus/awesome-scalability" target="_blank" rel="noopener">awesome-scalability</a></td><td>Colección curada de artículos reales sobre escalar sistemas</td></tr>
+            <tr><td><a href="https://architecturenotes.co" target="_blank" rel="noopener">Architecture Notes</a></td><td>Artículos largos y bien ilustrados sobre decisiones de arquitectura</td></tr>
+            <tr><td><a href="https://sre.google/books/" target="_blank" rel="noopener">sre.google/books</a></td><td>Los libros de SRE de Google, completos y gratis online</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Seguridad</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://owasp.github.io/www-project-top-ten/" target="_blank" rel="noopener">OWASP Top 10</a></td><td>Los riesgos más frecuentes en aplicaciones web, con guías de mitigación</td></tr>
+            <tr><td><a href="https://cheatsheetseries.owasp.org" target="_blank" rel="noopener">OWASP Cheat Sheet Series</a></td><td>Hojas de trucos concretas por tema (auth, JWT, SQL injection, CSRF…)</td></tr>
+            <tr><td><a href="https://portswigger.net/web-security" target="_blank" rel="noopener">Web Security Academy</a></td><td>Laboratorios prácticos gratis donde explotas cada vulnerabilidad. La mejor forma de entenderlas</td></tr>
+            <tr><td><a href="https://overthewire.org/wargames/" target="_blank" rel="noopener">OverTheWire</a></td><td>Wargames de línea de comandos y seguridad, de fácil a difícil</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Blogs, newsletters y gente a seguir</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://martinfowler.com" target="_blank" rel="noopener">martinfowler.com</a></td><td>Artículos de referencia sobre arquitectura, refactoring, microservicios, CI/CD</td></tr>
+            <tr><td><a href="https://jvns.ca" target="_blank" rel="noopener">jvns.ca</a> + <a href="https://wizardzines.com" target="_blank" rel="noopener">wizardzines.com</a></td><td>Julia Evans: explicaciones cortas y dibujadas de DNS, TCP, debugging, contenedores</td></tr>
+            <tr><td><a href="https://danluu.com" target="_blank" rel="noopener">danluu.com</a></td><td>Ensayos profundos y basados en datos sobre rendimiento, confiabilidad y la industria</td></tr>
+            <tr><td><a href="https://newsletter.pragmaticengineer.com" target="_blank" rel="noopener">The Pragmatic Engineer</a> <span class="rl-tag paid">parte pago</span></td><td>Gergely Orosz: cómo funcionan por dentro los equipos de ingeniería y las carreras en tech</td></tr>
+            <tr><td><a href="https://highscalability.com" target="_blank" rel="noopener">High Scalability</a></td><td>Arquitecturas reales de empresas grandes</td></tr>
+            <tr><td><a href="https://aphyr.com/tags/jepsen" target="_blank" rel="noopener">Jepsen (aphyr.com)</a></td><td>Análisis reales de cómo las bases de datos rompen sus promesas de consistencia bajo fallos</td></tr>
+            <tr><td><a href="https://www.brendangregg.com" target="_blank" rel="noopener">brendangregg.com</a></td><td>La referencia de análisis de rendimiento en sistemas Linux</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Comunidades</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://www.reddit.com/r/learnprogramming/" target="_blank" rel="noopener">r/learnprogramming</a> · <a href="https://www.reddit.com/r/ExperiencedDevs/" target="_blank" rel="noopener">r/ExperiencedDevs</a> · <a href="https://www.reddit.com/r/devops/" target="_blank" rel="noopener">r/devops</a></td><td>Preguntas de principiante, carrera y práctica profesional, y DevOps</td></tr>
+            <tr><td><a href="https://stackoverflow.com" target="_blank" rel="noopener">Stack Overflow</a></td><td>Preguntas y respuestas técnicas; casi cualquier error ya está resuelto ahí</td></tr>
+            <tr><td><a href="https://news.ycombinator.com" target="_blank" rel="noopener">Hacker News</a> · <a href="https://lobste.rs" target="_blank" rel="noopener">Lobsters</a></td><td>Noticias y discusión técnica; Lobsters es más pequeño y enfocado</td></tr>
+            <tr><td>Discord</td><td>The Odin Project, Reactiflux (React), Gophers (Go), Python — cada ecosistema tiene el suyo</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>YouTube</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Canal</th><th>Para qué</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://www.youtube.com/@hnasr" target="_blank" rel="noopener">Hussein Nasser</a></td><td>Backend engineering a fondo: protocolos, bases de datos, redes</td></tr>
+            <tr><td><a href="https://www.youtube.com/@Fireship" target="_blank" rel="noopener">Fireship</a></td><td>Panorámicas rápidas de tecnologías, en 5-10 minutos</td></tr>
+            <tr><td><a href="https://www.youtube.com/@CodeAesthetic" target="_blank" rel="noopener">CodeAesthetic</a></td><td>Diseño de código y buenas prácticas, muy bien explicado</td></tr>
+            <tr><td><a href="https://www.youtube.com/@ThePrimeagen" target="_blank" rel="noopener">ThePrimeagen</a></td><td>Herramientas, rendimiento y cultura de desarrollo (formato largo)</td></tr>
+            <tr><td><a href="https://www.youtube.com/@CMUDatabaseGroup" target="_blank" rel="noopener">CMU Database Group</a></td><td>Las clases completas de bases de datos de Andy Pavlo</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Herramientas de bolsillo</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Herramienta</th><th>Para qué</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://regex101.com" target="_blank" rel="noopener">regex101.com</a></td><td>Construir y entender expresiones regulares, con explicación en vivo</td></tr>
+            <tr><td><a href="https://crontab.guru" target="_blank" rel="noopener">crontab.guru</a></td><td>Traducir expresiones de cron a lenguaje humano</td></tr>
+            <tr><td><a href="https://explainshell.com" target="_blank" rel="noopener">explainshell.com</a></td><td>Pega un comando de shell y te explica cada flag</td></tr>
+            <tr><td><a href="https://caniuse.com" target="_blank" rel="noopener">caniuse.com</a></td><td>Qué features de la web soporta cada navegador</td></tr>
+            <tr><td><a href="https://gitdiagram.com" target="_blank" rel="noopener">GitDiagram</a> · <a href="https://github.com/tt-a1i/archify" target="_blank" rel="noopener">Archify</a> · <a href="https://excalidraw.com" target="_blank" rel="noopener">Excalidraw</a></td><td>Generar diagramas de un repo, de una descripción, o dibujarlos a mano</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Laboratorio: probar el concepto en el navegador <span class="rl-tag free">sin registro</span></h3>
+        <p>Herramientas open source que corren enteras en la pestaña, sin cuenta ni instalación. La idea:
+        cuando una sección te suene abstracta, abre el laboratorio y toca el concepto funcionando.</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Herramienta</th><th>Qué concepto de la guía vuelve tangible</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://sqlime.org/" target="_blank" rel="noopener">Sqlime</a> · <a href="https://lite.datasette.io" target="_blank" rel="noopener">Datasette Lite</a></td><td>§6 — SQLite entero compilado a WASM: crea tablas, índices y mira el plan de ejecución sin backend</td></tr>
+            <tr><td><a href="https://jonathanwalker.github.io/SQLChef/" target="_blank" rel="noopener">SQLChef</a></td><td>§6 — consultar CSV, JSON y Parquet con SQL directo; ver un archivo como fuente de datos</td></tr>
+            <tr><td><a href="https://www.drawdb.app" target="_blank" rel="noopener">drawDB</a></td><td>§6 — dibujar el ERD (entidades, claves foráneas, cardinalidades) y exportar el <code class="inline">CREATE TABLE</code></td></tr>
+            <tr><td><a href="https://db-engines.com/" target="_blank" rel="noopener">DB-Engines</a></td><td>§6 — ranking y comparación lado a lado de cientos de motores (relacional, documento, clave-valor, grafo, columnar)</td></tr>
+            <tr><td><a href="https://hoppscotch.io/" target="_blank" rel="noopener">Hoppscotch</a></td><td>§5 — armar peticiones HTTP (métodos, cabeceras, cuerpo, auth) contra endpoints reales; alternativa a Postman sin cuenta</td></tr>
+            <tr><td><a href="https://jsoncrack.com/" target="_blank" rel="noopener">JSON Crack</a> · <a href="https://transform.tools/" target="_blank" rel="noopener">Transform</a></td><td>§5 — pegar un JSON/YAML y verlo como grafo; convertir entre formatos de serialización y ver el árbol</td></tr>
+            <tr><td><a href="https://astexplorer.net/" target="_blank" rel="noopener">AST explorer</a> · <a href="https://tokeko.specy.app/" target="_blank" rel="noopener">Tokeko</a></td><td>§3 — ver el árbol sintáctico que produce un parser real; construir un parser LALR/LR(1) paso a paso</td></tr>
+            <tr><td><a href="https://asm-editor.specy.app" target="_blank" rel="noopener">ASM Editor</a></td><td>§3 · §4 mapa 1 — escribir y ejecutar ensamblador x86/MIPS/RISC-V con los registros y la pila a la vista</td></tr>
+            <tr><td><a href="https://www.falstad.com/circuit/" target="_blank" rel="noopener">CircuitJS1</a> · <a href="https://www.gately.dev/" target="_blank" rel="noopener">Gately</a></td><td>§4 mapa 1 — simulador de circuitos y de compuertas lógicas animado: qué hay debajo del ensamblador</td></tr>
+            <tr><td><a href="https://algorithm-visualizer.org/" target="_blank" rel="noopener">Algorithm Visualizer</a> · <a href="https://pythontutor.com" target="_blank" rel="noopener">Python Tutor</a></td><td>plan 12m — animar un algoritmo desde el código; ejecutar paso a paso viendo la pila y el <em>heap</em></td></tr>
+            <tr><td><a href="https://the-algorithms.com/" target="_blank" rel="noopener">The Algorithms</a></td><td>plan 12m — implementaciones de referencia de cada algoritmo y estructura de datos, en 20+ lenguajes</td></tr>
+            <tr><td><a href="https://brouter.de/brouter-web/" target="_blank" rel="noopener">BRouter-web</a> · <a href="https://rooc.specy.app/" target="_blank" rel="noopener">ROOC</a></td><td>plan 12m — Dijkstra/A* real sobre calles de OpenStreetMap; modelar y resolver optimización lineal/entera</td></tr>
+            <tr><td><a href="https://www.tldraw.com/" target="_blank" rel="noopener">tldraw</a></td><td>§8 — CRDT en vivo: abre el mismo lienzo en dos pestañas, edita a la vez y observa la convergencia sin árbitro central</td></tr>
+            <tr><td><a href="https://pairdrop.net/" target="_blank" rel="noopener">PairDrop</a> · <a href="https://file.pizza/" target="_blank" rel="noopener">FilePizza</a></td><td>§8 · §4 mapa 2 — WebRTC + señalización P2P: los datos viajan directo navegador-a-navegador, el servidor solo presenta a los pares</td></tr>
+            <tr><td><a href="https://cryptpad.fr" target="_blank" rel="noopener">CryptPad</a></td><td>§9 — suite colaborativa cifrada extremo a extremo; ejemplo real de arquitectura zero-knowledge</td></tr>
+            <tr><td><a href="https://gchq.github.io/CyberChef/" target="_blank" rel="noopener">CyberChef</a> · <a href="https://it-tools.tech/" target="_blank" rel="noopener">IT-Tools</a></td><td>§9 — encadenar encoding, hashing (SHA-256, bcrypt), cifrado (AES) y decode de JWT; tocar la criptografía a mano</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Hosting gratis para desplegar los proyectos</h3>
+        <p>Capas gratuitas suficientes para poner en línea los <a href="#proyectos">tres proyectos</a> con
+        dominio y HTTPS. Verifica límites y si piden tarjeta antes de decidir — cambian seguido.</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Servicio</th><th>Qué ofrece</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://render.com/" target="_blank" rel="noopener">Render</a></td><td>Web services, cron jobs y PostgreSQL gestionado; deploy desde git con HTTPS automático. Lo más parecido al viejo Heroku</td></tr>
+            <tr><td><a href="https://railway.com/" target="_blank" rel="noopener">Railway</a></td><td>Backend + base de datos en un proyecto, buena experiencia de desarrollo; crédito mensual gratis limitado</td></tr>
+            <tr><td><a href="https://fly.io/" target="_blank" rel="noopener">Fly.io</a></td><td>Corre contenedores en varias regiones; sirve para practicar despliegue multi-región y cercanía al usuario</td></tr>
+            <tr><td><a href="https://www.cloudflare.com/products/workers/" target="_blank" rel="noopener">Cloudflare Workers</a></td><td>Serverless en el <em>edge</em>, ancho de banda sin límite; encarna el modelo "función corta sin servidor" de la §3</td></tr>
+            <tr><td><a href="https://www.pythonanywhere.com/" target="_blank" rel="noopener">PythonAnywhere</a></td><td>Entorno Python hospedado con MySQL y consola web; cero configuración para un primer despliegue</td></tr>
+          </tbody>
+        </table></div>
+
+        <div class="note">
+          <span class="label">Cómo usar este directorio</span>
+          <p>No lo recorras entero. Cuando estés en una etapa del <a href="#curriculo">currículo</a> o
+          del <a href="#ruta">plan de 12 meses</a>, vuelve aquí y toma <strong>un</strong> recurso de
+          la categoría que te toca. La documentación oficial y un proyecto en marcha enseñan más que
+          diez pestañas abiertas.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Backend de Punta a Punta</strong> — guía de estudio compilada a partir de una
+    conversación, ampliada con un currículo de libros y cursos. Pensada para consultar por partes.</p>
+    <p>Los nombres de productos, versiones y precios cambian; los conceptos de las secciones 3 a 11
+    son estables. Verifica ediciones, disponibilidad y precios antes de comprar o decidir. Los libros
+    y cursos son recomendaciones de referencia amplia, no una lista cerrada.</p>
+  </div>
+</footer>

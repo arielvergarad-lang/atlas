@@ -1,0 +1,411 @@
+<title>Atlas — Serie de guías</title>
+<meta name="description" content="Índice maestro de la serie Atlas: diez guías de estudio densas para autodidactas — Backend, Seguridad, DevOps, Front-end, IA aplicada, Arquitectura de la Nube, Carrera y Freelance, Datos y SQL, Fundamentos de CS, y Recursos y Comunidades. Mismo formato, navegables por separado.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #23272e;
+    --ink: #e7e5df;
+    --ink-soft: #b9bdc6;
+    --muted: #8b919c;
+    --line: #333842;
+    --line-soft: #2a2f37;
+    --accent: #4bb7a8;
+    --accent-soft: #16302d;
+    --accent-ink: #7fd3c7;
+    --rust: #d98a5f;
+    --rust-soft: #35241b;
+    --code-bg: #10131a;
+    --code-ink: #d9e2ec;
+    --code-comment: #7b8798;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-inner { padding: clamp(2.4rem, 6vw, 4.2rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem) 0 5rem; }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: 244px minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.88rem; border-left: 2px solid var(--line); padding-left: 1rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  nav.toc p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.7rem;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: flex; flex-direction: column; gap: 0.1rem; }
+  nav.toc a {
+    display: block; padding: 0.3rem 0.4rem; color: var(--ink-soft); text-decoration: none;
+    border-radius: 5px; counter-increment: toc; transition: background 0.15s, color 0.15s;
+  }
+  nav.toc a::before {
+    content: counter(toc, decimal-leading-zero); font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--muted); margin-right: 0.55rem;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+  nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 979px) {
+    nav.toc {
+      position: static; border-left: none; border: 1px solid var(--line); border-radius: 10px;
+      padding: 1.1rem 1.2rem; background: var(--surface); max-height: none;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 1rem; }
+  }
+
+  main { min-width: 0; }
+  section.block { scroll-margin-top: 2rem; padding-top: 1rem; }
+  section.block + section.block { margin-top: 3.4rem; border-top: 1px solid var(--line-soft); padding-top: 2.6rem; }
+  .sec-num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--accent-ink); }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.55rem, 4vw, 2.1rem);
+    line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; margin: 0.3rem 0 1rem;
+  }
+  h3 { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 1.16rem; margin: 2rem 0 0.6rem; letter-spacing: -0.005em; }
+  h4 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.86rem;
+    letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-soft); margin: 1.4rem 0 0.5rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  main a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  .lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 66ch; }
+  ul, ol.body-list { max-width: 68ch; padding-left: 1.2rem; margin: 0 0 1rem; }
+  li { margin: 0.35rem 0; }
+
+  code.inline {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.08em 0.36em; color: var(--ink);
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-ink);
+    font-size: 0.82rem; line-height: 1.6; padding: 1rem 1.15rem; border-radius: 9px; overflow-x: auto;
+    margin: 0 0 1.2rem; border: 1px solid rgba(255,255,255,0.06);
+  }
+  pre .c { color: var(--code-comment); }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  .concept { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 1.1rem 1.25rem; margin: 0 0 0.9rem; }
+  .concept .term {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.95rem;
+    color: var(--accent-ink); margin: 0 0 0.35rem;
+  }
+  .concept .term span { color: var(--muted); font-weight: 400; }
+  .concept p { margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .concept p:first-of-type { margin-top: 0; }
+  .concept .why { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.9rem; color: var(--ink-soft); }
+  .concept .why b {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 0.1rem;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.85rem 1.1rem;
+    border-radius: 0 8px 8px 0; margin: 0 0 1.3rem; font-size: 0.94rem;
+  }
+  .note.rust { border-left-color: var(--rust); background: var(--rust-soft); }
+  .note p { margin: 0; max-width: none; }
+  .note p + p { margin-top: 0.5rem; }
+  .note .label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-ink); display: block; margin-bottom: 0.25rem;
+  }
+  .note.rust .label { color: var(--rust); }
+
+  .diagram {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; line-height: 1.5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 1rem 1.15rem;
+    overflow-x: auto; white-space: pre; color: var(--ink-soft); margin: 0 0 1.3rem;
+  }
+
+  .chip {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; white-space: nowrap;
+  }
+  .chip.t1 { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* Reading list */
+  .stage { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 1.15rem 1.3rem; margin: 0 0 1rem; }
+  .stage > h4 { margin: 0 0 0.6rem; color: var(--accent-ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 0.5rem; }
+  .stage > p { font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.7rem; }
+  .book { padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  .book:last-child { border-bottom: none; }
+  .book .t { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 600; }
+  .book .a { color: var(--muted); }
+  .book .d { display: block; color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.1rem; }
+  .rl-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.08rem 0.38rem; border-radius: 3px; margin-left: 0.35rem; white-space: nowrap; vertical-align: 0.08em;
+  }
+  .rl-tag.free { background: var(--accent-soft); color: var(--accent-ink); }
+  .rl-tag.paid { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .rl-tag.lvl { background: var(--rust-soft); color: var(--rust); }
+
+  .project { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 0 0 1.8rem; box-shadow: var(--shadow); }
+  .project-head { padding: 1.2rem 1.4rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .project-head .stack {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 0.3rem;
+  }
+  .project-head h3 { margin: 0 0 0.4rem; font-size: 1.28rem; font-family: "IBM Plex Serif", Georgia, serif; }
+  .project-head p { margin: 0; font-size: 0.95rem; color: var(--ink-soft); max-width: none; }
+  .project-body { padding: 0.6rem 1.4rem 1.4rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line-soft); }
+  .phase:last-of-type { border-bottom: none; }
+  .phase .pn {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 5px; padding: 0.1rem 0.4rem; height: fit-content; white-space: nowrap;
+  }
+  .phase .pt { font-weight: 600; font-size: 0.95rem; grid-column: 2; }
+  .phase .pd { grid-column: 2; font-size: 0.92rem; color: var(--ink-soft); }
+  .phase .pd code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; }
+  .learn { margin-top: 1rem; font-size: 0.9rem; background: var(--accent-soft); color: var(--accent-ink); padding: 0.7rem 0.95rem; border-radius: 8px; }
+  .learn b { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
+
+  footer.foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.5rem 0 3.5rem; font-size: 0.9rem; color: var(--muted); }
+  footer.foot p { max-width: 66ch; }
+
+  .guide-grid { display: grid; gap: 1.1rem; grid-template-columns: 1fr; margin: 0 0 2rem; }
+  @media (min-width: 720px) { .guide-grid { grid-template-columns: 1fr 1fr; } }
+  a.guide-card { display: block; text-decoration: none; color: inherit; border: 1px solid var(--line); border-radius: 12px; background: var(--surface); padding: 1.3rem 1.4rem; box-shadow: var(--shadow); transition: border-color 0.15s, transform 0.15s; }
+  a.guide-card:hover { border-color: var(--accent); transform: translateY(-2px); }
+  a.guide-card:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  .guide-card .gc-top { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.5rem; }
+  .guide-card .gc-emoji { font-size: 1.4rem; line-height: 1; }
+  .guide-card .gc-title { font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: 1.24rem; letter-spacing: -0.01em; }
+  .guide-card .gc-meta { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.06em; text-transform: uppercase; color: var(--accent-ink); margin-bottom: 0.5rem; }
+  .guide-card .gc-desc { font-size: 0.94rem; color: var(--ink-soft); margin: 0; max-width: none; }
+  .guide-card .gc-arrow { color: var(--accent-ink); font-family: "IBM Plex Mono", monospace; font-size: 0.82rem; margin-top: 0.7rem; }
+  .grp { font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--muted); margin: 1.8rem 0 0.8rem; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <p class="kicker">Serie de guías de estudio · para autodidactas · edición densa</p>
+    <h1>Atlas</h1>
+    <p class="standfirst">
+      Diez guías que cubren el oficio de punta a punta, cada una para consultar por partes:
+      conceptos antes que sintaxis, un currículo curado de libros y cursos, y un laboratorio
+      para tocar cada idea en el navegador. Mismo formato, navegables por separado.
+    </p>
+    <div class="meta-row">
+      <span class="tag">10 guías</span>
+      <span class="tag">~140 secciones</span>
+      <span class="tag">conceptos &gt; sintaxis</span>
+      <span class="tag">currículo + laboratorio en cada una</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout" style="grid-template-columns: 1fr; max-width: 900px; margin: 0 auto;">
+    <main>
+      <section class="block" id="guias">
+        <span class="sec-num">01</span>
+        <h2>Las guías</h2>
+        <p class="lead">
+          Empieza por <strong>Backend</strong> si vienes de atrás — fija el vocabulario que las
+          otras dan por sabido; <strong>Fundamentos de CS</strong> va bien en paralelo. Las demás
+          no tienen orden: abre la que te toque construir.
+        </p>
+        <p class="grp">El sistema</p>
+        <div class="guide-grid">
+        <a class="guide-card" href="guia/backend-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">📓</span><span class="gc-title">Backend de Punta a Punta</span></div>
+          <p class="gc-meta">20 secciones · ~60 libros · 3 proyectos</p>
+          <p class="gc-desc">Todo lo que sostiene un sistema de servidor: lenguajes y frameworks, cómo corre tu código, las capas de un sistema (5 mapas), bases de datos —incluida su operación en producción—, arquitectura, sistemas distribuidos, el ciclo de vida y la operación. La guía madre.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        <a class="guide-card" href="guia/seguridad-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">🛡️</span><span class="gc-title">Seguridad de Punta a Punta</span></div>
+          <p class="gc-meta">15 secciones · profundidad alta</p>
+          <p class="gc-desc">Modelo de amenazas, criptografía aplicada, OWASP Top 10, secure coding por lenguaje, identidad y autorización, infraestructura, cadena de suministro, seguridad móvil, ofensiva ética, defensa y detección, seguridad de IA y cumplimiento.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        <a class="guide-card" href="guia/devops-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">🔧</span><span class="gc-title">DevOps de Punta a Punta</span></div>
+          <p class="gc-meta">15 secciones · profundidad alta</p>
+          <p class="gc-desc">Métricas DORA, control de versiones a escala, CI/CD por dentro, contenedores y Kubernetes, infraestructura como código, redes cloud, observabilidad, secretos, FinOps, platform engineering y multirregión / recuperación ante desastres.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        <a class="guide-card" href="guia/frontend-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">🎨</span><span class="gc-title">Front-end de Punta a Punta</span></div>
+          <p class="gc-meta">13 secciones · profundidad media</p>
+          <p class="gc-desc">Cómo se pinta una página, qué modelo de render resuelve qué problema, estado y reactividad, hidratación, bundling, CSS a escala, accesibilidad, rendimiento percibido (Core Web Vitals), testing de front-end, i18n y design systems.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        <a class="guide-card" href="guia/ia-aplicada-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">🤖</span><span class="gc-title">IA aplicada de Punta a Punta</span></div>
+          <p class="gc-meta">18 secciones · profundidad alta</p>
+          <p class="gc-desc">El LLM como producto: prompting como ingeniería, contexto y caching, RAG a fondo, agentes y MCP, evals, observabilidad, guardrails, costos, fine-tuning, deploy, multimodal, embeddings a fondo, modelos locales y abiertos, UX de features con IA y construcción del dataset.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        <a class="guide-card" href="guia/cloud-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">☁️</span><span class="gc-title">Arquitectura de la Nube de Punta a Punta</span></div>
+          <p class="gc-meta">14 secciones · profundidad alta</p>
+          <p class="gc-desc">Diseñar sobre infraestructura gestionada: modelos de servicio y responsabilidad compartida, AWS/Azure/GCP, organización de cuentas y landing zones, identidad, redes, cómputo, almacenamiento y datos, patrones, el marco Well-Architected, FinOps, IaC y seguridad de la postura en la nube.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        </div>
+        <p class="grp">Alrededor del sistema</p>
+        <div class="guide-grid">
+        <a class="guide-card" href="guia/carrera-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">💼</span><span class="gc-title">Carrera + Freelance de Punta a Punta</span></div>
+          <p class="gc-meta">14 secciones · tabla de portales · plan de 90 días</p>
+          <p class="gc-desc">La única que no es sobre código: portafolio, CV, entrevistas técnicas y de diseño, arranque freelance, propuestas, precio, trabajo remoto y comunicación — para conseguir clientes y empleadores fuera del país.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        <a class="guide-card" href="guia/datos-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">📊</span><span class="gc-title">Datos y SQL de Punta a Punta</span></div>
+          <p class="gc-meta">13 secciones · profundidad alta</p>
+          <p class="gc-desc">El lado analítico que Backend no cubre: OLTP vs OLAP, SQL analítico y window functions, modelado dimensional, warehouse y lakehouse, ETL/ELT, dbt, calidad de datos, analítica de producto y datos para IA.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        <a class="guide-card" href="guia/fundamentos-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">🧮</span><span class="gc-title">Fundamentos de CS de Punta a Punta</span></div>
+          <p class="gc-meta">11 secciones · profundidad alta</p>
+          <p class="gc-desc">La base que las otras dan por sabida: representación de datos, la máquina, complejidad algorítmica, estructuras de datos, patrones de algoritmos, lenguajes, concurrencia, computabilidad y teoría de la información.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        <a class="guide-card" href="guia/recursos-guia.html" target="_blank" rel="noopener">
+          <div class="gc-top"><span class="gc-emoji">🧭</span><span class="gc-title">Recursos y Comunidades</span></div>
+          <p class="gc-meta">9 secciones · 42 enlaces · plan de 4 meses</p>
+          <p class="gc-desc">Dónde aprender, practicar y conversar con más personas: programas de Google y AWS, plataformas de ciberseguridad, comunidades de programación y sistemas, higiene al entrar a comunidades y un plan hacia AWS Community Builders. Cada recurso con enlace, costo, cómo empezar y estado de verificación.</p>
+          <p class="gc-arrow">Abrir la guía &rarr;</p>
+        </a>
+        </div>
+      </section>
+
+      <section class="block" id="como">
+        <span class="sec-num">02</span>
+        <h2>Cómo se relacionan</h2>
+        <div class="concept">
+          <p class="term">Un mismo sistema, muchos ángulos</p>
+          <p>Las seis primeras describen el mismo objeto —una aplicación real en producción—
+          desde distintas capas: <strong>Backend</strong> es la estructura, <strong>Seguridad</strong>
+          cómo no se rompe, <strong>DevOps</strong> cómo llega a producción y sigue viva,
+          <strong>Front-end</strong> lo que ve el usuario, <strong>IA aplicada</strong> qué cambia
+          cuando una pieza es un modelo de lenguaje, <strong>Arquitectura de la Nube</strong> sobre
+          qué infraestructura corre todo. <strong>Datos y SQL</strong> es el lado
+          analítico de esa misma aplicación; <strong>Fundamentos de CS</strong>, la teoría debajo
+          de todo; <strong>Carrera + Freelance</strong>, cómo consigues que te paguen por hacerlo;
+          <strong>Recursos y Comunidades</strong>, dónde seguir aprendiendo y con quién conversar.
+          Se cruzan a propósito.</p>
+        </div>
+        <div class="concept">
+          <p class="term">Cómo leerlas</p>
+          <p>No de corrido. Cada guía es material de consulta: cuando estés construyendo algo y
+          una parte te suene abstracta, abre la sección que le corresponde, lee sus tres o cuatro
+          conceptos, y si sigue sin cuajar, abre la herramienta del <em>laboratorio</em> de esa
+          guía y tócala funcionando.</p>
+        </div>
+        <div class="note">
+          <span class="label">Sobre los datos que cambian</span>
+          <p>Nombres de productos, versiones, precios y límites cambian rápido —sobre todo en
+          DevOps, IA aplicada, Datos y Carrera—. Los conceptos de las secciones numeradas son
+          estables; verifica cualquier cifra concreta antes de decidir. Los currículos son
+          referencia amplia, no listas cerradas.</p>
+        </div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Atlas</strong> — serie compilada en sesiones de Claude Code (2026-09; ampliación y
+    guía de Arquitectura de la Nube, 2026-09-10). Cada guía tiene su propio artefacto, su copia
+    local en <code class="inline">~/</code> y su copia en el vault. Para actualizar una: pedir en
+    una sesión nueva "actualiza mi artefacto &lt;url&gt;".</p>
+  </div>
+</footer>

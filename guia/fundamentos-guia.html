@@ -1,0 +1,2131 @@
+<title>Fundamentos de CS de Punta a Punta</title>
+<meta name="description" content="Guía de estudio densa de fundamentos de ciencias de la computación para autodidactas: representación de datos, la máquina, complejidad algorítmica, estructuras de datos, patrones de algoritmos, cómo funcionan los lenguajes, concurrencia, computabilidad (P vs NP, el problema de la parada) y teoría de la información — más un currículo y un laboratorio sin registro.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #23272e;
+    --ink: #e7e5df;
+    --ink-soft: #b9bdc6;
+    --muted: #8b919c;
+    --line: #333842;
+    --line-soft: #2a2f37;
+    --accent: #4bb7a8;
+    --accent-soft: #16302d;
+    --accent-ink: #7fd3c7;
+    --rust: #d98a5f;
+    --rust-soft: #35241b;
+    --code-bg: #10131a;
+    --code-ink: #d9e2ec;
+    --code-comment: #7b8798;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-inner { padding: clamp(2.4rem, 6vw, 4.2rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem) 0 5rem; }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: 244px minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.88rem; border-left: 2px solid var(--line); padding-left: 1rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  nav.toc p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.7rem;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: flex; flex-direction: column; gap: 0.1rem; }
+  nav.toc a {
+    display: block; padding: 0.3rem 0.4rem; color: var(--ink-soft); text-decoration: none;
+    border-radius: 5px; counter-increment: toc; transition: background 0.15s, color 0.15s;
+  }
+  nav.toc a::before {
+    content: counter(toc, decimal-leading-zero); font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--muted); margin-right: 0.55rem;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+  nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 979px) {
+    nav.toc {
+      position: static; border-left: none; border: 1px solid var(--line); border-radius: 10px;
+      padding: 1.1rem 1.2rem; background: var(--surface); max-height: none;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 1rem; }
+  }
+
+  main { min-width: 0; }
+  section.block { scroll-margin-top: 2rem; padding-top: 1rem; }
+  section.block + section.block { margin-top: 3.4rem; border-top: 1px solid var(--line-soft); padding-top: 2.6rem; }
+  .sec-num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--accent-ink); }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.55rem, 4vw, 2.1rem);
+    line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; margin: 0.3rem 0 1rem;
+  }
+  h3 { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 1.16rem; margin: 2rem 0 0.6rem; letter-spacing: -0.005em; }
+  h4 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.86rem;
+    letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-soft); margin: 1.4rem 0 0.5rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  main a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  .lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 66ch; }
+  ul, ol.body-list { max-width: 68ch; padding-left: 1.2rem; margin: 0 0 1rem; }
+  li { margin: 0.35rem 0; }
+
+  code.inline {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.08em 0.36em; color: var(--ink);
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-ink);
+    font-size: 0.82rem; line-height: 1.6; padding: 1rem 1.15rem; border-radius: 9px; overflow-x: auto;
+    margin: 0 0 1.2rem; border: 1px solid rgba(255,255,255,0.06);
+  }
+  pre .c { color: var(--code-comment); }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  .concept { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 1.1rem 1.25rem; margin: 0 0 0.9rem; }
+  .concept .term {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.95rem;
+    color: var(--accent-ink); margin: 0 0 0.35rem;
+  }
+  .concept .term span { color: var(--muted); font-weight: 400; }
+  .concept p { margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .concept p:first-of-type { margin-top: 0; }
+  .concept .why { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.9rem; color: var(--ink-soft); }
+  .concept .why b {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 0.1rem;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.85rem 1.1rem;
+    border-radius: 0 8px 8px 0; margin: 0 0 1.3rem; font-size: 0.94rem;
+  }
+  .note.rust { border-left-color: var(--rust); background: var(--rust-soft); }
+  .note p { margin: 0; max-width: none; }
+  .note p + p { margin-top: 0.5rem; }
+  .note .label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-ink); display: block; margin-bottom: 0.25rem;
+  }
+  .note.rust .label { color: var(--rust); }
+
+  .diagram {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; line-height: 1.5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 1rem 1.15rem;
+    overflow-x: auto; white-space: pre; color: var(--ink-soft); margin: 0 0 1.3rem;
+  }
+
+  .chip {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; white-space: nowrap;
+  }
+  .chip.t1 { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* Reading list */
+  .stage { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 1.15rem 1.3rem; margin: 0 0 1rem; }
+  .stage > h4 { margin: 0 0 0.6rem; color: var(--accent-ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 0.5rem; }
+  .stage > p { font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.7rem; }
+  .book { padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  .book:last-child { border-bottom: none; }
+  .book .t { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 600; }
+  .book .a { color: var(--muted); }
+  .book .d { display: block; color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.1rem; }
+  .rl-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.08rem 0.38rem; border-radius: 3px; margin-left: 0.35rem; white-space: nowrap; vertical-align: 0.08em;
+  }
+  .rl-tag.free { background: var(--accent-soft); color: var(--accent-ink); }
+  .rl-tag.paid { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .rl-tag.lvl { background: var(--rust-soft); color: var(--rust); }
+
+  .project { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 0 0 1.8rem; box-shadow: var(--shadow); }
+  .project-head { padding: 1.2rem 1.4rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .project-head .stack {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 0.3rem;
+  }
+  .project-head h3 { margin: 0 0 0.4rem; font-size: 1.28rem; font-family: "IBM Plex Serif", Georgia, serif; }
+  .project-head p { margin: 0; font-size: 0.95rem; color: var(--ink-soft); max-width: none; }
+  .project-body { padding: 0.6rem 1.4rem 1.4rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line-soft); }
+  .phase:last-of-type { border-bottom: none; }
+  .phase .pn {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 5px; padding: 0.1rem 0.4rem; height: fit-content; white-space: nowrap;
+  }
+  .phase .pt { font-weight: 600; font-size: 0.95rem; grid-column: 2; }
+  .phase .pd { grid-column: 2; font-size: 0.92rem; color: var(--ink-soft); }
+  .phase .pd code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; }
+  .learn { margin-top: 1rem; font-size: 0.9rem; background: var(--accent-soft); color: var(--accent-ink); padding: 0.7rem 0.95rem; border-radius: 8px; }
+  .learn b { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
+
+  footer.foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.5rem 0 3.5rem; font-size: 0.9rem; color: var(--muted); }
+  footer.foot p { max-width: 66ch; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <p class="kicker">Guía de estudio · Fundamentos de Computación · edición densa</p>
+    <h1>Fundamentos de CS de Punta a Punta</h1>
+    <p class="standfirst">La base que las otras guías dan por sabida: cómo la máquina representa todo, cómo ejecuta tu código, qué mide la notación asintótica, cómo funcionan por dentro las estructuras de datos y los lenguajes, la concurrencia, y qué se puede y qué no se puede computar. Con intuición antes que formalismo.</p>
+    <div class="meta-row">
+      <span class="tag">para autodidactas</span>
+      <span class="tag">la teoría, ordenada</span>
+      <span class="tag">11 secciones</span>
+      <span class="tag">intuición &gt; formalismo</span>
+      <span class="tag">laboratorio sin registro</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p>Índice</p>
+      <ol>
+        <li><a href="#representacion">Cómo la máquina representa todo</a></li>
+        <li><a href="#maquina">De la compuerta al programa</a></li>
+        <li><a href="#complejidad">Complejidad algorítmica</a></li>
+        <li><a href="#estructuras">Estructuras de datos por dentro</a></li>
+        <li><a href="#algoritmos">Patrones de algoritmos</a></li>
+        <li><a href="#lenguajes">Cómo funciona un lenguaje</a></li>
+        <li><a href="#concurrencia">Concurrencia</a></li>
+        <li><a href="#computo">Qué se puede computar</a></li>
+        <li><a href="#teoria-info">Teoría de la información</a></li>
+        <li><a href="#curriculo">Currículo: libros y cursos</a></li>
+        <li><a href="#laboratorio">Laboratorio: ver la teoría funcionando</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+<section class="block" id="representacion">
+  <span class="sec-num">01</span>
+  <h2>Cómo la máquina representa todo</h2>
+  <p class="lead">
+    Un computador solo sabe distinguir dos estados. Números, texto, colores, sonido y tu
+    código mismo son, al final, tiras de bits con una convención acordada para leerlas. Casi
+    todos los bugs "raros" de tipos, precisión o encoding nacen de olvidar cuál es la
+    convención.
+  </p>
+
+  <div class="concept">
+    <p class="term">Sistema posicional y bases</p>
+    <p>En base 10 el número <code class="inline">305</code> vale 3·10² + 0·10¹ + 5·10⁰. En
+    base 2 es igual con potencias de 2: <code class="inline">101</code> vale 1·4 + 0·2 + 1·1 = 5.
+    Un <strong>bit</strong> es un dígito binario; ocho bits son un <strong>byte</strong> y
+    representan 2⁸ = 256 valores distintos (0 a 255). Hexadecimal (base 16, dígitos
+    <code class="inline">0-9 a-f</code>) es solo taquigrafía: cada dígito hex son exactamente
+    4 bits, así que un byte son dos dígitos hex (<code class="inline">0xFF</code> = 255).</p>
+    <p class="why"><b>por qué importa</b>Máscaras de bits, permisos de archivo
+    (<code class="inline">chmod 640</code>), colores <code class="inline">#1d2127</code>,
+    direcciones de memoria y flags de red son todos el mismo truco: empaquetar varios datos
+    pequeños en un entero y leerlos por posición.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Enteros con signo: complemento a dos</p>
+    <p>Para representar negativos se podría reservar un bit de signo, pero eso da
+    <em>dos ceros</em> (+0 y −0) y obliga a la CPU a tratar la suma y la resta como casos
+    distintos. La solución universal hoy es <strong>complemento a dos</strong>: el negativo de
+    <code class="inline">x</code> es "invertir todos los bits y sumar 1". El bit más alto pasa
+    a valer una potencia <em>negativa</em>. Con esto hay un solo cero, el rango es asimétrico
+    (un negativo más que positivos) y —lo importante— <strong>sumar y restar usan el mismo
+    circuito</strong> que para los sin signo.</p>
+<pre><span class="c"># calcular -5 en 8 bits, a mano</span>
+  5            = 0000 0101
+  invertir     = 1111 1010     <span class="c"># complemento a uno</span>
+  sumar 1      = 1111 1011  =  -5
+
+<span class="c"># comprobación leyendo por posición (el bit alto vale -128):</span>
+  -128 + 64 + 32 + 16 + 8 + 0 + 2 + 1  =  -5
+
+<span class="c"># rango de un entero de 8 bits con signo:</span>
+  -128 .. +127        <span class="c"># asimétrico: -(-128) no cabe → overflow</span></pre>
+    <p class="why"><b>por qué importa</b>El "wraparound" viene de aquí: sumar 1 a
+    <code class="inline">INT_MAX</code> da <code class="inline">INT_MIN</code>. Bugs históricos
+    (Gangnam Style rompiendo el contador de YouTube de 32 bits, el "año 2038" de Unix) son
+    exactamente este desbordamiento.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Qué hace tu lenguaje cuando un entero desborda</p>
+    <p>El wraparound de arriba no es universal: cada lenguaje decide qué hacer cuando una suma
+    se sale del rango representable, y las diferencias sorprenden. En <strong>C/C++</strong>,
+    el desborde de un entero <em>sin signo</em> está definido —envuelve módulo 2ⁿ—, pero el de
+    un entero <em>con signo</em> es <strong>comportamiento indefinido</strong>: el compilador
+    puede asumir que nunca ocurre y optimizar en consecuencia, a veces eliminando el chequeo que
+    tú mismo escribiste. En <strong>Rust</strong>, compilar en modo <em>debug</em> hace que el
+    desborde lance <code class="inline">panic!</code>; en modo <em>release</em> envuelve en
+    silencio, salvo que pidas explícitamente <code class="inline">wrapping_add</code>,
+    <code class="inline">checked_add</code> (devuelve <code class="inline">Option</code>) o
+    <code class="inline">saturating_add</code> (se queda pegado en el máximo o el mínimo). En
+    <strong>Python</strong> los enteros son de precisión arbitraria: nunca desbordan, crecen lo
+    que haga falta, a costa de memoria y de que la aritmética deja de ser O(1).</p>
+    <p class="why"><b>por qué importa</b>El mismo bug —un contador que se sale de rango— es
+    silencioso y determinista en un lenguaje, un panic reproducible en otro, e imposible en un
+    tercero. Es la primera pregunta a hacerse al portar código numérico entre lenguajes.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Punto flotante IEEE-754</p>
+    <p>Los reales no caben en bits finitos, así que se aproximan con notación científica
+    binaria: <code class="inline">valor = signo × mantisa × 2^exponente</code>. El estándar
+    IEEE-754 fija el formato. Un <code class="inline">double</code> (64 bits) usa 1 bit de
+    signo, 11 de exponente (con sesgo 1023) y 52 de mantisa. Como la mantisa siempre empieza
+    por <code class="inline">1.</code> en binario normalizado, ese 1 no se guarda ("bit
+    implícito") y quedan 53 bits efectivos de precisión ≈ 15-17 dígitos decimales.</p>
+    <div class="diagram">DOUBLE (64 bits) IEEE-754
+
+ 63  62            52 51                                              0
++--+----------------+------------------------------------------------+
+|s |   exponente    |               mantisa / fracción               |
+| 1|    11 bits      |                    52 bits                     |
++--+----------------+------------------------------------------------+
+
+valor = (-1)^s  x  1.fraccion(base 2)  x  2^(exponente - 1023)
+
+casos especiales:  exp=0 -> subnormales y cero    exp=todo-1 -> Inf / NaN
+
+
+COMPLEMENTO A DOS (rueda de un entero de 3 bits, para intuición)
+
+        000 = 0
+   111        001
+  -1            1
+ 110            010
+ -2             2
+  101          011
+  -3      100    3
+         -4   (el salto -4 -> 3 es el overflow)</div>
+    <p class="why"><b>por qué <code class="inline">0.1 + 0.2 != 0.3</code></b>
+    En binario, <code class="inline">0.1</code> es <code class="inline">0.00011001100110011…</code>
+    periódico infinito, igual que 1/3 en decimal. No cabe: se guarda el
+    <code class="inline">double</code> más cercano, que es
+    <code class="inline">0.1000000000000000055511151231257827…</code>. Lo mismo con 0.2. Al
+    sumar, los errores se acumulan y el resultado es
+    <code class="inline">0.30000000000000004</code>, distinto del
+    <code class="inline">double</code> más cercano a 0.3. No es un bug del lenguaje: es la
+    aritmética que tiene tu CPU.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">La trampa</span>
+    <p>Nunca uses <code class="inline">float</code>/<code class="inline">double</code> para
+    dinero. Guarda centavos como enteros, o usa un tipo decimal (<code class="inline">DECIMAL</code>
+    en SQL, <code class="inline">BigDecimal</code>, <code class="inline">decimal.Decimal</code>).
+    Para comparar flotantes, nunca <code class="inline">a == b</code>: compara
+    <code class="inline">abs(a - b) &lt; epsilon</code> con un epsilon acorde a la magnitud.
+    Y cuidado con sumar muchos números de escalas muy distintas: los pequeños "se pierden"
+    bajo el redondeo del grande.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">NaN: el valor que rompe la igualdad</p>
+    <p>IEEE-754 reserva el patrón de exponente "todo unos" con mantisa distinta de cero para
+    <strong>NaN</strong> ("not a number"): lo que da <code class="inline">0.0 / 0.0</code>,
+    <code class="inline">sqrt(-1)</code> o <code class="inline">Inf - Inf</code>. Por
+    definición del estándar, <strong>NaN nunca es igual a sí mismo</strong>: toda comparación
+    con un NaN —igualdad, menor, mayor— da falso, salvo la comparación de "distinto", que da
+    verdadero. Además NaN es "contagioso": cualquier operación aritmética que lo toque da NaN.</p>
+    <p class="why"><b>dónde muerde</b>Buscar un NaN dentro de una colección con el operador de
+    igualdad de siempre no lo encuentra aunque esté ahí;
+    <code class="inline">min</code>/<code class="inline">max</code> con un NaN de por medio
+    devuelve NaN silenciosamente en vez de un error; ordenar una lista con NaNs da resultados
+    que dependen de la implementación. Para detectarlo se usa una función dedicada
+    (<code class="inline">isNaN</code>, o el truco clásico de compararlo consigo mismo y ver
+    que da falso), nunca el operador de igualdad normal.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Texto: Unicode y UTF-8</p>
+    <p><strong>Unicode</strong> es el catálogo: asigna a cada carácter de (casi) todo idioma
+    un número llamado <em>code point</em>, de <code class="inline">U+0000</code> a
+    <code class="inline">U+10FFFF</code>. <strong>UTF-8</strong> es una forma de
+    <em>serializar</em> esos números a bytes: 1 byte para ASCII (compatibilidad total hacia
+    atrás), 2-4 bytes para el resto, y es auto-sincronizante (si pierdes un byte, te
+    reencuentras en el siguiente carácter). <code class="inline">"café"</code> ocupa 5 bytes
+    en UTF-8 porque <code class="inline">é</code> son dos (<code class="inline">C3 A9</code>).
+    Muchos emoji son <em>secuencias</em> de varios code points unidos por
+    <em>zero-width joiner</em>.</p>
+    <p class="why"><b>por qué importa</b>"Longitud de un string" es ambiguo: ¿bytes, code
+    points o grafemas (lo que el usuario ve como un carácter)?
+    <code class="inline">"👨‍👩‍👧".length</code> puede dar 8, 5 o 1 según qué cuentes. El
+    <em>mojibake</em> (<code class="inline">Ã©</code> en vez de <code class="inline">é</code>)
+    es leer bytes UTF-8 como si fueran Latin-1. Regla: UTF-8 en todas partes, y declara el
+    encoding en cada frontera (BD, HTTP, archivos).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Endianness <span>· orden de los bytes</span></p>
+    <p>Un entero de 32 bits ocupa 4 bytes en memoria, pero ¿en qué orden?
+    <strong>Little-endian</strong> (x86, ARM habitual) guarda primero el byte menos
+    significativo; <strong>big-endian</strong> (orden de red, algunos MIPS/SPARC) primero el
+    más significativo. <code class="inline">0x12345678</code> en little-endian se ve en
+    memoria como <code class="inline">78 56 34 12</code>.</p>
+    <p class="why"><b>cuándo te muerde</b>Al leer un archivo binario, un protocolo de red o
+    datos que cruzaron de una arquitectura a otra. Por eso los formatos serios fijan el orden
+    ("network byte order" es big-endian) y existen <code class="inline">htons()</code>,
+    <code class="inline">struct.pack</code> con marcador de endianness, etc.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">De bits a tipos</p>
+    <p>Un tipo es una <strong>interpretación acordada</strong> de una región de bytes más las
+    operaciones válidas sobre ella. Los mismos 32 bits
+    <code class="inline">0100 0000 0100 1001 0000 1111 1101 1011</code> son
+    <code class="inline">1078530011</code> leídos como entero y
+    <code class="inline">3.14159…</code> leídos como <code class="inline">float</code>. El
+    compilador (o el runtime) recuerda qué son y aplica la operación correcta; un
+    <em>cast</em> de C reinterpreta, una conversión los transforma.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Alineación y padding de structs</p>
+    <p>La CPU lee memoria en bloques alineados (a menudo de 4 u 8 bytes); leer un dato de 4
+    bytes que empieza en una dirección que no es múltiplo de 4 puede costar una lectura extra,
+    o en algunas arquitecturas directamente fallar. Por eso el compilador inserta
+    <strong>padding</strong> (bytes de relleno invisibles) para que cada campo de un
+    <code class="inline">struct</code> empiece en una dirección alineada al tamaño de su propio
+    tipo.</p>
+<pre><span class="c">// en una maquina de 64 bits, esto NO ocupa 1+8+4 = 13 bytes</span>
+struct Ejemplo {
+    char  a;      <span class="c">// 1 byte  + 7 de padding, para alinear b a 8</span>
+    double b;     <span class="c">// 8 bytes</span>
+    int   c;      <span class="c">// 4 bytes + 4 de padding final, para alinear el struct a 8</span>
+};                <span class="c">// total real: 24 bytes</span>
+
+<span class="c">// reordenando de mayor a menor tamano se evita casi todo el padding:</span>
+struct Compacto {
+    double b;     <span class="c">// 8 bytes</span>
+    int   c;      <span class="c">// 4 bytes</span>
+    char  a;      <span class="c">// 1 byte + 3 de padding final</span>
+};                <span class="c">// total real: 16 bytes</span></pre>
+    <p class="why"><b>por qué importa</b>En structs muy repetidos —un array de eventos, una
+    fila de base de datos representada en memoria— el orden de los campos cambia el tamaño
+    real, y con eso cuántos caben en una línea de caché. Es una optimización gratuita: ordenar
+    los campos de mayor a menor tamaño. Los lenguajes con GC (Java, Python) esconden esto; C,
+    C++, Rust y Go lo exponen (Go incluso lo señala con un chequeo de alineación de campos).</p>
+  </div>
+</section>
+
+<section class="block" id="maquina">
+  <span class="sec-num">02</span>
+  <h2>De la compuerta al programa</h2>
+  <p class="lead">
+    Entre el transistor y tu línea de Python hay una torre de abstracciones, cada una
+    ofreciendo una interfaz limpia y escondiendo la de abajo. Saber que existe te explica por
+    qué un programa "correcto" puede ir 50 veces más lento que otro igual de correcto.
+  </p>
+
+  <div class="concept">
+    <p class="term">Transistor → compuerta → circuito</p>
+    <p>Un <strong>transistor</strong> es un interruptor controlado por electricidad: sin
+    partes móviles, conmuta miles de millones de veces por segundo. Combinando transistores se
+    construyen <strong>compuertas lógicas</strong> (AND, OR, NOT, y de ahí NAND, XOR…).
+    Combinando compuertas se hace aritmética: un <em>sumador de 1 bit</em> son dos XOR y dos
+    AND; encadenando 64 tienes un sumador de 64 bits. Un <em>latch</em> guarda un bit; muchos
+    latches son un registro o una celda de memoria.</p>
+    <p class="why"><b>por qué importa</b>No hay magia en el fondo: "el hardware calcula" es
+    compuertas hechas de interruptores. Nand2Tetris construye una CPU entera desde una sola
+    NAND para volver esto tangible.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">La CPU y el ciclo de instrucción</p>
+    <p>La <strong>ALU</strong> (unidad aritmético-lógica) hace las operaciones. Los
+    <strong>registros</strong> son un puñado de celdas (decenas) dentro de la CPU, las más
+    rápidas que existen. La <strong>unidad de control</strong> repite sin parar el ciclo
+    <em>fetch–decode–execute</em>: trae la siguiente instrucción de memoria (la dirección la
+    tiene el <em>program counter</em>), la decodifica, la ejecuta, avanza el PC. Un salto
+    (<code class="inline">if</code>, bucle, llamada) es simplemente escribir otra dirección en
+    el PC.</p>
+    <p class="why"><b>qué esconde</b>Las CPU modernas hacen esto de forma muy paralela por
+    dentro: <em>pipelining</em> (varias instrucciones en vuelo), ejecución fuera de orden,
+    predicción de saltos, ejecución especulativa. Tú ves un modelo secuencial simple; ellas
+    apuestan a qué harás después. Cuando la predicción falla, se pierden ciclos: por eso un
+    bucle con ramas impredecibles es más lento que uno predecible.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Modo usuario, modo kernel e interrupciones</p>
+    <p>La CPU tiene al menos dos <strong>niveles de privilegio</strong>: en <em>modo
+    usuario</em> tu programa no puede tocar hardware directamente ni la memoria de otro
+    proceso; en <em>modo kernel</em> el sistema operativo puede hacer cualquier cosa. Cruzar de
+    uno a otro se hace con una <strong>syscall</strong> (tu programa pide "abre este archivo",
+    "manda estos bytes por la red") o con una <strong>interrupción</strong> (el hardware
+    —teclado, disco, temporizador— avisa "tengo algo para ti" y la CPU suspende lo que hacía
+    para atenderlo). El <em>temporizador</em> es la interrupción que hace posible el
+    <em>time-sharing</em>: cada pocos milisegundos interrumpe al proceso en curso para que el
+    planificador del kernel decida a quién le toca la CPU después.</p>
+    <p class="why"><b>por qué importa</b>Cruzar a modo kernel cuesta cientos de ciclos, mucho
+    más que una llamada a función normal; por eso la I/O hecha syscall por syscall (leer un
+    archivo byte a byte) es lenta, y por eso existen los buffers: agrupar muchas operaciones
+    pequeñas en una sola syscall grande. Una herramienta como <code class="inline">strace</code>
+    en Linux muestra exactamente qué syscalls hace tu proceso y cuánto tarda cada una.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">La jerarquía de memoria y la localidad</p>
+    <p>No existe memoria a la vez enorme, rápida y barata, así que se apilan varias: pocos
+    registros rapidísimos arriba, un disco gigante y lento abajo, y cachés intermedias. La
+    CPU siempre busca primero en la caché; si el dato no está (<em>cache miss</em>) baja al
+    siguiente nivel y paga el precio. La diferencia entre acertar en L1 y ir a RAM es de
+    ~100×.</p>
+    <div class="diagram">nivel            tamaño típico     latencia aprox.   escala relativa
+                                                   (si L1 = 1 s)
+registros        ~1 KB             ~0.3 ns          ~1 s
+cache L1         32-64 KB          ~1 ns            ~3 s
+cache L2         256 KB - 1 MB     ~4 ns            ~12 s
+cache L3         8-32 MB           ~15 ns           ~1 min
+RAM              GB                ~100 ns          ~5 min
+SSD NVMe         TB                ~100 us          ~3 dias
+disco duro       TB                ~10 ms           ~1 anio
+red mismo centro de datos          ~0.5 ms          ~2 semanas
+
+la caché trae datos en LINEAS de 64 bytes: si lees a[0], a[1..15] ya vienen gratis</div>
+    <p class="why"><b>por qué importa en tu código</b>Recorrer un array (memoria contigua) es
+    mucho más rápido que recorrer una lista enlazada del mismo tamaño (nodos dispersos), aunque
+    ambas sean O(n): la primera aprovecha la línea de caché, la segunda provoca un miss por
+    nodo. "Localidad" (espacial: datos vecinos; temporal: reusar lo recién visto) es la
+    variable oculta detrás de mucho rendimiento real.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Memoria virtual, paginación y el TLB</p>
+    <p>Tu programa nunca ve direcciones físicas de RAM: ve un espacio de direcciones
+    <strong>virtual</strong>, privado y contiguo, que la CPU y el kernel traducen a memoria
+    física real en bloques llamados <strong>páginas</strong> (típicamente 4 KB). Una tabla de
+    páginas guarda esa traducción; como consultarla en cada acceso sería carísimo, la CPU la
+    cachea en el <strong>TLB</strong> (translation lookaside buffer). Si una página no está en
+    RAM —se llevó al disco, o nunca se cargó— ocurre un <em>page fault</em>: el kernel la trae
+    y reintenta la instrucción, transparente para tu código pero miles de veces más lento que un
+    acceso normal.</p>
+    <div class="diagram">direccion virtual del proceso A          direccion virtual del proceso B
+   0x00401000 ------\                       0x00401000 ------\
+                      \  (cada proceso tiene                    \
+                       \   su propia tabla                        \
+                        \   de paginas)                             \
+                         v                                           v
+              RAM FISICA: pagina 7742                    RAM FISICA: pagina 91034
+
+  dos procesos usan la MISMA direccion virtual y viven en sitios distintos de la RAM fisica:
+  por eso un proceso no puede leer ni corromper la memoria de otro sin permiso del kernel</div>
+    <p class="why"><b>por qué importa</b>Es lo que permite que cada proceso "crea" tener toda la
+    RAM para él, que dos procesos estén aislados por seguridad, y que el sistema pueda
+    <em>swapear</em> páginas frías a disco para simular más RAM de la que hay físicamente —a
+    costa de un <em>thrashing</em> brutal si se abusa—. También explica por qué
+    <code class="inline">mmap</code> puede tratar un archivo como si fuera memoria: es el mismo
+    mecanismo de traducción, apuntando al archivo en vez de a RAM.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">La pila de llamadas <span>· call stack</span></p>
+    <p>Cada llamada a función empuja un <strong>marco</strong> (<em>stack frame</em>) en la
+    pila: sus parámetros, sus variables locales y la dirección a la que volver. Al terminar,
+    el marco se descarta y se salta a la dirección de retorno. Es una estructura LIFO perfecta
+    para anidamiento. La recursión infinita la desborda: <em>stack overflow</em>.</p>
+    <div class="diagram">tope ->  +---------------------------+
+         |  marco de  parsear()      |   locales, args, retorno
+         +---------------------------+
+         |  marco de  leer_config()  |
+         +---------------------------+
+         |  marco de  main()         |
+         +---------------------------+
+         (crece hacia abajo; el heap crece hacia arriba desde el otro extremo)</div>
+  </div>
+
+  <div class="concept">
+    <p class="term">Qué hace de verdad una línea de C</p>
+    <p><code class="inline">total = a + b;</code> se convierte en algo como:
+    <code class="inline">LOAD r1, [a]</code> (traer <code class="inline">a</code> de memoria a
+    un registro), <code class="inline">LOAD r2, [b]</code>,
+    <code class="inline">ADD r3, r1, r2</code>, <code class="inline">STORE [total], r3</code>.
+    Un <code class="inline">printf</code> es una <em>llamada al sistema</em>
+    (<code class="inline">write</code>) que cede el control al kernel. Un
+    <code class="inline">malloc</code> pide memoria al sistema y devuelve un puntero. Ese es el
+    "de verdad": cargas, operaciones sobre registros, guardados, saltos y syscalls.</p>
+    <p class="why"><b>para qué</b>Con Compiler Explorer (godbolt.org) ves el ensamblador que
+    genera tu código y entiendes por qué una versión es más rápida, qué inlinea el compilador,
+    o por qué ese <em>bounds check</em> aparece/desaparece.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Coherencia de caché y <em>false sharing</em></p>
+    <p>Cada núcleo tiene su propia caché con una copia de los datos que usa. Cuando dos núcleos
+    comparten un dato, el hardware mantiene las copias <strong>coherentes</strong> (protocolos
+    como MESI): si el núcleo A modifica su copia, la copia de B se invalida y hay que releer
+    desde un nivel compartido. Esto ocurre a nivel de <em>línea de caché completa</em> (~64
+    bytes), no de variable individual: si dos variables distintas pero cercanas en memoria caen
+    en la misma línea, y cada una la modifica un núcleo distinto, el hardware las trata como si
+    compitieran por el mismo dato. Eso es <strong>false sharing</strong>: código sin ninguna
+    condición de carrera lógica que igual se vuelve lentísimo por el tráfico de invalidación
+    entre cachés.</p>
+    <p class="why"><b>cómo se arregla</b>Con padding deliberado, separando las variables de
+    hilos distintos en líneas de caché diferentes —algunas librerías de concurrencia alinean
+    contadores exactamente para esto—. Es el motivo por el que "cada hilo escribe en su propio
+    contador y se suman al final" a veces rinde peor de lo esperado si esos contadores quedaron
+    contiguos en un mismo array.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Enlace</span>
+    <p>La guía de Backend (§3 "Cómo corre tu código" y §4 "Las capas", mapa 1) recorre esta
+    torre desde arriba —tu configuración, el runtime, la libc, las syscalls, el kernel—. Esta
+    sección la mira desde abajo. Es el mismo edificio: cada capa expone una interfaz estable y
+    oculta su complejidad, y depurar es, casi siempre, acertar en qué capa está el problema
+    antes de tocar nada.</p>
+  </div>
+</section>
+
+<section class="block" id="complejidad">
+  <span class="sec-num">03</span>
+  <h2>Complejidad y notación asintótica</h2>
+  <p class="lead">
+    La pregunta no es "¿cuántos milisegundos tarda?" —eso depende de la máquina— sino "¿cómo
+    crece el tiempo cuando crecen los datos?". Esa forma de crecer es lo que decide si tu
+    código aguanta 10× más carga o se cae.
+  </p>
+
+  <div class="concept">
+    <p class="term">Qué mide y qué ignora</p>
+    <p>Se cuenta el número de operaciones fundamentales en función del tamaño de la entrada
+    <code class="inline">n</code>, y se conserva solo el <strong>término dominante sin
+    constantes</strong>. <code class="inline">3n² + 100n + 5000</code> se resume como
+    <code class="inline">n²</code>: para <code class="inline">n</code> grande, el resto no
+    cambia la <em>forma</em> de la curva. Se ignoran las constantes (dependen del hardware, del
+    lenguaje, del compilador) y los términos menores. Es una lupa para el comportamiento
+    <em>a gran escala</em>.</p>
+    <p class="why"><b>el reverso</b>Para <code class="inline">n</code> pequeño las constantes
+    mandan: un O(n²) con constante minúscula puede ganarle a un O(n log n) con constante
+    grande. Por eso las librerías de ordenamiento cambian a inserción cuando quedan &lt;16
+    elementos.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">O, Ω y Θ — las tres cotas</p>
+    <p>Son afirmaciones sobre funciones, con definición precisa:</p>
+    <p><strong>O(g)</strong> — cota superior. <code class="inline">f ∈ O(g)</code> si existen
+    constantes <code class="inline">c &gt; 0</code> y <code class="inline">n₀</code> tales que
+    <code class="inline">0 ≤ f(n) ≤ c·g(n)</code> para todo
+    <code class="inline">n ≥ n₀</code>. "<code class="inline">f</code> no crece más rápido que
+    <code class="inline">g</code>." Es lo que casi todos dicen al hablar de Big-O.</p>
+    <p><strong>Ω(g)</strong> — cota inferior. Igual pero
+    <code class="inline">0 ≤ c·g(n) ≤ f(n)</code>. "<code class="inline">f</code> crece al
+    menos tan rápido como <code class="inline">g</code>." Sirve para decir "este problema
+    <em>no puede</em> resolverse en menos de…".</p>
+    <p><strong>Θ(g)</strong> — cota ajustada. <code class="inline">f ∈ Θ(g)</code> si
+    <code class="inline">f ∈ O(g)</code> <em>y</em> <code class="inline">f ∈ Ω(g)</code>:
+    crecen al mismo ritmo salvo constantes. Es la afirmación más fuerte y la más honesta
+    cuando la sabes.</p>
+    <p class="why"><b>el abuso común</b>Decir "quicksort es O(n log n)" es impreciso: su
+    <em>peor</em> caso es Θ(n²). Lo correcto: su caso promedio es Θ(n log n) y su peor caso
+    O(n²). "Búsqueda binaria es O(n)" es <em>técnicamente cierto</em> (una cota superior floja)
+    pero inútil; lo que quieres es Θ(log n).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Relaciones de recurrencia: resolver el costo de la recursión</p>
+    <p>Un algoritmo recursivo define su costo <code class="inline">T(n)</code> en función de sí
+    mismo sobre entradas menores. Merge sort: <code class="inline">T(n) = 2·T(n/2) + O(n)</code>
+    (dos mitades más el costo de mezclar). Resolver esa ecuación da la complejidad total. Tres
+    formas de hacerlo: <strong>árbol de recursión</strong> (dibujar cada nivel de llamadas y
+    sumar el trabajo por nivel), <strong>sustitución</strong> (conjeturar una forma cerrada y
+    demostrarla por inducción), y el <strong>teorema maestro</strong>, un atajo para el caso
+    <code class="inline">T(n) = a·T(n/b) + O(nᵈ)</code>: se compara
+    <code class="inline">a</code> contra <code class="inline">bᵈ</code>. Si
+    <code class="inline">a &lt; bᵈ</code>, domina el costo de combinar (Θ(nᵈ)); si
+    <code class="inline">a = bᵈ</code>, hay un factor logarítmico extra (Θ(nᵈ log n) — el caso
+    de merge sort); si <code class="inline">a &gt; bᵈ</code>, domina el número de hojas del
+    árbol (Θ(n^(log_b a)) — el caso de Karatsuba para multiplicar enteros grandes, que divide en
+    3 subproblemas de mitad de tamaño en vez de los 4 ingenuos y da Θ(n^1.585), mejor que el
+    Θ(n²) de la multiplicación escolar).</p>
+    <p class="why"><b>por qué importa</b>Ver <code class="inline">T(n) = 2·T(n/2) + O(n)</code>
+    y saber de memoria que da Θ(n log n) —sin rehacer el árbol cada vez— es lo que separa
+    "reconozco la forma" de "puedo derivarla en una pizarra en una entrevista".</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Mejor, promedio y peor caso</p>
+    <p>Para una misma entrada de tamaño <code class="inline">n</code> el coste puede variar
+    según <em>qué</em> datos sean. Buscar en una lista: mejor caso el elemento está primero
+    (Θ(1)), peor caso no está (Θ(n)), promedio Θ(n). El <strong>peor caso</strong> es el que
+    se usa para garantías (SLAs, tiempo real). El <strong>promedio</strong> requiere asumir una
+    distribución de entradas y a veces engaña: un hash map es O(1) promedio pero O(n) si un
+    atacante fuerza colisiones (ataque de <em>hash flooding</em>).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Análisis amortizado</p>
+    <p>Algunas operaciones son casi siempre baratas y de vez en cuando caras. Un array
+    dinámico: <code class="inline">append</code> es O(1)… hasta que se llena y hay que copiar
+    todo a un bloque del doble de tamaño, que es O(n). Pero como duplicas, ese coste O(n) se
+    "reparte" entre las siguientes <code class="inline">n</code> inserciones baratas: el coste
+    <strong>amortizado</strong> por inserción es O(1). No es un promedio probabilístico: es una
+    garantía sobre <em>cualquier</em> secuencia de operaciones. Métodos: agregado, contable
+    ("banquero"), potencial.</p>
+    <p class="why"><b>dónde aparece</b>Array dinámico, hash map (resize), tabla de dispersión,
+    <em>splay trees</em>, el algoritmo de unión-búsqueda. Cuando alguien dice "O(1)
+    amortizado", pregunta por el peor caso individual: puede haber una pausa fea en el momento
+    del resize (importa en sistemas de baja latencia).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El O(n²) escondido que tumba el servidor</p>
+    <p>El caso clásico: un bucle que por dentro llama a algo que parece barato pero recorre
+    toda la colección. Con los datos de prueba (200 filas) nadie lo nota. Con los datos reales
+    (50.000 filas) el servidor se cae.</p>
+<pre><span class="c"># buscar duplicados por id — O(n^2)</span>
+for i in items:
+    for j in items:
+        if i.id == j.id and i is not j:
+            marcar(i)
+<span class="c"># 200 filas  ->      40.000 vueltas   (imperceptible)</span>
+<span class="c"># 50.000 filas -> 2.500.000.000 vueltas   (timeout, OOM, caida)</span>
+
+<span class="c"># version O(n): un conjunto hash</span>
+vistos = set()
+for i in items:
+    if i.id in vistos:
+        marcar(i)
+    vistos.add(i.id)</pre>
+    <p class="why"><b>otras formas del mismo error</b>El problema N+1 de un ORM (una consulta
+    por fila), <code class="inline">list.contains()</code> dentro de un bucle,
+    concatenar strings con <code class="inline">+</code> en un bucle (cada
+    <code class="inline">+</code> copia todo lo acumulado → O(n²)),
+    <code class="inline">array.unshift()</code> repetido. Revisa siempre qué complejidad tiene
+    lo que llamas <em>dentro</em> del bucle.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estimar a ojo</p>
+    <p>Una CPU hace del orden de 10⁸–10⁹ operaciones simples por segundo. Con eso: si
+    <code class="inline">n = 10⁶</code>, un algoritmo O(n) o O(n log n) va bien; O(n²) es 10¹²
+    → minutos u horas; O(2ⁿ) es imposible pasado <code class="inline">n ≈ 40</code>. Órdenes de
+    magnitud a memorizar:</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>n</th><th>log n</th><th>n</th><th>n log n</th><th>n²</th><th>2ⁿ</th></tr></thead>
+      <tbody>
+        <tr><td>16</td><td>4</td><td>16</td><td>64</td><td>256</td><td>65 536</td></tr>
+        <tr><td>1 000</td><td>~10</td><td>1 000</td><td>~10 000</td><td>10⁶</td><td>≈10³⁰¹ (absurdo)</td></tr>
+        <tr><td>10⁶</td><td>~20</td><td>10⁶</td><td>~2·10⁷</td><td>10¹² (≈horas)</td><td>—</td></tr>
+        <tr><td>10⁹</td><td>~30</td><td>10⁹ (≈1 s)</td><td>~3·10¹⁰</td><td>10¹⁸ (≈siglos)</td><td>—</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Antes de escribir nada: "voy a tener ~10⁵ elementos y
+    este enfoque es O(n²) → 10¹⁰ → no". Ese cálculo de servilleta ahorra reescribir en
+    producción.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">La escalera de crecimiento, de memoria</p>
+    <p>De más lento a más rápido a crecer, esta es la jerarquía que conviene tener memorizada:
+    cada función domina asintóticamente a la anterior, sin importar las constantes.</p>
+    <div class="diagram">O(1)  &lt;  O(log log n)  &lt;  O(log n)  &lt;  O(sqrt(n))  &lt;  O(n)
+   &lt;  O(n log n)  &lt;  O(n^2)  &lt;  O(n^3)  &lt;  ...  &lt;  O(2^n)  &lt;  O(n!)  &lt;  O(n^n)
+
+  constante   log-log     logaritmico   raiz       lineal    linearitmico   polinomial ...   exponencial   factorial
+
+intuicion de cada franja:
+  O(log n)      - descartar la mitad cada vez (busqueda binaria, arboles balanceados)
+  O(n)          - tocar cada elemento una vez
+  O(n log n)    - dividir y vencer con un combinar lineal (los mejores ordenamientos por comparacion)
+  O(n^2)        - comparar cada par de elementos (bucles anidados)
+  O(2^n)        - probar cada subconjunto posible (hay 2^n subconjuntos de n elementos)
+  O(n!)         - probar cada permutacion posible (el viajante por fuerza bruta)</div>
+    <p class="why"><b>el atajo mental</b>Si tu algoritmo "prueba todos los subconjuntos", ya es
+    exponencial antes de analizar nada más; si "prueba todos los órdenes posibles", es
+    factorial. Y cualquier polinomio, por grande que sea su exponente, crece más despacio que
+    cualquier exponencial, por pequeña que sea su base: para <code class="inline">n</code>
+    suficientemente grande, n¹⁰⁰ pierde contra 1.01ⁿ.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Complejidad espacial</span>
+    <p>La misma notación aplica a la <strong>memoria</strong> extra que usa un algoritmo.
+    Merge sort es O(n log n) en tiempo pero O(n) en espacio (necesita un buffer); heapsort es
+    O(n log n) en tiempo y O(1) en espacio. La recursión gasta espacio de pila O(profundidad).
+    A veces el cuello de botella real no es el tiempo sino la RAM.</p>
+  </div>
+</section>
+
+<section class="block" id="estructuras">
+  <span class="sec-num">04</span>
+  <h2>Estructuras de datos por dentro</h2>
+  <p class="lead">
+    Elegir la estructura correcta es la decisión de diseño con más impacto y menos código.
+    Todas hacen el mismo trabajo —guardar y recuperar datos— pero cada una regala una
+    operación y cobra en otra. La pregunta siempre es: ¿qué operación hago más, y sobre cuántos
+    datos?
+  </p>
+
+  <div class="concept">
+    <p class="term">Array vs lista enlazada</p>
+    <p>Un <strong>array</strong> es un bloque contiguo de memoria: acceso por índice O(1)
+    (dirección = base + i·tamaño), amigable con la caché, pero insertar/borrar en medio es
+    O(n) (hay que desplazar) y crecer implica realojar. Una <strong>lista enlazada</strong> son
+    nodos dispersos, cada uno con un puntero al siguiente: insertar/borrar donde ya tienes el
+    nodo es O(1), pero llegar al elemento <code class="inline">k</code> es O(k), y cada nodo es
+    un salto de caché más overhead de puntero.</p>
+    <p class="why"><b>en la práctica</b>Casi siempre gana el array dinámico
+    (<code class="inline">Vec</code>, <code class="inline">list</code>,
+    <code class="inline">ArrayList</code>, slice). Las listas enlazadas brillan en nichos:
+    colas donde insertas/sacas en los extremos, estructuras persistentes/inmutables, o cuando
+    guardas punteros a nodos y necesitas borrado O(1). "Usé lista enlazada" rara vez es la
+    respuesta correcta hoy.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Pila y cola</p>
+    <p><strong>Pila</strong> (LIFO, "último en entrar, primero en salir"):
+    <code class="inline">push</code>/<code class="inline">pop</code> por un extremo. Es la
+    call stack, el "deshacer", el recorrido en profundidad, el <em>matching</em> de
+    paréntesis. <strong>Cola</strong> (FIFO): entras por atrás, sales por delante. Es el
+    recorrido en anchura, una lista de tareas pendientes, un buffer entre productor y
+    consumidor. La <strong>cola de prioridad</strong> (un heap por dentro) saca siempre el
+    elemento de mayor prioridad, no el más antiguo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Buffer circular <span>· ring buffer / deque</span></p>
+    <p>Un array de tamaño fijo con dos índices (<code class="inline">head</code>,
+    <code class="inline">tail</code>) que "envuelven" al llegar al final del array. Permite
+    insertar y sacar en O(1) por <em>ambos</em> extremos sin desplazar nada y sin la indirección
+    de punteros de una lista enlazada — así se implementa de verdad un <strong>deque</strong>
+    (cola de doble extremo) en la mayoría de librerías estándar. Cuando se llena, según el
+    diseño, bloquea al productor o sobrescribe el dato más viejo (buffer circular "lossy",
+    típico en audio y video en vivo).</p>
+    <p class="why"><b>dónde vive</b>Los buffers de teclado y de red del sistema operativo, el
+    streaming de audio, un historial de "deshacer" con límite fijo, y la implementación de una
+    cola de alto rendimiento cuando se conoce de antemano una capacidad máxima razonable.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Hash map — por qué tu diccionario es O(1)</p>
+    <p>Una función <em>hash</em> convierte la clave en un número; ese número, módulo el tamaño
+    de la tabla, da el índice de una <strong>cubeta</strong>. Ir a una cubeta es O(1). El
+    problema son las <strong>colisiones</strong> (dos claves a la misma cubeta): se resuelven
+    encadenando una lista en la cubeta, o con <em>direccionamiento abierto</em> (buscar la
+    siguiente cubeta libre). Mientras el <strong>factor de carga</strong> (elementos ÷ cubetas)
+    se mantenga bajo —típicamente &lt; 0.75— hay pocas colisiones y las operaciones son O(1)
+    promedio. Al superarlo, se hace <em>resize</em>: tabla nueva del doble y se reinserta todo,
+    O(n) puntual, O(1) amortizado.</p>
+    <div class="diagram">tabla de 8 cubetas       indice = hash(clave) mod 8
+
+  0 | --> ("gato",3) --> ("loro",7)      dos claves cayeron en 0:
+  1 | (vacio)                            colision -> se encadenan
+  2 | --> ("perro",1)
+  3 | (vacio)
+  4 | --> ("pez",9) --> ("rana",2) --> ("oso",5)
+  5 | (vacio)
+  6 | --> ("aguila",4)
+  7 | (vacio)
+
+factor de carga  a = 6 / 8 = 0.75
+si a supera el umbral -> tabla nueva de 16, se re-hashea todo (O(n) puntual)
+si TODAS colisionan (hash malo o adversario) -> se degrada a O(n)</div>
+    <p class="why"><b>por qué importa</b>El "O(1)" tiene letra chica: depende de una buena
+    función hash y de un factor de carga controlado. Por eso lenguajes serios aleatorizan el
+    hash por proceso (defensa contra <em>hash flooding</em>) y por eso una clave con
+    <code class="inline">__hash__</code> mal implementado (o mutable) rompe el diccionario en
+    silencio.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Bloom filter <span>· ¿seguro que no está?</span></p>
+    <p>Una estructura probabilística: un array de <code class="inline">m</code> bits, todos en
+    cero al inicio, y <code class="inline">k</code> funciones hash independientes. Para
+    insertar un elemento se ponen a 1 los <code class="inline">k</code> bits que dan esas
+    funciones. Para consultar: si <em>algún</em> bit de los <code class="inline">k</code> es 0,
+    el elemento <strong>seguro que no está</strong>; si todos son 1,
+    <strong>probablemente está</strong> —puede ser un <em>falso positivo</em>, dos elementos
+    distintos que activaron los mismos bits—. Nunca hay falsos negativos. No se puede borrar ni
+    recuperar los elementos guardados: solo responde sí, quizás, o no.</p>
+    <div class="diagram">array de 16 bits, k=3 funciones hash
+
+insertar "gato":   bits 2, 7, 13  ->  se ponen a 1
+insertar "perro":  bits 5, 7, 9   ->  se ponen a 1
+
+  0 0 1 0 0 1 0 1 0 1 0 0 0 1 0 0
+  0 1 2 3 4 5 6 7 8 9 . . .    13
+
+consultar "loro" (nunca insertado): sus bits son 2, 9, 14
+  el bit 14 vale 0  ->  respuesta: seguro que no esta (correcto)
+
+consultar "oso" (nunca insertado): sus bits son 2, 7, 13 (coincide por casualidad)
+  los tres bits ya estan en 1  ->  respuesta: probablemente esta (FALSO POSITIVO)</div>
+    <p class="why"><b>por qué se usa a pesar del error</b>Ocupa una fracción del espacio de un
+    hash set real —bits, no punteros ni claves completas— y responde en tiempo constante. Se
+    usa como filtro barato <em>antes</em> de una consulta cara: "¿puede que este nombre de
+    usuario ya exista?" antes de ir a la base de datos, caché de CDN para no buscar en disco
+    objetos que nunca se han pedido, o detectar URLs maliciosas ya vistas. Ajustando
+    <code class="inline">m</code> y <code class="inline">k</code> según cuántos elementos se
+    esperan, se controla la tasa de falsos positivos.</p>
+  </div>
+
+  <h3>Árboles</h3>
+
+  <div class="concept">
+    <p class="term">Árboles de búsqueda: BST, balanceados, B-tree</p>
+    <p>Un <strong>BST</strong> (árbol binario de búsqueda) mantiene el invariante "izquierda
+    &lt; nodo &lt; derecha", así que buscar es bajar comparando: O(altura). Si insertas datos
+    ya ordenados, el árbol degenera en una lista y la altura es O(n). Los <strong>árboles
+    balanceados</strong> (AVL, rojo-negro) se reequilibran en cada inserción con rotaciones
+    para garantizar altura O(log n). El <strong>B-tree</strong> es la versión "de disco": cada
+    nodo tiene <em>muchas</em> claves y muchos hijos, del tamaño de una página (~8-16 KB), para
+    minimizar lecturas de disco.</p>
+    <div class="diagram">BST (1 clave por nodo)           B-TREE de orden 4 (hasta 3 claves por nodo)
+
+        50                                   [ 30 | 60 ]
+       /  \                                 /     |     \
+      30   70                          [10|20] [40|50] [70|80|90]
+     / \   / \
+   20  40 60  80
+
+ altura ~ log2(n)                 altura ~ log_B(n), con B grande = arbol muy plano
+ 1 comparacion por nivel          1 nodo = 1 pagina de disco = 1 lectura
+ optimo en RAM                    3 niveles indexan millones de filas
+                                  asi son los indices de PostgreSQL / MySQL / SQLite</div>
+    <p class="why"><b>el vínculo con tu BD</b>Un índice de base de datos <em>es</em> un B-tree
+    (o B+tree). Por eso <code class="inline">WHERE id = ?</code> con índice es O(log n) y sin
+    índice es O(n) (<em>full scan</em>); por eso un índice sobre
+    <code class="inline">(a, b)</code> sirve para filtrar por <code class="inline">a</code> o
+    por <code class="inline">a, b</code> pero no por <code class="inline">b</code> solo; y por
+    qué insertar en una tabla muy indexada es lento (hay que actualizar cada árbol).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Skip list <span>· balanceo sin rotaciones</span></p>
+    <p>Una lista enlazada ordenada con "carriles rápidos" superpuestos: cada nodo, al
+    insertarse, recibe una altura aleatoria (cada nivel adicional con probabilidad 1/2), y los
+    niveles altos permiten saltar muchos nodos de una vez. Buscar baja por los carriles rápidos
+    hasta acercarse al objetivo, y termina en el nivel base. El resultado es O(log n) esperado
+    para buscar, insertar y borrar —comparable a un árbol balanceado— pero
+    <strong>sin rotaciones</strong>: el balanceo sale gratis de la aleatoriedad, lo que hace la
+    implementación mucho más simple y amigable con la concurrencia.</p>
+    <div class="diagram">nivel 3:  1 ------------------------------------> 9
+nivel 2:  1 --------> 4 ----------------------> 9
+nivel 1:  1 -> 2 -> 4 -> 5 ----------> 7 -> 9
+nivel 0:  1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8 -> 9   (lista completa)
+
+buscar 7: nivel 3 se pasa de largo -> baja a nivel 2 (4, luego 9 se pasa) -> baja a nivel 1
+          (5, luego 7: encontrado) -- salto varios nodos sin recorrerlos uno a uno</div>
+    <p class="why"><b>dónde vive</b>El <em>sorted set</em> de Redis, LevelDB/RocksDB, y varias
+    implementaciones de mapas ordenados concurrentes en Java. La alternativa cuando se quiere
+    "un árbol balanceado" pero preocupa la complejidad de implementar rotaciones correctamente
+    bajo concurrencia.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Heap binario</p>
+    <p>Un árbol casi completo donde cada nodo es menor (o mayor) que sus hijos. No está
+    totalmente ordenado, solo lo justo para que el mínimo (o máximo) esté siempre en la raíz:
+    <code class="inline">peek</code> O(1), <code class="inline">insert</code> y
+    <code class="inline">pop</code> O(log n). Se implementa sobre un array (hijo de
+    <code class="inline">i</code> en <code class="inline">2i+1</code>,
+    <code class="inline">2i+2</code>), sin punteros. Es la cola de prioridad de Dijkstra, del
+    planificador de tareas, del "top-K elementos", del merge de K listas ordenadas.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Trie <span>· árbol de prefijos</span></p>
+    <p>Un árbol donde cada arista es un carácter y cada camino desde la raíz deletrea una
+    clave. Buscar/insertar una clave de longitud <code class="inline">L</code> es O(L),
+    <em>independiente de cuántas claves haya guardadas</em>. Comparte prefijos, así que
+    "autocompletar" (dame todas las claves bajo este prefijo) es natural. Cuesta memoria si el
+    alfabeto es grande y las claves no comparten prefijos.</p>
+    <p class="why"><b>dónde vive</b>Autocompletado, routers IP (<em>longest prefix match</em>),
+    correctores ortográficos, índices de motores de búsqueda.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Grafo: matriz vs lista de adyacencia</p>
+    <p>Un grafo son nodos (vértices) y conexiones (aristas). Dos representaciones:
+    <strong>matriz de adyacencia</strong> <code class="inline">A[i][j] = 1</code> si hay
+    arista — consulta "¿i conecta con j?" O(1), pero ocupa O(V²) aunque haya pocas aristas.
+    <strong>Lista de adyacencia</strong>: por cada nodo, la lista de sus vecinos — ocupa
+    O(V+E), recorrer vecinos es eficiente, pero "¿i conecta con j?" es O(grado). Los grafos
+    reales son <em>dispersos</em> (pocas aristas por nodo), así que casi siempre lista de
+    adyacencia.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Unión-búsqueda <span>· union-find / DSU</span></p>
+    <p>Mantiene un conjunto de elementos particionado en grupos disjuntos, con dos operaciones:
+    <code class="inline">find(x)</code> (¿a qué grupo pertenece?) y
+    <code class="inline">union(x, y)</code> (fusiona dos grupos). Con las optimizaciones de
+    <em>compresión de caminos</em> y <em>unión por rango</em>, ambas son casi O(1) (α(n),
+    inversa de Ackermann, ≤ 4 para cualquier <code class="inline">n</code> del universo).</p>
+    <p class="why"><b>dónde aparece</b>Detectar componentes conexas, el algoritmo de Kruskal
+    para árbol de expansión mínima, detección de ciclos, "¿estas dos cuentas están
+    vinculadas?".</p>
+  </div>
+
+  <h4>Big-O de operaciones por estructura</h4>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Estructura</th><th>Acceso por índice</th><th>Buscar valor</th><th>Insertar</th><th>Borrar</th><th>Espacio</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Array dinámico</strong></td><td>Θ(1)</td><td>Θ(n)</td><td>Θ(1) amort. al final / Θ(n) en medio</td><td>Θ(n)</td><td>Θ(n)</td></tr>
+      <tr><td><strong>Lista enlazada</strong></td><td>Θ(n)</td><td>Θ(n)</td><td>Θ(1) con el nodo</td><td>Θ(1) con el nodo</td><td>Θ(n)</td></tr>
+      <tr><td><strong>Pila / cola</strong></td><td>—</td><td>Θ(n)</td><td>Θ(1)</td><td>Θ(1)</td><td>Θ(n)</td></tr>
+      <tr><td><strong>Hash map</strong></td><td>—</td><td>Θ(1) prom · O(n) peor</td><td>Θ(1) prom · O(n) peor</td><td>Θ(1) prom · O(n) peor</td><td>Θ(n)</td></tr>
+      <tr><td><strong>Árbol balanceado (AVL/RB)</strong></td><td>Θ(log n)</td><td>Θ(log n)</td><td>Θ(log n)</td><td>Θ(log n)</td><td>Θ(n)</td></tr>
+      <tr><td><strong>B-tree</strong></td><td>Θ(log n)</td><td>Θ(log n)</td><td>Θ(log n)</td><td>Θ(log n)</td><td>Θ(n)</td></tr>
+      <tr><td><strong>Heap binario</strong></td><td>min/máx Θ(1)</td><td>Θ(n)</td><td>Θ(log n)</td><td>Θ(log n) (la raíz)</td><td>Θ(n)</td></tr>
+      <tr><td><strong>Trie</strong></td><td>—</td><td>Θ(L) (longitud de la clave)</td><td>Θ(L)</td><td>Θ(L)</td><td>O(alfabeto · nodos)</td></tr>
+      <tr><td><strong>Unión-búsqueda</strong></td><td>—</td><td>find: Θ(α(n)) ≈ Θ(1)</td><td>union: Θ(α(n)) ≈ Θ(1)</td><td>—</td><td>Θ(n)</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note rust">
+    <span class="label">Trade-off memoria ↔ tiempo</span>
+    <p>Casi toda estructura "rápida" gasta memoria para lograrlo: el hash map tiene cubetas
+    vacías, el trie duplica nodos, el índice de BD es una copia extra del árbol que hay que
+    mantener sincronizada. Cachear un resultado es cambiar CPU por RAM. No hay comida gratis:
+    la pregunta de diseño es cuál de los dos recursos es tu cuello de botella.</p>
+  </div>
+</section>
+
+<section class="block" id="algoritmos">
+  <span class="sec-num">05</span>
+  <h2>Patrones algorítmicos</h2>
+  <p class="lead">
+    No hace falta memorizar 300 algoritmos. Hay unos 12 patrones que cubren casi todo lo que
+    aparece en el trabajo y en las entrevistas. Reconocer cuál aplica —por la forma del
+    problema— es la habilidad real.
+  </p>
+
+  <h3>Recorrido lineal: punteros y búsqueda</h3>
+
+  <div class="concept">
+    <p class="term">Dos punteros y ventana deslizante</p>
+    <p><strong>Dos punteros</strong>: sobre datos ordenados, en vez de dos bucles anidados
+    (O(n²)), avanzas dos índices que se cruzan: "¿hay dos números que sumen X?" en O(n).
+    <strong>Ventana deslizante</strong>: para "el mejor subarreglo/substring contiguo que
+    cumple P", mantienes una ventana <code class="inline">[i, j]</code>, expandes
+    <code class="inline">j</code>, y contraes <code class="inline">i</code> cuando la condición
+    se rompe. Cada elemento entra y sale una vez → O(n) en vez de O(n·k).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Búsqueda binaria (y sus variantes)</p>
+    <p>Sobre datos ordenados, descarta la mitad del espacio en cada paso: O(log n). Simple de
+    describir, endiablada de escribir bien: el bug clásico es el desbordamiento en
+    <code class="inline">(lo + hi) / 2</code> y los <em>off-by-one</em> en los límites. La
+    versión robusta usa un intervalo semiabierto:</p>
+<pre><span class="c"># a esta ordenado ascendente. Devuelve un indice de 'objetivo' o -1.</span>
+fn busqueda_binaria(a, objetivo):
+    lo = 0
+    hi = len(a)                       <span class="c"># intervalo semiabierto [lo, hi)</span>
+    while lo &lt; hi:
+        mid = lo + (hi - lo) / 2      <span class="c"># // division entera; evita overflow de lo+hi</span>
+        if a[mid] == objetivo:
+            return mid
+        elif a[mid] &lt; objetivo:
+            lo = mid + 1               <span class="c"># descarta la mitad izquierda, mid incluido</span>
+        else:
+            hi = mid                  <span class="c"># descarta desde mid a la derecha</span>
+    return -1</pre>
+    <p><strong>Variantes</strong>: primer elemento ≥ X (<em>lower_bound</em>), último ≤ X,
+    "búsqueda binaria sobre la respuesta" (cuando el espacio no es un array sino un rango de
+    valores posibles y tienes un predicado monótono: "¿alcanza con capacidad C?").</p>
+    <p class="why"><b>por qué importa</b>Está dentro de casi todo: bisección de un commit que
+    rompió (<code class="inline">git bisect</code>), buscar en un índice, resolver ecuaciones
+    numéricas, límites de rate. Y es el ejemplo canónico de que "sé la idea" ≠ "sé
+    implementarlo sin bugs".</p>
+  </div>
+
+  <h3>Bits y cadenas</h3>
+
+  <div class="concept">
+    <p class="term">Manipulación de bits como patrón</p>
+    <p>Tratar un entero como un conjunto de flags o un conjunto pequeño de elementos, y resolver
+    con operadores a nivel de bit en vez de bucles. Trucos recurrentes:
+    <code class="inline">n &amp; (n - 1)</code> apaga el bit 1 más bajo de
+    <code class="inline">n</code> (sirve para contar bits activos, o para comprobar si es
+    potencia de 2 viendo si el resultado da cero); <code class="inline">n &amp; -n</code> aísla
+    ese mismo bit más bajo; la propiedad <code class="inline">a XOR b XOR a = b</code> permite
+    intercambiar dos variables sin una tercera, o encontrar "el único número que no se repite"
+    en un array en tiempo O(n) y espacio O(1). Un entero de 32 bits puede representar un
+    <em>subconjunto</em> de hasta 32 elementos (bit <code class="inline">i</code> encendido =
+    el elemento <code class="inline">i</code> está dentro); iterar todas las máscaras de 0 a
+    2³² - 1 enumera todos los subconjuntos posibles — la forma habitual de fuerza bruta sobre
+    conjuntos pequeños (n ≤ ~20).</p>
+    <p class="why"><b>por qué importa</b>Son operaciones O(1) reales de la CPU: útiles para
+    flags de permisos, máscaras de red, programación dinámica sobre subconjuntos ("bitmask DP",
+    común en problemas de asignación con pocos elementos) y para exprimir memoria — un
+    <code class="inline">bitset</code> guarda un millón de flags booleanos en ~125 KB, no en 1
+    MB.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Búsqueda de patrones en texto: por qué KMP evita el retroceso</p>
+    <p>Buscar una subcadena de largo <code class="inline">m</code> dentro de un texto de largo
+    <code class="inline">n</code> a lo ingenuo —comparar desde cada posición y, al fallar,
+    volver a empezar desde el principio del patrón— es O(n·m) en el peor caso (un texto de puras
+    "a" y un patrón que casi siempre calza pero falla al final). <strong>Knuth-Morris-Pratt
+    (KMP)</strong> precomputa, sobre el propio patrón, cuánto se puede "reutilizar" al fallar
+    —el prefijo del patrón que también es sufijo hasta ese punto— así nunca retrocede en el
+    texto. Resultado: O(n + m) garantizado, sin importar el patrón. Parientes de la misma
+    familia: Boyer-Moore (salta más rápido en la práctica comparando desde el final del patrón)
+    y Rabin-Karp (hashea ventanas del texto, útil para buscar muchos patrones a la vez).</p>
+    <p class="why"><b>por qué importa</b>La función de buscar texto de tu lenguaje ya implementa
+    algo de esta familia —no se reescribe en el día a día— pero reconocer que "buscar texto
+    dentro de texto" tiene una cota mejor que O(n·m) importa al procesar archivos grandes, y KMP
+    es el ejemplo canónico de precomputar sobre la entrada más chica para no repetir trabajo
+    sobre la más grande.</p>
+  </div>
+
+  <h3>Descomponer el problema</h3>
+
+  <div class="concept">
+    <p class="term">Recursión y backtracking</p>
+    <p><strong>Recursión</strong>: una función que se define en términos de sí misma sobre un
+    subproblema más chico, con un <em>caso base</em> que corta. Cada llamada añade un marco a
+    la pila. <strong>Backtracking</strong>: exploras un árbol de decisiones, y cuando una rama
+    no lleva a solución, <em>deshaces</em> el último paso y pruebas otra. Permutaciones,
+    Sudoku, N reinas, generar combinaciones válidas. La poda (abandonar ramas imposibles
+    temprano) es lo que lo hace viable.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Divide y vencerás</p>
+    <p>Parte el problema en subproblemas independientes, resuélvelos recursivamente, combina.
+    Merge sort (divide a la mitad, ordena cada mitad, mezcla), quicksort, búsqueda binaria,
+    multiplicación rápida, la FFT. El coste sale del <em>teorema maestro</em>: si divides en
+    <code class="inline">a</code> subproblemas de tamaño <code class="inline">n/b</code> y
+    combinas en O(nᵈ), el total depende de comparar <code class="inline">a</code> con
+    <code class="inline">bᵈ</code>.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Programación dinámica</p>
+    <p>Aplica cuando el problema tiene (1) <strong>subestructura óptima</strong> —la solución
+    óptima se arma con soluciones óptimas de subproblemas— y (2) <strong>subproblemas
+    solapados</strong> —los mismos subproblemas se repiten muchas veces—. La idea: resolver
+    cada subproblema <em>una sola vez</em> y guardar el resultado.</p>
+    <p><strong>Memoización</strong> (top-down): recursión normal + un caché; solo calculas los
+    subproblemas que hacen falta. <strong>Tabulación</strong> (bottom-up): llenas una tabla en
+    orden, de los casos base hacia arriba; sin pila de recursión, y a menudo puedes tirar filas
+    viejas para bajar el espacio.</p>
+<pre><span class="c"># Fibonacci ingenuo: O(2^n) — recalcula los mismos subproblemas</span>
+fn fib(n):
+    if n &lt; 2: return n
+    return fib(n-1) + fib(n-2)
+
+<span class="c"># con memoizacion: O(n) tiempo, O(n) espacio — cada n se resuelve 1 vez</span>
+memo = {}
+fn fib(n):
+    if n &lt; 2: return n
+    if n in memo: return memo[n]
+    memo[n] = fib(n-1) + fib(n-2)
+    return memo[n]</pre>
+    <div class="diagram">CAMBIO DE MONEDAS: minimo nro de monedas para cada valor, con {1, 3, 4}
+
+valor:   0    1    2    3    4    5    6
+       +----+----+----+----+----+----+----+
+ dp:   | 0  | 1  | 2  | 1  | 1  | 2  | 2  |
+       +----+----+----+----+----+----+----+
+                           ^
+   dp[5] = 1 + min( dp[5-1], dp[5-3], dp[5-4] )
+         = 1 + min( dp[4],   dp[2],   dp[1]   )
+         = 1 + min( 1,       2,       1       )  =  2      (p. ej. 4 + 1)
+
+cada celda: O(nro de monedas). Total: O(valor x nro de monedas).
+el enfoque VORAZ (tomar siempre la mayor) daria 4+1+1 = 3 -> aqui falla.</div>
+    <p class="why"><b>cómo reconocerla</b>"Cuenta de cuántas formas…", "el mínimo/máximo
+    coste para…", "¿se puede llegar a…?", y cuando tu solución recursiva vuelve a llamar con
+    los mismos argumentos. Sospecha DP cuando el backtracking se repite.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Algoritmos voraces <span>· greedy</span></p>
+    <p>En cada paso tomas la opción que <em>ahora</em> parece mejor, sin reconsiderar. Es
+    rápido y simple, pero solo da el óptimo global si el problema tiene la propiedad adecuada
+    (matroide / elección voraz segura). Funciona para: dar cambio con monedas "canónicas",
+    Dijkstra, Huffman, planificación por fecha límite, árbol de expansión mínima. <strong>Falla
+    </strong> para: cambio con monedas raras (ver diagrama arriba), mochila 0/1, el viajante.</p>
+    <p class="why"><b>la disciplina</b>Si propones un voraz, debes poder <em>argumentar</em>
+    por qué la elección local nunca cierra la puerta al óptimo. Si no puedes, probablemente
+    necesitas DP.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Algoritmos aleatorizados</p>
+    <p>Introducir aleatoriedad a propósito puede simplificar un algoritmo o evitar su peor caso.
+    <strong>Las Vegas</strong>: siempre da la respuesta correcta, pero el tiempo varía —quicksort
+    con pivote aleatorio evita que datos ya ordenados, o un atacante, fuercen el O(n²); el
+    tiempo esperado sigue siendo O(n log n)—. <strong>Monte Carlo</strong>: tiempo fijo, pero
+    hay una probabilidad —controlable, y que puede hacerse arbitrariamente pequeña repitiendo—
+    de dar una respuesta incorrecta (los tests de primalidad como Miller-Rabin funcionan así).
+    <strong>Quickselect</strong> encuentra el k-ésimo menor elemento de una colección en O(n)
+    esperado: la misma partición de quicksort, pero descartando la mitad que no importa en vez
+    de ordenar las dos.</p>
+    <p class="why"><b>por qué importa</b>Muchos problemas no tienen un algoritmo determinista
+    rápido conocido, pero sí uno aleatorizado simple y rápido en <em>esperanza</em>. Y el pivote
+    aleatorio de quicksort es la razón real por la que las librerías estándar no sufren el
+    ataque de "mandar datos ya ordenados para tumbar el servidor con O(n²)".</p>
+  </div>
+
+  <h3>Grafos y ordenamiento</h3>
+
+  <div class="concept">
+    <p class="term">Sobre grafos: BFS, DFS y los demás</p>
+    <p><strong>BFS</strong> (anchura, con cola): visita por niveles; encuentra el camino más
+    corto en <em>número de aristas</em> en un grafo sin pesos. <strong>DFS</strong>
+    (profundidad, con pila o recursión): baja hasta el fondo y retrocede; base de la detección
+    de ciclos, el orden topológico y las componentes conexas. <strong>Dijkstra</strong>:
+    camino más corto con pesos no negativos (BFS + cola de prioridad).
+    <strong>Orden topológico</strong>: linealizar un DAG respetando dependencias (compilar
+    módulos, planificar tareas, resolver fórmulas de una hoja de cálculo). <strong>Árbol de
+    expansión mínima</strong> (Kruskal/Prim): conectar todo con el menor coste total de
+    aristas.</p>
+    <div class="diagram">grafo no dirigido:            A
+                             / \
+                            B   C
+                           / \   \
+                          D   E   F
+
+BFS desde A  (cola FIFO)              DFS desde A  (pila / recursion)
+ cola:[A] -> visita A, encola B,C      va a fondo y retrocede
+ [B,C] -> visita B, encola D,E         A -> B -> D  (backtrack)
+ [C,D,E] -> visita C, encola F              -> E    (backtrack x2)
+ ...                                   -> C -> F
+ orden: A B C D E F                    orden: A B D E C F
+ = camino minimo en nro de aristas     = poca memoria; ciclos, topologico</div>
+  </div>
+
+  <div class="concept">
+    <p class="term">Ordenamiento: por qué comparar es Ω(n log n)</p>
+    <p>Cualquier algoritmo que ordene <em>solo comparando pares</em> de elementos puede verse
+    como un árbol de decisión: cada comparación es una rama. Para <code class="inline">n</code>
+    elementos hay <code class="inline">n!</code> ordenamientos posibles, así que el árbol tiene
+    ≥ <code class="inline">n!</code> hojas, y su altura (número de comparaciones en el peor
+    caso) es ≥ <code class="inline">log₂(n!) ≈ n log n</code> (Stirling). Esa es una cota
+    <strong>inferior</strong> demostrada: <em>ningún</em> algoritmo de comparación baja de ahí.
+    Los que sí bajan (counting, radix, bucket) <strong>no comparan</strong>: usan la estructura
+    de las claves (rango acotado, dígitos), y por eso son O(n) pero solo aplican a datos
+    especiales.</p>
+  </div>
+
+  <h4>Ordenamientos y su complejidad</h4>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Algoritmo</th><th>Mejor</th><th>Promedio</th><th>Peor</th><th>Espacio</th><th>Estable</th><th>Nota</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Inserción</strong></td><td>Θ(n)</td><td>Θ(n²)</td><td>Θ(n²)</td><td>O(1)</td><td>sí</td><td>rapidísimo en arrays pequeños o casi ordenados</td></tr>
+      <tr><td><strong>Selección</strong></td><td>Θ(n²)</td><td>Θ(n²)</td><td>Θ(n²)</td><td>O(1)</td><td>no</td><td>mínimo número de escrituras</td></tr>
+      <tr><td><strong>Burbuja</strong></td><td>Θ(n)</td><td>Θ(n²)</td><td>Θ(n²)</td><td>O(1)</td><td>sí</td><td>solo didáctico</td></tr>
+      <tr><td><strong>Merge sort</strong></td><td>Θ(n log n)</td><td>Θ(n log n)</td><td>Θ(n log n)</td><td>O(n)</td><td>sí</td><td>predecible; bueno para datos externos / enlazados</td></tr>
+      <tr><td><strong>Quicksort</strong></td><td>Θ(n log n)</td><td>Θ(n log n)</td><td>Θ(n²)</td><td>O(log n)</td><td>no</td><td>el más rápido en la práctica; peor caso con mal pivote</td></tr>
+      <tr><td><strong>Heapsort</strong></td><td>Θ(n log n)</td><td>Θ(n log n)</td><td>Θ(n log n)</td><td>O(1)</td><td>no</td><td>in-place y sin peor caso cuadrático</td></tr>
+      <tr><td><strong>Timsort</strong></td><td>Θ(n)</td><td>Θ(n log n)</td><td>Θ(n log n)</td><td>O(n)</td><td>sí</td><td>híbrido; el de Python, Java, Rust (slices)</td></tr>
+      <tr><td><strong>Counting sort</strong></td><td>Θ(n+k)</td><td>Θ(n+k)</td><td>Θ(n+k)</td><td>O(n+k)</td><td>sí</td><td>no comparativo; k = rango de valores</td></tr>
+      <tr><td><strong>Radix sort</strong></td><td>Θ(d·(n+k))</td><td>Θ(d·(n+k))</td><td>Θ(d·(n+k))</td><td>O(n+k)</td><td>sí</td><td>no comparativo; d = número de dígitos</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">Estabilidad</span>
+    <p>Un orden es <strong>estable</strong> si dos elementos con la misma clave quedan en el
+    orden relativo que traían. Importa cuando ordenas por varias claves en pasos: ordenar por
+    apellido y luego —de forma estable— por ciudad deja "por ciudad, y dentro de cada ciudad
+    por apellido". Con un orden inestable, ese truco no funciona.</p>
+  </div>
+</section>
+
+<section class="block" id="lenguajes">
+  <span class="sec-num">06</span>
+  <h2>Cómo funciona un lenguaje</h2>
+  <p class="lead">
+    Un lenguaje de programación es un traductor: convierte un texto que tú entiendes en algo
+    que la máquina ejecuta. Entender ese pipeline te explica los mensajes de error, por qué
+    unos lenguajes son más rápidos, y qué significan de verdad "tipado" y "garbage collector".
+  </p>
+
+  <div class="concept">
+    <p class="term">El pipeline: léxico → parser → AST → ejecución</p>
+    <p><strong>Análisis léxico</strong> (lexer/scanner): parte el texto en <em>tokens</em>
+    (palabras clave, identificadores, números, operadores), descartando espacios y comentarios.
+    <strong>Parser</strong>: agrupa los tokens según la <em>gramática</em> del lenguaje,
+    respetando precedencia y asociatividad, y construye el <strong>AST</strong> (árbol de
+    sintaxis abstracta), la representación estructurada del programa.
+    <strong>Análisis semántico</strong>: chequeo de tipos, resolución de nombres, alcance.
+    Luego, una de tres: interpretar el AST directamente, compilarlo a <em>bytecode</em> para
+    una máquina virtual, o compilarlo a código nativo.</p>
+    <div class="diagram">codigo fuente:   x = 2 + 3 * y
+
+1. LEXICO  ->  [IDENT x] [=] [NUM 2] [+] [NUM 3] [*] [IDENT y]
+
+2. PARSER  ->  AST (la precedencia de * sobre + queda en la forma del arbol)
+                    ( = )
+                   /     \
+               IDENT x   ( + )
+                        /     \
+                    NUM 2    ( * )
+                            /     \
+                       NUM 3    IDENT y
+
+3a. INTERPRETE           3b. BYTECODE + VM         3c. COMPILADOR NATIVO
+    recorre el AST           PUSH 3                    genera x86-64 / ARM
+    y evalua nodo            PUSH y                    lo ejecuta el SO directo
+    a nodo                   MUL                       (C, Go, Rust via LLVM)
+    (Ruby clasico,           PUSH 2
+     AST-walkers)            ADD
+                             STORE x
+                         la VM ejecuta esto
+                         (JVM, CPython, V8*)
+
+* V8 y la JVM ademas usan JIT: compilan a nativo el codigo "caliente" en ejecucion.</div>
+    <p class="why"><b>por qué importa</b>"SyntaxError" es el parser; "NameError/undefined" es
+    la resolución de nombres; "TypeError" es el chequeo de tipos (en compilación o en runtime
+    según el lenguaje). Herramientas como linters, formateadores, <em>codemods</em> y el
+    resaltado del editor trabajan sobre el AST. Y compilar a bytecode una vez y ejecutarlo
+    muchas es más rápido que reparsear texto cada vez.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Interpretado vs bytecode+VM vs compilado</p>
+    <p><strong>Compilado a nativo</strong> (C, Rust, Go): traducción total antes de ejecutar →
+    binario autónomo, arranque en milisegundos, máxima velocidad, pero compilas para cada
+    plataforma. <strong>Bytecode + VM</strong> (Java, C#, Python): compilas a un formato
+    intermedio portátil que corre sobre una máquina virtual; "compila una vez, corre donde haya
+    VM". <strong>Interpretado puro</strong>: se lee y ejecuta sobre la marcha, máxima
+    flexibilidad (<code class="inline">eval</code>, REPL), mínimo rendimiento. <strong>JIT</strong>:
+    la VM observa qué código se ejecuta mucho y lo compila a nativo en caliente — arranque de
+    intérprete, velocidad cercana a compilado tras el calentamiento (V8, JVM HotSpot,
+    PyPy, .NET).</p>
+    <p class="why"><b>consecuencias prácticas</b>Por qué un binario Go no necesita "instalar el
+    runtime" y un script Python sí; por qué un Lambda en Java tiene <em>cold start</em> feo y
+    uno en Go no; por qué el <em>benchmark</em> de un servicio JIT hay que medirlo <em>tras</em>
+    calentarlo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Tipado: estático vs dinámico, fuerte vs débil</p>
+    <p>Son <strong>dos ejes independientes</strong>, y se confunden todo el tiempo.
+    <strong>Estático</strong>: los tipos se conocen y verifican en compilación (el error salta
+    antes de ejecutar). <strong>Dinámico</strong>: el tipo viaja con el valor y se comprueba en
+    runtime. <strong>Fuerte</strong>: el lenguaje no mezcla tipos a tus espaldas
+    (<code class="inline">"1" + 1</code> es error). <strong>Débil</strong>: hace conversiones
+    implícitas para que "algo funcione" (<code class="inline">"1" + 1 == "11"</code>). La
+    <strong>inferencia</strong> es ortogonal: el compilador deduce el tipo sin que lo escribas
+    (<code class="inline">let x = 3</code> en Rust), lo que da la seguridad del estático con la
+    brevedad del dinámico.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Combinación</th><th>Se verifica</th><th>Coerción implícita</th><th>Lenguajes</th><th>Qué te pasa</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Estático + fuerte</strong></td><td>en compilación</td><td>casi ninguna</td><td>Rust, Haskell, Go, Kotlin, C# (mayormente)</td><td>errores de tipo antes de desplegar; más ceremonia</td></tr>
+        <tr><td><strong>Estático + débil</strong></td><td>en compilación</td><td>casts libres, punteros reinterpretables</td><td>C, C++</td><td>compila, pero un cast malo corrompe memoria</td></tr>
+        <tr><td><strong>Dinámico + fuerte</strong></td><td>en runtime</td><td>poca (<code class="inline">"1"+1</code> lanza)</td><td>Python, Ruby, Elixir</td><td>el error aparece al ejecutar esa rama, no antes</td></tr>
+        <tr><td><strong>Dinámico + débil</strong></td><td>en runtime</td><td>mucha y sorprendente</td><td>JavaScript, PHP, Perl</td><td><code class="inline">[] + {}</code>, <code class="inline">"" == 0</code> → bugs silenciosos</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>El tipado estático es documentación que no miente,
+    autocompletado real y una clase entera de bugs que no llega a producción; cuesta verbosidad
+    y flexibilidad. Por eso existen TypeScript, mypy, Sorbet: añadir una capa estática
+    <em>encima</em> de un lenguaje dinámico. "Fuerte/débil" no es un espectro limpio, pero la
+    intuición sirve: cuántas locuras te deja hacer sin quejarse.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Closures <span>· funciones que recuerdan su entorno</span></p>
+    <p>Una <strong>closure</strong> es una función junto con las variables de su entorno léxico
+    que usa pero no recibe como parámetro, capturadas en el momento en que se crea. La función
+    sigue viendo esas variables aunque el ámbito donde nacieron ya haya terminado — el
+    recolector de basura no puede liberarlas mientras la closure siga viva, porque siguen siendo
+    alcanzables desde ella.</p>
+<pre><span class="c"># hacer_contador() termina, pero 'n' sigue viva: la closure la mantiene atrapada</span>
+fn hacer_contador():
+    n = 0
+    fn incrementar():          <span class="c"># closure: usa 'n' del entorno que la envuelve</span>
+        n = n + 1
+        return n
+    return incrementar
+
+contador = hacer_contador()
+contador()    <span class="c"># 1</span>
+contador()    <span class="c"># 2 -- el mismo 'n', no uno nuevo cada vez</span></pre>
+    <p class="why"><b>la trampa clásica</b>Capturar la variable de control de un bucle
+    <em>por referencia</em> en vez de por valor: en JavaScript, tres callbacks creados dentro de
+    un mismo bucle con <code class="inline">var</code> comparten la misma variable, y los tres
+    terminan viendo su valor final en vez del valor que tenía en su propia vuelta;
+    <code class="inline">let</code>, con ámbito de bloque, crea una variable nueva por
+    iteración y lo evita. Es también la base de los callbacks, los decoradores de Python, y los
+    "módulos" con estado privado antes de que existieran clases con campos privados.</p>
+  </div>
+
+  <h3>Gestión de memoria</h3>
+
+  <div class="concept">
+    <p class="term">Stack vs heap</p>
+    <p>La <strong>pila</strong> guarda las variables locales y datos de tamaño conocido en
+    compilación; se administra sola (crece al llamar, se libera al volver), es rapidísima
+    (mover un puntero) y limitada (megabytes). El <strong>heap</strong> guarda lo que dura más
+    que una función o cuyo tamaño se decide en runtime; se pide y se libera explícita o
+    automáticamente, es más lento (hay que <em>buscar</em> un hueco), grande, y puede
+    fragmentarse.</p>
+    <div class="diagram">      PILA (stack)                          HEAP (monton)
+ -------------------------            --------------------------
+ tamano conocido en compilacion       tamano/vida decididos en runtime
+ se libera sola al volver             liberar: manual / refcount / GC
+ rapida (mueve un puntero)            mas lenta (busca hueco libre)
+
+ tope-> +------------------+          +-----+     +-------------+
+        | marco de  f()    |          | obj |     |   buffer    |
+        |  var locales     |          +-----+     +-------------+
+        |  dir. de retorno |             ^                ^
+        +------------------+             |                |
+        | marco de main()  |------> puntero en la pila que apunta
+        +------------------+        al dato que vive en el heap
+
+ desbordar -> stack overflow         no liberar -> fuga de memoria (leak)</div>
+    <p class="why"><b>dónde lo ves</b>En C/C++/Rust lo decides tú (<code class="inline">Box</code>,
+    <code class="inline">malloc</code>). En Java/Python/JS los objetos van al heap y los
+    primitivos/referencias a la pila, casi transparente — hasta que un
+    <code class="inline">StackOverflowError</code> por recursión, o un
+    <code class="inline">OutOfMemoryError</code> por acumular en el heap, te obliga a pensarlo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Gestión de memoria: manual, refcount, GC</p>
+    <p><strong>Manual</strong> (C): tú llamas <code class="inline">free</code>. Máximo control,
+    cero overhead, y la fuente histórica de <em>use-after-free</em>, <em>double-free</em> y
+    fugas. <strong>Conteo de referencias</strong> (CPython, Swift): cada objeto cuenta cuántos
+    lo apuntan; al llegar a cero se libera de inmediato. Predecible, pero cuesta en cada
+    asignación y no libera <em>ciclos</em> (A apunta a B, B a A) sin un recolector auxiliar.
+    <strong>Garbage collection rastreador</strong> (JVM, Go, JS): cada tanto, parte de las
+    "raíces" (pila, globales) y marca todo lo alcanzable; lo no marcado es basura
+    (<em>mark-and-sweep</em>). El <strong>GC generacional</strong> aprovecha que "casi todo
+    objeto muere joven": revisa seguido la generación nueva (barato) y rara vez la vieja.</p>
+    <p class="why"><b>el coste que no se ve</b>El GC introduce pausas (los recolectores
+    modernos las hacen cortas y concurrentes, pero existen); por eso importan en sistemas de
+    baja latencia. Rust elige otra vía: <em>ownership</em> y <em>borrow checker</em> deciden en
+    compilación cuándo liberar — sin GC y sin los bugs del manual, a cambio de una curva de
+    aprendizaje.</p>
+  </div>
+
+  <h3>Paradigmas</h3>
+
+  <div class="concept">
+    <p class="term">Paradigmas: qué resuelve cada uno</p>
+    <p><strong>Imperativo</strong>: describes <em>los pasos</em> y el estado que cambia. Es
+    cercano a cómo funciona la máquina. <strong>Funcional</strong>: funciones puras (mismo
+    input → mismo output, sin efectos), datos inmutables, funciones como valores de primera
+    clase (pasarlas, devolverlas). Elimina clases enteras de bugs de estado compartido y hace
+    el código más fácil de testear y paralelizar. <strong>Orientado a objetos</strong>: agrupa
+    datos y el comportamiento que los toca, y controla qué es visible desde fuera
+    (encapsulación). Su aporte real no es la herencia —a menudo un error— sino el
+    <em>polimorfismo</em>: llamar a <code class="inline">.area()</code> sin saber si es un
+    círculo o un cuadrado, y poder añadir formas sin tocar el código que las usa.</p>
+    <p class="why"><b>en la práctica</b>Los lenguajes actuales son multiparadigma y tú mezclas:
+    objetos para estructurar módulos, funciones puras para la lógica de negocio,
+    <code class="inline">map</code>/<code class="inline">filter</code>/<code class="inline">reduce</code>
+    para transformar colecciones, inmutabilidad donde la concurrencia lo pide.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cómo se decide qué código corre: despacho estático vs dinámico</p>
+    <p>Cuando llamas al método "área" de una forma que puede ser un círculo o un cuadrado,
+    ¿qué código exacto se ejecuta? <strong>Despacho estático</strong> (o monomórfico): el
+    compilador ya sabe el tipo exacto y conecta la llamada directamente en tiempo de
+    compilación — cero overhead, y hasta se puede <em>inlinear</em>. <strong>Despacho
+    dinámico</strong>: el tipo real solo se conoce en tiempo de ejecución, así que cada objeto
+    (o su clase) lleva una <strong>vtable</strong> —una tabla de punteros a función— y llamar al
+    método significa: mirar la vtable del objeto y saltar al puntero que corresponde. Un nivel
+    extra de indirección que el compilador no puede inlinear ni predecir tan bien.</p>
+    <div class="diagram">objeto Circulo                objeto Cuadrado
++----------------+             +----------------+
+| vtable ptr ----+--\          | vtable ptr ----+--\
+| radio = 5      |   \         | lado = 4       |   \
++----------------+    \        +----------------+    \
+                        v                               v
+              VTABLA Circulo                  VTABLA Cuadrado
+              area()  -> Circulo::area        area()  -> Cuadrado::area
+              perim() -> Circulo::perim       perim() -> Cuadrado::perim
+
+forma.area()  --  sigue el puntero de vtable del objeto  --  salta a la funcion correcta</div>
+    <p class="why"><b>por qué importa</b>Es el costo real y medible del polimorfismo: las
+    interfaces de Java, los métodos virtuales de C++, los métodos de Python (que además resuelve
+    por diccionario, más lento aún). Rust y C++ dejan elegir entre genéricos/templates
+    (estático, rápido, código duplicado por tipo) o un objeto de tipo dinámico (un solo código,
+    con un salto indirecto). En rutas calientes de bajísima latencia esta elección se mide en
+    nanosegundos y aparece en los perfiles.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Genéricos: borrado de tipos vs monomorfización</p>
+    <p>Una lista genérica necesita generar código real en algún momento, y los lenguajes eligen
+    caminos distintos. <strong>Borrado de tipos</strong> (<em>type erasure</em>, Java): en
+    tiempo de ejecución todos los genéricos son el mismo código operando sobre un tipo base
+    universal; el compilador solo usa el tipo declarado para chequear y luego lo descarta — un
+    binario más chico, pero dos listas de tipos distintos comparten la misma clase en runtime.
+    <strong>Monomorfización</strong> (Rust, plantillas de C++): el compilador genera una copia
+    especializada del código <em>por cada tipo concreto usado</em> — cero overhead en tiempo de
+    ejecución, tan rápido como si se hubiera escrito a mano para ese tipo, a cambio de binarios
+    más grandes y compilación más lenta. Go usó una forma de borrado vía interfaces durante años
+    y añadió genéricos con monomorfización parcial recién en 2022.</p>
+    <p class="why"><b>por qué importa</b>Explica por qué los genéricos de Rust y C++ son
+    "gratis" en tiempo de ejecución pero inflan el tiempo de compilación y el tamaño del
+    binario, y por qué Java tiene que envolver ("boxear") un número primitivo en un objeto cada
+    vez que lo mete en una colección genérica: el borrado de tipos exige que todo sea un objeto
+    en el heap, no un primitivo en la pila.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Para tocarlo con las manos</span>
+    <p><em>Crafting Interpreters</em> (gratis, de Bob Nystrom) te hace construir dos
+    intérpretes del mismo lenguaje: uno árbol-walker y uno de bytecode+VM. Es la forma más
+    rápida de que "lexer, parser, AST, VM, GC" dejen de ser palabras. AST Explorer
+    (astexplorer.net) te deja ver el AST de tu propio código en vivo.</p>
+  </div>
+</section>
+
+<section class="block" id="concurrencia">
+  <span class="sec-num">07</span>
+  <h2>Concurrencia y paralelismo</h2>
+  <p class="lead">
+    En cuanto dos cosas ocurren "a la vez" —dos peticiones, dos hilos, dos máquinas— el
+    razonamiento secuencial deja de servir. La concurrencia es difícil porque el número de
+    intercalados posibles explota, y la mayoría funcionan… hasta el que no.
+  </p>
+
+  <div class="concept">
+    <p class="term">Proceso vs hilo</p>
+    <p>Un <strong>proceso</strong> es un programa en ejecución con su <em>propio</em> espacio
+    de memoria, aislado por el sistema operativo. Un <strong>hilo</strong> es una línea de
+    ejecución dentro de un proceso; los hilos de un mismo proceso <em>comparten</em> memoria
+    (el heap, las globales) pero cada uno tiene su pila. Crear un proceso es caro; crear un
+    hilo es más barato; cambiar de contexto entre cualquiera de los dos cuesta. Los
+    <em>hilos verdes</em> / corrutinas (goroutines, procesos de Elixir,
+    <code class="inline">async</code> tasks) los gestiona el runtime, no el kernel: pueden
+    existir millones.</p>
+    <p class="why"><b>la consecuencia</b>Memoria compartida = comunicación rápida pero
+    peligrosa (hay que sincronizar). Procesos aislados = seguro pero comunicarse cuesta
+    (serializar, copiar, IPC). Esa elección define cómo escala un servidor.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Concurrencia ≠ paralelismo</p>
+    <p><strong>Concurrencia</strong> es <em>estructurar</em> el programa como tareas
+    independientes que progresan de forma intercalada (un cocinero atendiendo tres ollas).
+    <strong>Paralelismo</strong> es <em>ejecutar</em> varias literalmente al mismo tiempo, en
+    varios núcleos (tres cocineros). Puedes tener concurrencia en un solo núcleo (repartiendo
+    el tiempo) y necesitas paralelismo real para acelerar cálculo puro. Un programa concurrente
+    bien diseñado <em>puede</em> volverse paralelo si hay núcleos; uno mal diseñado no.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Ley de Amdahl: el límite de paralelizar</p>
+    <p>Si una fracción <code class="inline">p</code> de un programa se puede paralelizar
+    perfectamente y el resto (<code class="inline">1 - p</code>) es inherentemente secuencial,
+    la aceleración máxima con <code class="inline">N</code> núcleos es
+    <code class="inline">1 / ((1 - p) + p/N)</code>. El límite cuando
+    <code class="inline">N</code> crece sin tope es <code class="inline">1 / (1 - p)</code>:
+    por más núcleos que agregues, nunca se supera ese techo, fijado por la parte que
+    <em>no</em> se puede paralelizar.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>% paralelizable (p)</th><th>4 núcleos</th><th>16 núcleos</th><th>núcleos infinitos</th></tr></thead>
+      <tbody>
+        <tr><td>50%</td><td>1.60×</td><td>1.88×</td><td>2.00× (techo)</td></tr>
+        <tr><td>90%</td><td>3.08×</td><td>6.40×</td><td>10.00× (techo)</td></tr>
+        <tr><td>99%</td><td>3.88×</td><td>13.91×</td><td>100.00× (techo)</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Antes de comprar más núcleos o repartir trabajo en más
+    máquinas, hay que preguntar qué fracción del trabajo total es de verdad paralelizable: el
+    setup, la coordinación, una sección serializada por un candado y la fase final de "juntar
+    resultados" cuentan como la parte no paralelizable. Es la razón matemática de que "le puse
+    el doble de servidores y solo mejoró un 20%" sea la norma, no la excepción. (La ley de
+    Gustafson matiza esto: si el tamaño del problema crece junto con los núcleos disponibles en
+    vez de quedarse fijo, la parte paralela también crece y el techo es menos pesimista.)</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">La condición de carrera</p>
+    <p>Ocurre cuando el resultado depende del <em>orden</em> en que se intercalan operaciones
+    de varios hilos sobre datos compartidos, y ese orden no está controlado. El caso de manual:
+    <code class="inline">saldo -= monto</code> parece una instrucción, pero son tres (leer,
+    restar, escribir), y otro hilo puede colarse en medio.</p>
+<pre>saldo = 100          <span class="c"># compartido. Dos hilos ejecutan retirar(70) a la vez.</span>
+
+fn retirar(monto):
+    if saldo &gt;= monto:            <span class="c"># hilo A lee 100, hilo B lee 100  -> ambos pasan</span>
+        <span class="c"># ... (el SO puede cambiar de hilo justo aqui)</span>
+        saldo = saldo - monto     <span class="c"># A: 100-70=30 escribe 30</span>
+                                  <span class="c"># B: 100-70=30 escribe 30</span>
+
+<span class="c"># resultado: saldo = 30, pero se retiraron 140 de una cuenta con 100.</span>
+<span class="c"># y solo pasa 1 de cada 10.000 veces, en produccion, un viernes.</span></pre>
+    <p class="why"><b>por qué es tan difícil</b>No es determinista: el test pasa, el bug
+    aparece bajo carga. La sección crítica (<code class="inline">if</code> + resta) debe ser
+    <strong>atómica</strong>: o toda de un hilo, o toda del otro, nunca entrelazada.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Mutex, semáforo, y el precio de sincronizar</p>
+    <p>Un <strong>mutex</strong> ("exclusión mutua") es un candado: un hilo lo toma, entra a la
+    sección crítica, lo suelta; el resto espera. Un <strong>semáforo</strong> permite hasta N
+    simultáneos (p. ej. "máximo 10 conexiones a la BD"). Un <strong>mutex de
+    lectura/escritura</strong> deja pasar muchos lectores o un escritor. Las
+    <strong>operaciones atómicas</strong> (compare-and-swap) sincronizan una sola variable sin
+    candado.</p>
+    <p class="why"><b>el costo</b>Cada candado <em>serializa</em>: si toda petición pasa por el
+    mismo mutex, tienes un servidor de un solo hilo con pasos extra. Candados demasiado finos
+    complican y arriesgan deadlock; demasiado gruesos matan el rendimiento. El mejor candado es
+    el que no necesitas: no compartas estado mutable.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estructuras lock-free y el problema ABA</p>
+    <p>En vez de un candado que bloquea a los demás hilos, una estructura
+    <strong>lock-free</strong> usa <strong>compare-and-swap (CAS)</strong>: "si el valor sigue
+    siendo el que yo leí, cámbialo al nuevo; si no, reintenta" —una operación atómica que nunca
+    bloquea—. Ningún hilo detiene a otro (si uno se cuelga, los demás siguen avanzando), pero
+    programarlas bien es notoriamente difícil. El riesgo clásico es el
+    <strong>problema ABA</strong>: un hilo lee el valor A, se suspende; mientras tanto otro hilo
+    lo cambia a B y luego de vuelta a A; el primer hilo retoma, ve que el valor "sigue siendo A"
+    y su CAS tiene éxito —pero la estructura cambió por debajo y esa suposición es falsa, por
+    ejemplo porque un nodo fue liberado y reasignado en el medio—.</p>
+    <p class="why"><b>cómo se evita</b>Añadiendo un contador de versión junto al valor (un CAS
+    que compara valor y versión a la vez), o postergando la liberación de memoria mientras
+    pueda haber lectores en vuelo (<em>hazard pointers</em>, reclamación por épocas). Es una de
+    las razones por las que "escribe tu propia estructura lock-free" es un consejo que casi
+    nadie debería seguir: conviene usar la de la librería estándar o una ya probada.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Deadlock <span>· abrazo mortal</span></p>
+    <p>Dos hilos, cada uno con un candado, esperando el del otro, para siempre. Se necesitan
+    <strong>cuatro condiciones a la vez</strong> (Coffman): exclusión mutua, retención y
+    espera, no expropiación, y espera circular. Rompe una y no hay deadlock: la más práctica es
+    eliminar la espera circular <strong>adquiriendo siempre los candados en el mismo orden
+    global</strong>. Parientes: <em>livelock</em> (los hilos reaccionan entre sí y ninguno
+    avanza) y <em>starvation</em> (un hilo nunca consigue el recurso).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El modelo de memoria de un lenguaje</p>
+    <p>Sorpresa incómoda: sin sincronización, un hilo <em>no</em> tiene garantizado ver los
+    cambios de otro en el orden en que se escribieron. El compilador reordena instrucciones
+    para optimizar y la CPU tiene cachés por núcleo y buffers de escritura. El <strong>modelo
+    de memoria</strong> (Java Memory Model, el de C++11, el de Go) define exactamente qué
+    garantías hay: la relación <em>happens-before</em>, qué establece una barrera
+    (<code class="inline">volatile</code>, atomics, un mutex), y qué es <em>data race</em>
+    (comportamiento indefinido en C/C++/Rust).</p>
+    <p class="why"><b>por qué te importa</b>El clásico "puse un <code class="inline">bool
+    listo = true</code> desde otro hilo y el bucle <code class="inline">while (!listo)</code>
+    no sale nunca": la variable estaba en un registro/caché. La solución no es
+    <code class="inline">sleep</code>, es una primitiva de sincronización de verdad.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">async/await y el bucle de eventos</p>
+    <p>Un modelo de concurrencia <em>sin</em> hilos extra: un solo hilo con un bucle que toma
+    tareas de una cola. Cuando una tarea llega a un <code class="inline">await</code> sobre
+    algo lento (red, disco), <em>se suspende y cede el control</em>; el bucle atiende otra;
+    cuando la operación termina, la tarea se reanuda donde quedó. Es concurrencia cooperativa:
+    ideal para cargas de I/O (miles de conexiones esperando), inútil para cálculo (un
+    <code class="inline">await</code> no reparte CPU).</p>
+    <p class="why"><b>la trampa</b>Una función que hace un cálculo pesado <em>sin</em>
+    <code class="inline">await</code> bloquea el bucle entero: nadie más es atendido. En Node
+    eso va a un <em>worker</em>. La guía de Backend (§3) lo cubre desde el ángulo del servidor
+    web; aquí el punto es que "async" es una forma de concurrencia, no de paralelismo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cómo cada lenguaje intenta ayudarte</p>
+    <p><strong>GIL</strong> (CPython, Ruby MRI): un candado global deja ejecutar bytecode a un
+    solo hilo a la vez. Los hilos sirven para I/O, no para CPU; para paralelismo real,
+    <code class="inline">multiprocessing</code> o extensiones nativas. <strong>Actores</strong>
+    (Erlang/Elixir): procesos aislados sin memoria compartida que solo se pasan mensajes; si
+    uno cae, no corrompe a nadie. <strong>Canales / CSP</strong> (Go): "no te comuniques
+    compartiendo memoria; comparte memoria comunicándote" — goroutines que se coordinan por
+    <code class="inline">chan</code>. <strong>Ownership</strong> (Rust): el compilador prohíbe
+    en tiempo de compilación que dos hilos tengan acceso mutable al mismo dato ("fearless
+    concurrency"). <strong>async</strong> (JS, Rust, C#, Python): el modelo de bucle de eventos
+    de arriba.</p>
+  </div>
+</section>
+
+<section class="block" id="computo">
+  <span class="sec-num">08</span>
+  <h2>Qué se puede computar y qué no</h2>
+  <p class="lead">
+    Hay preguntas que ningún programa —por más rápido que sea el hardware— puede responder
+    siempre, y otras que sí pero para las que no se conoce ningún método rápido. Saber
+    reconocerlas evita que pierdas semanas buscando un algoritmo que no existe (o que nadie ha
+    encontrado).
+  </p>
+
+  <div class="concept">
+    <p class="term">La máquina de Turing como modelo mental</p>
+    <p>Un modelo abstracto de 1936: una cinta infinita de celdas, un cabezal que lee/escribe y
+    se mueve, y un conjunto finito de reglas. Ridículamente simple, pero se demostró que puede
+    computar <em>cualquier cosa</em> que compute cualquier otro modelo razonable (tesis de
+    Church-Turing). Tu laptop, con memoria finita, es en el fondo una máquina de Turing con
+    cinta acotada. Sirve como regla: si algo no lo puede hacer una máquina de Turing, no lo
+    puede hacer ningún computador.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">La jerarquía de Chomsky: cuánta memoria necesita reconocer un lenguaje</p>
+    <p>No todos los "lenguajes" (conjuntos de cadenas válidas) necesitan la misma potencia
+    computacional para reconocerse: hay una jerarquía estricta de cuatro niveles.
+    <strong>Regulares</strong>: los reconoce un autómata finito, sin memoria extra — lo que
+    expresa una expresión regular clásica. <strong>Libres de contexto</strong>: necesitan una
+    pila (autómata de pila) — la sintaxis de la mayoría de lenguajes de programación, paréntesis
+    balanceados, anidamiento; lo que reconoce un parser con una gramática BNF.
+    <strong>Sensibles al contexto</strong> y <strong>recursivamente enumerables</strong>:
+    necesitan la potencia completa de una máquina de Turing.</p>
+    <div class="diagram">recursivamente enumerables   (Turing completo -- el nivel mas amplio)
++--------------------------------------------------------+
+| sensibles al contexto                                    |
+|  +-----------------------------------------------------+ |
+|  | libres de contexto   (automata de pila)              | |
+|  |  +--------------------------------------------------+| |
+|  |  | regulares   (automata finito, sin memoria extra)  || |
+|  |  +--------------------------------------------------+| |
+|  +-----------------------------------------------------+ |
++--------------------------------------------------------+
+
+  regular:              a*b*        (una expresion regular simple la reconoce)
+  libre de contexto:    a^n b^n     (n 'a' seguidas de n 'b' -- hace falta CONTAR con una pila)
+  ni libre de contexto: a^n b^n c^n (contar hasta n dos veces -- ya pide mas que una pila)</div>
+    <p class="why"><b>por qué importa</b>Es la razón formal de que "no se puede parsear HTML con
+    una expresión regular" sea cierto y no un meme: el HTML anidado es, como mínimo, libre de
+    contexto, y una expresión regular solo reconoce lenguajes regulares — no puede "contar"
+    paréntesis o etiquetas anidadas a profundidad arbitraria. También explica por qué el parser
+    de un lenguaje de programación necesita una pila (o su equivalente recursivo), y por qué un
+    lexer basado en expresiones regulares no alcanza para la sintaxis completa.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Decidible vs indecidible — el problema de la parada</p>
+    <p>Un problema es <strong>decidible</strong> si existe un algoritmo que, para toda entrada,
+    termina y responde sí/no correctamente. El <strong>problema de la parada</strong> es
+    indecidible: <em>no puede existir</em> un programa que, dado cualquier programa y su
+    entrada, decida siempre y sin equivocarse si ese programa termina o se cuelga (se prueba
+    por contradicción: si existiera, se podría construir uno que se contradice a sí mismo).</p>
+    <p class="why"><b>consecuencias reales</b>Por el teorema de Rice, casi cualquier pregunta
+    interesante sobre <em>lo que hace</em> un programa en general es indecidible: "¿este código
+    tiene un bucle infinito?", "¿estas dos funciones hacen lo mismo?", "¿este programa alguna
+    vez desreferencia null?". Por eso los analizadores estáticos, los <em>type checkers</em> y
+    los linters son <strong>conservadores</strong>: aproximan, dan falsos positivos, o piden
+    anotaciones. No es que sean flojos; es que la versión exacta es imposible.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">P, NP y qué significa "NP-completo"</p>
+    <p><strong>P</strong>: problemas que se pueden <em>resolver</em> en tiempo polinomial
+    (nᵏ para algún k fijo) — "tratables". <strong>NP</strong>: problemas cuya solución
+    propuesta se puede <em>verificar</em> en tiempo polinomial, aunque encontrarla parezca
+    requerir probar exponencialmente muchas opciones. Todo P está en NP. La pregunta abierta
+    —una de las más importantes de las matemáticas, con premio de un millón de dólares— es
+    <strong>¿P = NP?</strong>: ¿verificar rápido implica resolver rápido? Casi todos creen que
+    no, pero <em>nadie lo ha demostrado</em>.</p>
+    <p><strong>NP-completo</strong>: los problemas "más difíciles" de NP. Tienen dos
+    propiedades: están en NP, y <em>cualquier</em> problema de NP se puede transformar
+    (reducir) a ellos en tiempo polinomial. Corolario: si <em>alguien</em> encontrara un
+    algoritmo polinomial para <em>uno solo</em> de ellos, todos los de NP serían tratables y
+    P = NP.</p>
+    <div class="diagram">+-------------------------------------------------+
+|                    NP-dificil                    |
+|   +-------------------------+                     |
+|   |          NP             |                     |
+|   |    +-----------+        |   +-------------+   |
+|   |    |     P     |        |   | NP-completo |   |
+|   |    +-----------+        |   | = NP  n  NP-dificil
+|   |                         |   +-------------+   |
+|   +-------------------------+                     |
++-------------------------------------------------+
+
+se sabe:   P subset de NP            abierto:   ¿P = NP?
+SAT, clique, mochila 0/1, viajante (decision), coloreo, sudoku NxN: NP-completos
+factorizar enteros: en NP, no se sabe si en P, no se cree NP-completo</div>
+    <p class="why"><b>la frase correcta</b>NP-completo <strong>no</strong> significa
+    "imposible". Significa "no se conoce ningún atajo que evite, en el peor caso, una búsqueda
+    esencialmente exponencial". Instancias concretas se resuelven todos los días.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Más allá de P y NP: el resto del zoológico de clases</p>
+    <p><strong>PSPACE</strong>: problemas resolubles usando una cantidad polinomial de
+    <em>memoria</em>, sin límite de tiempo (versiones generalizadas de ajedrez o go en un
+    tablero de tamaño n caen aquí). <strong>EXPTIME</strong>: resolubles en tiempo exponencial.
+    Se sabe con certeza que P está contenido en NP, que NP está contenido en PSPACE, y que
+    PSPACE está contenido en EXPTIME. También se sabe —a diferencia de P vs NP— que
+    <strong>P es distinto de EXPTIME</strong>: hay una jerarquía temporal estricta demostrada,
+    aunque no se sepa exactamente dónde se separa cada nivel intermedio.
+    <strong>co-NP</strong> es lo simétrico de NP: verificar un "no" en vez de un "sí" en tiempo
+    polinomial. Si P fuera igual a NP también sería igual a co-NP, pero no se sabe si NP es
+    igual a co-NP incluso asumiendo que P es distinto de NP.</p>
+    <p class="why"><b>la idea que llevarse</b>"NP-difícil" no es el techo de la dificultad: hay
+    problemas genuinamente más difíciles —PSPACE-completos, EXPTIME-completos— y por encima de
+    todos ellos está lo <em>indecidible</em> (el problema de la parada), que ni siquiera tiene
+    una cota de tiempo o memoria porque directamente no termina. La jerarquía completa va de
+    decidible en tiempo razonable, a decidible pero de costo creciente, a indecidible.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Reducciones</p>
+    <p>"Reducir A a B" es transformar cualquier instancia de A en una de B, de modo que la
+    respuesta se conserve. Si puedes reducir A a B en tiempo polinomial y sabes resolver B
+    rápido, sabes resolver A rápido. Al revés: si A es difícil y lo reduces a B, entonces B es
+    <em>al menos</em> tan difícil. Así se demuestra que un problema nuevo es NP-completo: (1)
+    está en NP, (2) reduces un NP-completo conocido a él.</p>
+    <p class="why"><b>para qué sirve en el trabajo</b>Cuando un problema tuyo "huele" a uno
+    conocido (asignar turnos = coloreo de grafos; planificar entregas = viajante; empaquetar
+    en cajas = <em>bin packing</em>), reconoces que es NP-difícil y <em>dejas de buscar el
+    algoritmo perfecto</em>. Pasas a: heurísticas, aproximaciones con garantía, solvers
+    (SAT/ILP/CP), o resolver bien el caso pequeño que de verdad tienes.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Por qué esto aparece en el mundo real</p>
+    <p><em>Scheduling</em> (turnos, aulas, CI runners), <em>routing</em> y logística (rutas de
+    reparto), asignación de recursos, empaquetado, <em>layout</em>, resolución de
+    dependencias con versiones (el resolvedor de npm/pip es SAT), optimización de consultas SQL
+    (el planificador no explora todos los planes: es intratable). El patrón recurrente: el
+    problema es NP-difícil, así que la herramienta usa heurísticas y "suficientemente bueno" en
+    vez de "óptimo".</p>
+  </div>
+
+  <div class="note">
+    <span class="label">La idea que llevarse</span>
+    <p>Tres cajones: <strong>indecidible</strong> (ningún algoritmo, nunca — la parada,
+    propiedades semánticas de programas), <strong>intratable / NP-difícil</strong> (algoritmo
+    sí, rápido no se conoce — planificación, rutas), y <strong>tratable</strong> (P — ordenar,
+    caminos más cortos, <em>matching</em>). Antes de atacar un problema difícil, ubícalo: te
+    dice si buscas un algoritmo, una aproximación, o una reformulación.</p>
+  </div>
+</section>
+
+<section class="block" id="teoria-info">
+  <span class="sec-num">09</span>
+  <h2>Teoría de la información</h2>
+  <p class="lead">
+    Una misma idea —medir cuánta "sorpresa" hay en los datos— explica por qué existe un límite
+    a la compresión, cómo un hash reparte claves de forma pareja, y cómo un código QR sobrevive
+    a que le rayen un trozo.
+  </p>
+
+  <div class="concept">
+    <p class="term">Entropía como "sorpresa promedio"</p>
+    <p>La <strong>entropía de Shannon</strong> de una fuente es
+    <code class="inline">H = −Σ pᵢ · log₂(pᵢ)</code> bits, y mide la incertidumbre media por
+    símbolo: cuántos bits de información <em>en promedio</em> aporta cada uno. Un evento seguro
+    (p = 1) da 0 bits: no sorprende. Una moneda justa da 1 bit. Un dado justo, ~2.58 bits. Un
+    texto en español tiene baja entropía por carácter (la <code class="inline">u</code> tras
+    <code class="inline">q</code> no sorprende).</p>
+    <p class="why"><b>por qué es útil</b>Es el puente entre "probabilidad" y "número de bits".
+    Aparece en compresión (cuánto puedes reducir), en machine learning
+    (<em>cross-entropy loss</em> mide sorpresa del modelo frente a la realidad), en seguridad
+    (la entropía de una contraseña estima cuántos intentos cuesta adivinarla) y en árboles de
+    decisión (<em>information gain</em>).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El límite de la compresión</p>
+    <p>El <strong>teorema de codificación de fuente</strong> de Shannon dice: no puedes
+    codificar los datos de una fuente usando, en promedio, menos bits por símbolo que su
+    entropía, sin perder información. La compresión sin pérdida explota la <em>redundancia</em>
+    (símbolos desiguales, patrones repetidos); cuando ya no queda redundancia, se acabó. Por
+    eso volver a comprimir un <code class="inline">.zip</code> no lo achica, y por eso los datos
+    cifrados o ya comprimidos "parecen ruido": su entropía es máxima.</p>
+    <p class="why"><b>corolario práctico</b>No existe un compresor universal que achique
+    cualquier archivo: si achicara todos, dos entradas distintas colapsarían al mismo comprimido
+    y no podrías descomprimir (principio del palomar). Todo compresor <em>agranda</em> algunas
+    entradas a cambio de achicar las típicas.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Complejidad de Kolmogorov <span>· la otra forma de medir información</span></p>
+    <p>Shannon mide la sorpresa <em>promedio</em> de una fuente probabilística. La
+    <strong>complejidad de Kolmogorov</strong> de una cadena concreta es, en cambio, la longitud
+    del <em>programa más corto</em> que la genera. La cadena "01" repetida cien veces tiene
+    Kolmogorov bajísima —el programa "imprime 01 cien veces" es corto— aunque, medida
+    ingenuamente símbolo a símbolo, su entropía de Shannon sea alta. Una cadena de bits
+    verdaderamente al azar no se puede describir más corto que ella misma: es su propio
+    programa mínimo — eso es lo que significa formalmente "aleatorio" bajo esta teoría.</p>
+    <p class="why"><b>el problema, y por qué importa igual</b>Calcularla es, en general,
+    <em>indecidible</em> —no existe un algoritmo que la calcule para una cadena arbitraria; se
+    relaciona directamente con el problema de la parada—. Pese a eso, la intuición es real y
+    útil: es el fundamento teórico de por qué un buen compresor "entiende" patrones y
+    estructura que un conteo de frecuencias por símbolo no ve, y la idea detrás del principio de
+    longitud de descripción mínima (MDL) en machine learning: el mejor modelo es el que describe
+    los datos más cortamente.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Compresión sin pérdida: Huffman y LZ, en una idea</p>
+    <p><strong>Huffman</strong>: da códigos <em>de longitud variable</em>, cortos a los
+    símbolos frecuentes y largos a los raros, sin que ninguno sea prefijo de otro (así se
+    decodifica sin ambigüedad). Se construye el árbol desde abajo, fusionando siempre los dos
+    nodos de menor frecuencia. Es óptimo <em>símbolo a símbolo</em>.
+    <strong>LZ77/LZ78</strong> (la familia de gzip, zip, PNG): reemplaza secuencias repetidas
+    por una referencia "vuelve X atrás y copia Y bytes". Los formatos reales (DEFLATE)
+    combinan LZ + Huffman.</p>
+    <p><strong>Con pérdida</strong> (JPEG, MP3, H.264): descartan a propósito información que el
+    ojo o el oído no notan. No hay teorema del palomar que los frene porque no prometen
+    reconstruir el original.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Hashing: uniformidad y avalancha</p>
+    <p>Una buena función hash reparte las entradas de forma <em>pareja</em> sobre el rango de
+    salida (uniformidad), aunque las entradas se parezcan mucho: cambiar un bit de la entrada
+    debería cambiar ~la mitad de los bits de la salida (efecto <strong>avalancha</strong>). Eso
+    es lo que hace que un hash map tenga pocas colisiones y que un
+    <em>checksum</em> detecte cambios pequeños.</p>
+    <p class="why"><b>por qué importa</b>Un hash sesgado amontona claves en pocas cubetas y tu
+    diccionario O(1) se vuelve O(n). Por eso no inventes tu función hash: usa la de la librería
+    estándar (y siembra con una semilla por proceso para frustrar ataques de colisión).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Hash criptográfico vs no criptográfico</p>
+    <p>Los <strong>no criptográficos</strong> (FNV, MurmurHash, xxHash, CRC) priorizan
+    velocidad y buena distribución: para tablas hash, checksums, <em>sharding</em>,
+    deduplicación. Son fáciles de revertir o colisionar a propósito.
+    Los <strong>criptográficos</strong> (SHA-256, BLAKE3) añaden garantías de seguridad:
+    resistencia a preimagen (dado el hash, no puedes hallar una entrada), a segunda preimagen y
+    a colisiones (no puedes fabricar dos entradas con el mismo hash). Son más lentos por
+    diseño.</p>
+    <p class="why"><b>no los confundas</b>Usar MD5 o SHA para "guardar" contraseñas está mal
+    por dos motivos distintos: MD5 está roto (colisiones), y <em>cualquier</em> hash de
+    propósito general es demasiado rápido — para contraseñas se usan funciones deliberadamente
+    lentas y con sal (bcrypt, scrypt, Argon2). La guía de Seguridad (§2) entra a fondo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Códigos de detección y corrección de errores</p>
+    <p>La idea inversa a comprimir: <em>añadir</em> redundancia calculada para sobrevivir al
+    ruido. Un <strong>bit de paridad</strong> detecta un error (pero no lo corrige ni lo
+    localiza). Un <strong>checksum</strong> / <strong>CRC</strong> detecta ráfagas de errores.
+    Los <strong>códigos correctores</strong> (Hamming, Reed-Solomon, LDPC) permiten
+    <em>reconstruir</em> los bits dañados sin volver a pedirlos. La clave es la
+    <strong>distancia mínima</strong> <code class="inline">d</code> entre palabras válidas del
+    código: detectas hasta <code class="inline">d−1</code> errores y corriges
+    <code class="inline">⌊(d−1)/2⌋</code>.</p>
+    <p class="why"><b>por qué un QR sobrevive dañado</b>Los códigos QR llevan corrección
+    Reed-Solomon con cuatro niveles (L ≈ 7%, M ≈ 15%, Q ≈ 25%, H ≈ 30% de la simbología
+    recuperable). Por eso puedes ponerles un logo encima o escanearlos arrugados. La misma
+    familia protege CDs/DVDs, discos, códigos de barras, RAID 6, transmisiones del espacio
+    profundo y la memoria ECC de los servidores.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Capacidad de canal: el límite de Shannon para transmitir con ruido</p>
+    <p>El teorema de codificación de fuente (arriba) dice cuánto se puede <em>comprimir</em>. El
+    <strong>teorema de codificación de canal</strong> de Shannon es su contraparte para
+    <em>transmitir</em>: todo canal físico —un cable, el aire, una fibra— tiene una
+    <strong>capacidad</strong> en bits por segundo que depende de su ancho de banda y su
+    relación señal/ruido. Por debajo de esa capacidad existe <em>siempre</em> algún código que
+    permite transmitir con una tasa de error tan baja como se quiera, añadiendo la redundancia
+    de los códigos correctores de arriba; por encima de la capacidad,
+    <strong>es matemáticamente imposible</strong> lograr comunicación fiable, sin importar qué
+    tan ingenioso sea el código.</p>
+    <p class="why"><b>por qué importa</b>Es el límite duro detrás de "por qué el wifi no da más
+    velocidad aunque cambie el router": el ancho de banda disponible y el ruido del entorno
+    ponen un techo físico, no de ingeniería. Ejemplo histórico real: los módems analógicos de
+    los años 90 chocaron contra ~33.6 kbps, cerca del límite de Shannon calculado para una línea
+    telefónica con ruido de cuantización en ambos extremos de la conversión análogo-digital. Los
+    módems de 56k no violaron el teorema: cambiaron el canal —al conectar con el proveedor por
+    una línea que ya era digital en un extremo, evitaban una de las dos conversiones y así
+    reducían el ruido efectivo, elevando la capacidad real de ese nuevo canal—.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">El hilo conductor</span>
+    <p>Comprimir = <em>quitar</em> redundancia hasta el límite de la entropía. Corregir errores
+    = <em>añadir</em> redundancia estructurada para tolerar ruido. Hashear = destilar los datos
+    a una huella de tamaño fijo bien distribuida. Los tres son la misma pregunta —¿cuánta
+    información hay realmente aquí?— mirada desde tres lados.</p>
+  </div>
+</section>
+
+
+      <section class="block" id="curriculo">
+        <span class="sec-num">10</span>
+        <h2>Currículo: libros y cursos</h2>
+        <p class="lead">
+          Casi todo esto ya aparece en el currículo de la guía de Backend; aquí se ordena para
+          quien quiere la teoría primero. <span class="rl-tag free">gratis</span> es libre online;
+          <span class="rl-tag paid">pago</span> cuesta;
+          <span class="rl-tag lvl">nivel</span> indica dificultad.
+        </p>
+
+        <div class="stage">
+          <h4>Etapa 0 · La máquina, sin miedo</h4>
+          <div class="book"><span class="t">Code: The Hidden Language of Computer Hardware and Software</span> — <span class="a">Charles Petzold</span> <span class="rl-tag lvl">principiante</span><span class="d">Construye un computador conceptualmente desde interruptores. Cero matemática, lectura fascinante. Empieza aquí. En <a href="https://www.microsoftpressstore.com/store/code-the-hidden-language-of-computer-hardware-and-software-9780137909100" target="_blank" rel="noopener">Microsoft Press Store</a>.</span></div>
+          <div class="book"><span class="t">The Elements of Computing Systems (Nand2Tetris)</span> — <span class="a">Nisan &amp; Schocken</span> <span class="rl-tag free">gratis</span><span class="d">Construyes de verdad, de la compuerta NAND a un compilador y un sistema operativo. El curso web es gratis. En <a href="https://www.nand2tetris.org/" target="_blank" rel="noopener">nand2tetris.org</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 1 · Cómo tu código se ejecuta</h4>
+          <div class="book"><span class="t">Computer Systems: A Programmer's Perspective (CS:APP)</span> — <span class="a">Bryant &amp; O'Hallaron</span> <span class="rl-tag lvl">intermedio</span><span class="d">Memoria, ensamblador, enlazado, procesos, caché. El puente entre "escribo C" y "la máquina lo corre". En <a href="https://csapp.cs.cmu.edu/" target="_blank" rel="noopener">csapp.cs.cmu.edu</a>.</span></div>
+          <div class="book"><span class="t">Computer Organization and Design</span> — <span class="a">Patterson &amp; Hennessy</span> <span class="rl-tag lvl">intermedio</span><span class="d">La arquitectura por dentro: pipeline, jerarquía de memoria, paralelismo a nivel de instrucción. En <a href="https://shop.elsevier.com/books/computer-organization-and-design-mips-edition/patterson/978-0-12-820109-1" target="_blank" rel="noopener">Elsevier</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 2 · Algoritmos y estructuras de datos</h4>
+          <div class="book"><span class="t">Grokking Algorithms</span> — <span class="a">Aditya Bhargava</span> <span class="rl-tag lvl">principiante</span><span class="d">Ilustrado, corto, amable. El mejor punto de entrada antes de los pesados. En <a href="https://www.manning.com/books/grokking-algorithms" target="_blank" rel="noopener">Manning</a>.</span></div>
+          <div class="book"><span class="t">The Algorithm Design Manual</span> — <span class="a">Steven Skiena</span> <span class="rl-tag lvl">intermedio</span><span class="d">Práctico, con "historias de guerra" reales. El que recomienda teachyourselfcs. En <a href="https://www.algorist.com/" target="_blank" rel="noopener">algorist.com</a>.</span></div>
+          <div class="book"><span class="t">Introduction to Algorithms (CLRS)</span> — <span class="a">Cormen et al.</span> <span class="rl-tag lvl">referencia</span><span class="d">La referencia exhaustiva. Se consulta, no se lee de corrido. En <a href="https://mitpress.mit.edu/9780262046305/introduction-to-algorithms/" target="_blank" rel="noopener">MIT Press</a>.</span></div>
+          <div class="book"><span class="t">Algorithms, Part I &amp; II</span> — <span class="a">Princeton / Sedgewick, Coursera</span> <span class="rl-tag free">gratis</span><span class="d">Curso excelente. Alternativa en video: Berkeley CS61B. En <a href="https://www.coursera.org/learn/algorithms-part1" target="_blank" rel="noopener">Coursera</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 3 · Lenguajes y computabilidad</h4>
+          <div class="book"><span class="t">Crafting Interpreters</span> — <span class="a">Robert Nystrom</span> <span class="rl-tag free">gratis</span><span class="d">Construyes dos intérpretes de un lenguaje completo. La mejor forma de entender léxico, parser, AST y VM. En <a href="https://craftinginterpreters.com/" target="_blank" rel="noopener">craftinginterpreters.com</a>.</span></div>
+          <div class="book"><span class="t">Structure and Interpretation of Computer Programs (SICP)</span> — <span class="a">Abelson &amp; Sussman</span> <span class="rl-tag free">gratis</span> <span class="rl-tag lvl">difícil</span><span class="d">Qué es realmente programar. Duro y transformador; el clásico del MIT. En <a href="https://mitp-content-server.mit.edu/books/content/sectbyfn/books_pres_0/6515/sicp.zip/full-text/book/book.html" target="_blank" rel="noopener">sitio del MIT</a>.</span></div>
+          <div class="book"><span class="t">Introduction to the Theory of Computation</span> — <span class="a">Michael Sipser</span> <span class="rl-tag lvl">avanzado</span><span class="d">Autómatas, máquinas de Turing, decidibilidad, P vs NP. Riguroso y claro; para la §8. En <a href="https://math.mit.edu/~sipser/book.html" target="_blank" rel="noopener">math.mit.edu</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Meta-currículo</h4>
+          <div class="book"><span class="t">teachyourselfcs.com</span> — <span class="a">meta-guía</span> <span class="rl-tag free">gratis</span><span class="d">Nueve materias que todo ingeniero debería saber, con el mejor libro y curso de cada una. El mapa. En <a href="https://teachyourselfcs.com/" target="_blank" rel="noopener">teachyourselfcs.com</a>.</span></div>
+          <div class="book"><span class="t">CS50</span> — <span class="a">Harvard</span> <span class="rl-tag free">gratis</span><span class="d">La mejor introducción general a la computación si vienes de cero. En <a href="https://cs50.harvard.edu/x/" target="_blank" rel="noopener">cs50.harvard.edu</a>.</span></div>
+        </div>
+
+        <h3>Práctica</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://exercism.org" target="_blank" rel="noopener">Exercism</a></td><td>Ejercicios con mentoría humana gratis en 70+ lenguajes; para interiorizar estructuras y patrones</td></tr>
+            <tr><td><a href="https://leetcode.com" target="_blank" rel="noopener">LeetCode</a> (por patrones)</td><td>No 500 problemas: los ~15 patrones de la §5, unos pocos de cada uno, pensando en voz alta</td></tr>
+            <tr><td><a href="https://adventofcode.com" target="_blank" rel="noopener">Advent of Code</a></td><td>25 puzzles cada diciembre; obligan a elegir la estructura de datos correcta bajo presión</td></tr>
+            <tr><td><a href="https://www.nand2tetris.org" target="_blank" rel="noopener">nand2tetris.org</a></td><td>Los proyectos del libro, con el simulador de hardware y el IDE en el navegador</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="block" id="laboratorio">
+        <span class="sec-num">11</span>
+        <h2>Laboratorio: ver la teoría funcionando</h2>
+        <p class="lead">
+          Todo corre en la pestaña, sin cuenta. La teoría de esta guía se entiende mucho mejor
+          viéndola animada o ejecutándola paso a paso.
+        </p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Herramienta</th><th>Qué concepto de la guía vuelve tangible</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://pythontutor.com" target="_blank" rel="noopener">Python Tutor</a></td><td>§4 · §6 · §7 — ejecutar paso a paso viendo la pila, el heap y las referencias; recursión y aliasing dejan de ser abstractos</td></tr>
+            <tr><td><a href="https://visualgo.net/en" target="_blank" rel="noopener">VisuAlgo</a> · <a href="https://algorithm-visualizer.org/" target="_blank" rel="noopener">Algorithm Visualizer</a></td><td>§4 · §5 — animar árboles, hash maps, ordenamientos, BFS/DFS, Dijkstra y la tabla de DP llenándose</td></tr>
+            <tr><td><a href="https://godbolt.org" target="_blank" rel="noopener">Compiler Explorer (godbolt.org)</a></td><td>§1 · §2 · §6 — ver el ensamblador exacto que genera tu código; qué optimiza el compilador y qué no</td></tr>
+            <tr><td><a href="https://astexplorer.net/" target="_blank" rel="noopener">AST explorer</a></td><td>§6 — el árbol sintáctico que produce un parser real, para cualquier lenguaje</td></tr>
+            <tr><td><a href="https://asm-editor.specy.app" target="_blank" rel="noopener">ASM Editor</a></td><td>§2 — escribir y ejecutar ensamblador x86/MIPS/RISC-V con los registros y la pila a la vista</td></tr>
+            <tr><td><a href="https://www.falstad.com/circuit/" target="_blank" rel="noopener">CircuitJS1</a> · <a href="https://www.gately.dev/" target="_blank" rel="noopener">Gately</a></td><td>§2 — simulador de compuertas lógicas y circuitos: qué hay debajo del ensamblador</td></tr>
+            <tr><td><a href="https://float.exposed" target="_blank" rel="noopener">float.exposed</a> · <a href="https://www.h-schmidt.net/FloatConverter/IEEE754.html" target="_blank" rel="noopener">IEEE-754 converter</a></td><td>§1 — ver bit a bit por qué <code class="inline">0.1 + 0.2 != 0.3</code></td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Fundamentos de CS de Punta a Punta</strong> — guía hermana de la serie
+    <em>Atlas</em>. La base que las otras dan por sabida: representación, la máquina, complejidad,
+    estructuras de datos, algoritmos, lenguajes, concurrencia, computabilidad y teoría de la
+    información.</p>
+    <p>Estos conceptos casi no cambian —el complemento a dos, la notación asintótica y el problema
+    de la parada son igual de ciertos que hace décadas—. Los libros y cursos son referencia
+    amplia, no una lista cerrada; varios se comparten con la guía de Backend.</p>
+  </div>
+</footer>

@@ -1,0 +1,1860 @@
+<title>Carrera + Freelance de Punta a Punta</title>
+<meta name="description" content="Guía de estudio sobre carrera en tecnología y freelance internacional para autodidactas: el oficio, portafolio, CV, entrevistas técnicas y de diseño, arranque freelance, ventas y propuestas, precio, trabajo remoto, comunicación y crecimiento — más un currículo, una tabla de portales de empleo y un plan de 90 días.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #23272e;
+    --ink: #e7e5df;
+    --ink-soft: #b9bdc6;
+    --muted: #8b919c;
+    --line: #333842;
+    --line-soft: #2a2f37;
+    --accent: #4bb7a8;
+    --accent-soft: #16302d;
+    --accent-ink: #7fd3c7;
+    --rust: #d98a5f;
+    --rust-soft: #35241b;
+    --code-bg: #10131a;
+    --code-ink: #d9e2ec;
+    --code-comment: #7b8798;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-inner { padding: clamp(2.4rem, 6vw, 4.2rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem) 0 5rem; }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: 244px minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.88rem; border-left: 2px solid var(--line); padding-left: 1rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  nav.toc p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.7rem;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: flex; flex-direction: column; gap: 0.1rem; }
+  nav.toc a {
+    display: block; padding: 0.3rem 0.4rem; color: var(--ink-soft); text-decoration: none;
+    border-radius: 5px; counter-increment: toc; transition: background 0.15s, color 0.15s;
+  }
+  nav.toc a::before {
+    content: counter(toc, decimal-leading-zero); font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--muted); margin-right: 0.55rem;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+  nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 979px) {
+    nav.toc {
+      position: static; border-left: none; border: 1px solid var(--line); border-radius: 10px;
+      padding: 1.1rem 1.2rem; background: var(--surface); max-height: none;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 1rem; }
+  }
+
+  main { min-width: 0; }
+  section.block { scroll-margin-top: 2rem; padding-top: 1rem; }
+  section.block + section.block { margin-top: 3.4rem; border-top: 1px solid var(--line-soft); padding-top: 2.6rem; }
+  .sec-num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--accent-ink); }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.55rem, 4vw, 2.1rem);
+    line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; margin: 0.3rem 0 1rem;
+  }
+  h3 { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 1.16rem; margin: 2rem 0 0.6rem; letter-spacing: -0.005em; }
+  h4 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.86rem;
+    letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-soft); margin: 1.4rem 0 0.5rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  main a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  .lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 66ch; }
+  ul, ol.body-list { max-width: 68ch; padding-left: 1.2rem; margin: 0 0 1rem; }
+  li { margin: 0.35rem 0; }
+
+  code.inline {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.08em 0.36em; color: var(--ink);
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-ink);
+    font-size: 0.82rem; line-height: 1.6; padding: 1rem 1.15rem; border-radius: 9px; overflow-x: auto;
+    margin: 0 0 1.2rem; border: 1px solid rgba(255,255,255,0.06);
+  }
+  pre .c { color: var(--code-comment); }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  .concept { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 1.1rem 1.25rem; margin: 0 0 0.9rem; }
+  .concept .term {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.95rem;
+    color: var(--accent-ink); margin: 0 0 0.35rem;
+  }
+  .concept .term span { color: var(--muted); font-weight: 400; }
+  .concept p { margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .concept p:first-of-type { margin-top: 0; }
+  .concept .why { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.9rem; color: var(--ink-soft); }
+  .concept .why b {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 0.1rem;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.85rem 1.1rem;
+    border-radius: 0 8px 8px 0; margin: 0 0 1.3rem; font-size: 0.94rem;
+  }
+  .note.rust { border-left-color: var(--rust); background: var(--rust-soft); }
+  .note p { margin: 0; max-width: none; }
+  .note p + p { margin-top: 0.5rem; }
+  .note .label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-ink); display: block; margin-bottom: 0.25rem;
+  }
+  .note.rust .label { color: var(--rust); }
+
+  .diagram {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; line-height: 1.5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 1rem 1.15rem;
+    overflow-x: auto; white-space: pre; color: var(--ink-soft); margin: 0 0 1.3rem;
+  }
+
+  .chip {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; white-space: nowrap;
+  }
+  .chip.t1 { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* Reading list */
+  .stage { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 1.15rem 1.3rem; margin: 0 0 1rem; }
+  .stage > h4 { margin: 0 0 0.6rem; color: var(--accent-ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 0.5rem; }
+  .stage > p { font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.7rem; }
+  .book { padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  .book:last-child { border-bottom: none; }
+  .book .t { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 600; }
+  .book .a { color: var(--muted); }
+  .book .d { display: block; color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.1rem; }
+  .rl-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.08rem 0.38rem; border-radius: 3px; margin-left: 0.35rem; white-space: nowrap; vertical-align: 0.08em;
+  }
+  .rl-tag.free { background: var(--accent-soft); color: var(--accent-ink); }
+  .rl-tag.paid { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .rl-tag.lvl { background: var(--rust-soft); color: var(--rust); }
+
+  .project { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 0 0 1.8rem; box-shadow: var(--shadow); }
+  .project-head { padding: 1.2rem 1.4rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .project-head .stack {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 0.3rem;
+  }
+  .project-head h3 { margin: 0 0 0.4rem; font-size: 1.28rem; font-family: "IBM Plex Serif", Georgia, serif; }
+  .project-head p { margin: 0; font-size: 0.95rem; color: var(--ink-soft); max-width: none; }
+  .project-body { padding: 0.6rem 1.4rem 1.4rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line-soft); }
+  .phase:last-of-type { border-bottom: none; }
+  .phase .pn {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 5px; padding: 0.1rem 0.4rem; height: fit-content; white-space: nowrap;
+  }
+  .phase .pt { font-weight: 600; font-size: 0.95rem; grid-column: 2; }
+  .phase .pd { grid-column: 2; font-size: 0.92rem; color: var(--ink-soft); }
+  .phase .pd code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; }
+  .learn { margin-top: 1rem; font-size: 0.9rem; background: var(--accent-soft); color: var(--accent-ink); padding: 0.7rem 0.95rem; border-radius: 8px; }
+  .learn b { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
+
+  footer.foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.5rem 0 3.5rem; font-size: 0.9rem; color: var(--muted); }
+  footer.foot p { max-width: 66ch; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <p class="kicker">Guía de estudio · Carrera &amp; Freelance internacional · edición densa</p>
+    <h1>Carrera + Freelance de Punta a Punta</h1>
+    <p class="standfirst">La única guía de la serie que no es sobre código: cómo conseguir que te paguen bien por escribirlo, desde otro país. Portafolio, CV, entrevistas, freelance, propuestas, precio, trabajo remoto y comunicación — con una tabla de portales de empleo y un plan de 90 días.</p>
+    <div class="meta-row">
+      <span class="tag">para autodidactas</span>
+      <span class="tag">sin título, con proyectos reales</span>
+      <span class="tag">14 secciones</span>
+      <span class="tag">portales de empleo</span>
+      <span class="tag">plan de 90 días</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p>Índice</p>
+      <ol>
+        <li><a href="#oficio">El oficio más allá del código</a></li>
+        <li><a href="#portafolio">Portafolio que convence</a></li>
+        <li><a href="#cv-perfil">CV y perfil</a></li>
+        <li><a href="#entrevistas">El proceso de entrevista</a></li>
+        <li><a href="#algoritmos-entrevista">Algoritmos para entrevistas</a></li>
+        <li><a href="#system-design-entrevista">La entrevista de diseño de sistemas</a></li>
+        <li><a href="#freelance-arranque">Arrancar como freelance</a></li>
+        <li><a href="#ventas-propuestas">Ventas y propuestas</a></li>
+        <li><a href="#precio">Poner precio</a></li>
+        <li><a href="#trabajo-remoto">Trabajo remoto de verdad</a></li>
+        <li><a href="#comunicacion">Comunicación</a></li>
+        <li><a href="#crecer">Crecer y no estancarse</a></li>
+        <li><a href="#curriculo">Currículo: libros y recursos</a></li>
+        <li><a href="#plan-90">Un plan de 90 días</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+<section class="block" id="oficio">
+  <span class="sec-num">01</span>
+  <h2>La profesión más allá del código</h2>
+  <p class="lead">
+    Saber programar es el precio de entrada, no la oferta de valor. Lo que se contrata —y se
+    paga— es a alguien que convierte un problema difuso en software que funciona y que otros
+    pueden mantener. Esta sección es el mapa de cómo funciona ese mercado antes de intentar
+    entrar en él.
+  </p>
+
+  <div class="concept">
+    <p class="term">Seniority real <span>· alcance, no años</span></p>
+    <p>El nivel no lo dan los años de experiencia sino el tamaño del problema que puedes tomar
+    sin que nadie te supervise. Un junior ejecuta una tarea bien definida. Un mid lleva una
+    <em>feature</em> completa sola. Un senior toma un problema ambiguo, lo parte en trabajo
+    para varias personas y responde por el resultado del sistema, no solo por su código.
+    Cinco años haciendo siempre lo mismo no son seniority, son un año repetido cinco veces.</p>
+    <p class="why"><b>por qué importa</b>Cuando negocias sueldo o tarifa, negocias contra el
+    nivel percibido. Si describes tu trabajo como "hice tareas" en vez de "resolví problemas
+    de negocio", te tasan como junior aunque no lo seas.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Qué se espera en cada nivel</p>
+    <p>Las expectativas cambian de forma predecible. Conocerlas te dice qué demostrar en una
+    entrevista y qué pedir para tu próximo salto.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Nivel</th><th>Qué se espera</th><th>Autonomía</th><th>Cómo se mide el impacto</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Junior</strong></td><td>Cerrar tareas acotadas con calidad; preguntar a tiempo; aprender el código base</td><td>Su trabajo se revisa a fondo; necesita que le partan el problema</td><td>Lo que entrega él mismo</td></tr>
+        <tr><td><strong>Mid</strong></td><td>Llevar una feature de punta a punta; estimar; revisar código de otros</td><td>Decide el "cómo" solo; pide ayuda en el "qué" cuando hace falta</td><td>Features entregadas y su calidad</td></tr>
+        <tr><td><strong>Senior</strong></td><td>Tomar problemas ambiguos; pensar en el sistema y en el equipo; desatascar a otros</td><td>Define el "qué" y el "cómo"; propone qué construir</td><td>Lo que el equipo entrega gracias a él</td></tr>
+        <tr><td><strong>Staff+</strong></td><td>Elegir qué problemas valen la pena; alinear a varios equipos</td><td>Influye sin autoridad formal</td><td>Decisiones técnicas de toda un área</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">T-shaped <span>· profundidad en una cosa, base ancha</span></p>
+    <p>El perfil que más se busca tiene una barra vertical —una especialidad donde eres muy
+    bueno— y una barra horizontal —nociones útiles de todo lo que la rodea: bases de datos,
+    infraestructura, frontend, producto, seguridad—. Ser solo especialista te vuelve un cuello
+    de botella; ser solo generalista te vuelve reemplazable. La dirección de este perfil
+    (aplicaciones con LLM) es una buena barra vertical con una horizontal de backend y datos.</p>
+    <p class="why"><b>por qué importa</b>Un cliente o un equipo pequeño no contrata cinco
+    especialistas; contrata a una persona que puede sostener el ciclo completo y profundizar
+    donde el proyecto lo exige.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cómo contrata la industria de verdad</p>
+    <p>Casi ninguna vacante buena se llena con un desconocido que aplicó en frío. Se llena por
+    <strong>referido</strong> —alguien de dentro responde por ti—, y en segundo lugar por
+    gente que el equipo ya vio de algún modo: una contribución a su open source, una charla,
+    un artículo, una respuesta útil en su comunidad. El portal de empleo es el último recurso
+    de ambos lados y tiene la peor tasa de éxito.</p>
+  </div>
+
+  <div class="diagram">CÓMO SE LLENA UNA VACANTE                          tasa de éxito
+  ┌───────────────────────────────────────────────┐
+  │  Referido interno (alguien te presenta)        │   alta      #######
+  ├───────────────────────────────────────────────┤
+  │  Contribución visible (open source, charla)    │   media     #####
+  ├───────────────────────────────────────────────┤
+  │  Contenido propio que hace que te encuentren   │   media     ####
+  ├───────────────────────────────────────────────┤
+  │  Portal de empleo (aplicas en frío)           │   baja      ##
+  ├───────────────────────────────────────────────┤
+  │  DM o correo en frío sin contexto             │   muy baja  #
+  └───────────────────────────────────────────────┘
+  El esfuerzo se invierte de abajo hacia arriba; el retorno llega al revés.
+  Consecuencia práctica: dedica el tiempo a construir la parte de arriba,
+  no a pulir la carta de presentación número 50.</div>
+
+  <div class="concept">
+    <p class="term">Superficie de suerte <span>· luck surface area</span></p>
+    <p>La probabilidad de que te llegue una oportunidad sin buscarla es, en la práctica,
+    <strong>lo que haces</strong> multiplicado por <strong>cuánta gente lo ve</strong>. Puedes
+    subir el primer factor (terminar proyectos, escribir con criterio) o el segundo (publicar
+    donde te vean: GitHub, un post, una charla, responder en una comunidad). La mayoría de los
+    autodidactas invierte todo en el primer factor y nada en el segundo, y luego se pregunta por
+    qué nadie los encuentra.</p>
+    <p class="why"><b>por qué importa</b>Conecta directo con el diagrama de arriba: referidos y
+    contribuciones visibles ganan porque alguien ya vio tu trabajo antes de necesitar contratar.
+    Sin el segundo factor, cada proyecto que haces empieza de cero en visibilidad.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Síndrome del impostor <span>· administrarlo, no eliminarlo</span></p>
+    <p>Sentir que no sabes lo suficiente no es una señal de que no estás calificado; es casi
+    universal, incluso en gente con quince años de experiencia. Lo que ayuda no es "sentirse
+    seguro" antes de actuar, sino evidencia externa acumulada: un registro simple de lo que
+    resolviste (a veces llamado <em>brag document</em>, ver §12) al que vuelves cuando la duda es
+    más fuerte que los hechos. Sin título formal, la tentación de sobrecompensar leyendo todo
+    antes de aplicar a algo es la forma más común en que este síndrome frena a un autodidacta.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Bootcamp, autodidacta o título — no compiten en lo mismo</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Vía</th><th>Fuerte en</th><th>Débil en</th></tr></thead>
+      <tbody>
+        <tr><td>Título universitario</td><td>Fundamentos formales, credencial reconocida, red de compañeros</td><td>Tiempo (años), a veces desconectado de cómo se trabaja hoy</td></tr>
+        <tr><td>Bootcamp</td><td>Velocidad, empleabilidad inmediata en un stack, cohorte y mentoría</td><td>Profundidad de fundamentos; se nota en la entrevista de sistemas</td></tr>
+        <tr><td>Autodidacta</td><td>Proyectos reales, criterio propio, ritmo ajustado a lo que el mercado pide</td><td>Sin estructura externa que fuerce cubrir huecos; la disciplina es toda tuya</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Ninguna vía es "mejor" en abstracto. Lo que un
+    autodidacta necesita compensar de forma activa son los fundamentos que un título cubre por
+    diseño: estructuras de datos, redes, algo de teoría de bases de datos. El resto —criterio,
+    entrega, comunicación— no lo da ninguna de las tres vías por sí sola.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Qué mirar en una oferta antes de postular</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Señal en el aviso</th><th>Qué sugiere</th></tr></thead>
+      <tbody>
+        <tr><td>Describe el problema del rol, no solo una lista de tecnologías</td><td>Alguien pensó el puesto; probablemente el proceso también esté cuidado</td></tr>
+        <tr><td>Rango de sueldo publicado</td><td>Transparencia; te ahorra semanas de proceso por un desajuste de expectativas</td></tr>
+        <tr><td>Pide "10+ años de experiencia" en una tecnología de 5</td><td>El aviso lo escribió alguien sin criterio técnico; calibra el resto con cuidado</td></tr>
+        <tr><td>Menciona cómo es el equipo y cómo trabajan (async, reuniones, revisión de código)</td><td>Cultura real, no solo beneficios de relleno</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="note">
+    <span class="label">Sin título, con proyectos en producción</span>
+    <p>Muchas empresas remotas ya no exigen título, sobre todo fuera del rubro más
+    tradicional. Lo que reemplaza la credencial es el portafolio y —más importante— poder
+    explicar tus decisiones técnicas con criterio. Lo que <em>no</em> reemplaza: la disciplina
+    de comunicar por escrito y de entregar sin que te persigan. Ahí es donde un autodidacta
+    con proyectos reales suele ir por delante de un recién egresado.</p>
+  </div>
+</section>
+
+<section class="block" id="portafolio">
+  <span class="sec-num">02</span>
+  <h2>Portafolio que convence</h2>
+  <p class="lead">
+    El portafolio existe para responder una pregunta del que contrata: "¿esta persona puede
+    hacer el ciclo completo sin que yo la vigile?". Dos o tres proyectos profundos lo
+    responden; diez clones de tutoriales lo responden que no.
+  </p>
+
+  <div class="concept">
+    <p class="term">Profundidad &nbsp;&gt;&nbsp; cantidad</p>
+    <p>Dos o tres proyectos que hiciste de principio a fin —diseño, implementación, deploy,
+    algo de mantenimiento— dicen mucho más que veinte repos pequeños. Un proyecto profundo
+    tiene decisiones que defender: por qué esa base de datos, por qué esa arquitectura, qué
+    salió mal y cómo lo arreglaste.</p>
+    <p class="why"><b>por qué importa</b>Quien revisa portafolios ha visto mil to-do apps.
+    Lo que no ha visto es a alguien que documentó por qué eligió cola de mensajes en vez de
+    <em>cron</em>, y qué pasó cuando la cola se llenó.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Caso de estudio por proyecto</p>
+    <p>Cada proyecto necesita una narración corta con cuatro partes: el <strong>problema</strong>
+    concreto que resuelve, las <strong>decisiones</strong> técnicas y por qué, los
+    <strong>trade-offs</strong> que aceptaste, y el <strong>resultado</strong> (funciona,
+    lo usa alguien, aprendiste X). Va en el <code class="inline">README</code> o en un post
+    aparte enlazado desde él.</p>
+    <p class="why"><b>por qué importa</b>El código muestra que <em>puedes</em> teclear; el
+    caso de estudio muestra que <em>piensas</em>. Lo segundo es lo que separa niveles de
+    sueldo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">GitHub como CV <span>· README de perfil, repos fijados</span></p>
+    <p>Tu perfil de GitHub es lo primero que abre un reclutador técnico. Un
+    <code class="inline">README</code> de perfil (repo con tu nombre de usuario) con quién
+    eres y qué haces; seis repos fijados —los mejores, no todos—; y constancia de commits a lo
+    largo de meses en vez de un pico aislado. Los repos abandonados a medias restan.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">README que se lee, deploy que se toca</p>
+    <p>El 80% del impacto de un repo está en su <code class="inline">README</code>: una línea
+    de qué es, captura o GIF, cómo correrlo en tres comandos, las decisiones. Y un enlace a
+    una demo viva: un botón "ver demo" convierte un repositorio en un producto. Alojado gratis
+    en un PaaS con un dominio propio barato.</p>
+    <p class="why"><b>por qué importa</b>Nadie clona tu repo para evaluarte. Si en treinta
+    segundos no entienden qué hace y no pueden verlo funcionando, pasan al siguiente.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Qué NO poner</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Sí</th><th>No</th></tr></thead>
+      <tbody>
+        <tr><td>2-3 proyectos hechos de punta a punta, con deploy vivo</td><td>Clones de tutoriales (weather app copiada, to-do de un curso)</td></tr>
+        <tr><td>Caso de estudio con decisiones y trade-offs</td><td>Repos vacíos, abandonados a medias o que no compilan</td></tr>
+        <tr><td>Algún PR o issue real en un proyecto ajeno</td><td>"Certificado de curso de X" como si fuera un proyecto</td></tr>
+        <tr><td>Tests en verde con badge de CI</td><td>40 repos sin fijar y sin README</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">El elevator pitch de un proyecto <span>· 30 segundos</span></p>
+    <p>Cuando alguien te pregunta "cuéntame de un proyecto tuyo", necesitas una respuesta de
+    treinta segundos, no un recorrido por el código. Estructura: qué problema resuelve (una
+    frase), qué decisión técnica defenderías si te la cuestionan, y un número o alcance que le
+    dé peso ("lo usan X personas", "procesa Y archivos al día"). Practícala en voz alta hasta que
+    salga sin dudar; es la pregunta más frecuente de toda la entrevista.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cómo elegir QUÉ construir</p>
+    <p>El proyecto correcto para portafolio cumple tres condiciones: resuelve un problema que
+    tú mismo tuviste o que puedes explicar sin inventar el contexto, usa el stack al que apuntas
+    (no el que ya dominas de sobra), y cabe en cuatro a ocho semanas de trabajo real. Un
+    proyecto que no termina nunca resta más que uno pequeño y cerrado.</p>
+    <p class="why"><b>por qué importa</b>"Un problema que tuviste tú mismo" es la diferencia
+    entre poder hablar con detalle de decisiones reales y recitar de memoria un tutorial. Se
+    nota en la primera pregunta de seguimiento.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Errores comunes al presentar un proyecto</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Error</th><th>Qué transmite</th></tr></thead>
+      <tbody>
+        <tr><td>Empezar por el stack ("usé React, Node, Postgres...")</td><td>Que no tienes claro el problema que resolviste</td></tr>
+        <tr><td>No mencionar nada que saliera mal</td><td>Que no lo hiciste tú, o que no reflexionas sobre tu trabajo</td></tr>
+        <tr><td>Explicar cada archivo del repo en orden</td><td>Que no distingues lo importante de los detalles</td></tr>
+        <tr><td>No tener una demo lista para mostrar en el momento</td><td>Que el proyecto no está realmente terminado</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Trabajo de clientes</span>
+    <p>Los proyectos personales y de open source son 100% tuyos para mostrar. El trabajo
+    pagado necesita permiso del cliente y a veces anonimizarlo (quitar nombre, datos, capturas
+    identificables). Para armar portafolio desde cero, los proyectos propios pesan igual o
+    más. Esta sección amplía la §15 de la guía de Backend (<em>Cómo mostrar el portafolio</em>),
+    que detalla las cuatro capas: proyecto presentable, perfil de GitHub, sitio de una página,
+    y escribir sobre lo que hiciste.</p>
+  </div>
+</section>
+
+<section class="block" id="cv-perfil">
+  <span class="sec-num">03</span>
+  <h2>CV y perfil que pasan el filtro</h2>
+  <p class="lead">
+    Un CV tiene dos lectores en serie: un sistema que busca coincidencia de palabras con la
+    oferta (ATS) y, si pasa, una persona que le dedica menos de un minuto. Tiene que ganar a
+    los dos sin mentirle a ninguno.
+  </p>
+
+  <div class="concept">
+    <p class="term">El ATS <span>· applicant tracking system</span></p>
+    <p>Es el software donde caen las postulaciones. Filtra y ordena por coincidencia de
+    términos con la descripción del puesto, y muchas veces recorta candidatos antes de que un
+    humano mire. No lo engañas metiendo palabras invisibles; lo aprovechas usando el mismo
+    vocabulario que el aviso: si pide "React", escribe "React", no solo "frontend".</p>
+    <p class="why"><b>por qué importa</b>Un CV excelente descrito con las palabras
+    equivocadas no llega nunca a ojos humanos. Adaptar tres o cuatro términos por oferta es de
+    los usos de tiempo con mejor retorno.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Formato que sobrevive al parser</p>
+    <p>Una sola columna, texto real (no una imagen ni un PDF escaneado), sin tablas ni cajas
+    de texto, encabezados estándar (<em>Experiencia</em>, <em>Proyectos</em>,
+    <em>Habilidades</em>). Una página si tienes menos de diez años de experiencia. Para
+    mercado anglosajón: sin foto, sin edad, sin estado civil.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Viñetas de impacto, no de tareas</p>
+    <p>Cada línea de experiencia es <strong>verbo + qué hiciste + resultado medible</strong>.
+    "Responsable del backend" no dice nada. "Reduje el tiempo de respuesta p95 de 800&nbsp;ms
+    a 120&nbsp;ms rediseñando las consultas y añadiendo caché" dice nivel, dominio y efecto.
+    Si no tienes métricas, usa alcance: "para 12&nbsp;000 usuarios", "3 integraciones de
+    pago".</p>
+    <p class="why"><b>por qué importa</b>El humano que lee salta de viñeta en viñeta buscando
+    señales de seniority. Los resultados medibles son esa señal; las responsabilidades son
+    ruido.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Qué va en cada sección</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Sección</th><th>Contenido</th></tr></thead>
+      <tbody>
+        <tr><td>Encabezado</td><td>Nombre, rol objetivo, ciudad + "disponible en remoto", correo, LinkedIn, GitHub, sitio propio</td></tr>
+        <tr><td>Resumen (2-3 líneas)</td><td>Qué eres, nivel, dominio, un logro que valga la pena. Sin adjetivos vacíos</td></tr>
+        <tr><td>Experiencia</td><td>Viñetas de impacto, orden cronológico inverso. Incluye trabajo real de agencia y freelance</td></tr>
+        <tr><td>Proyectos</td><td>2-3, con enlace a demo y repo, una línea de stack + resultado</td></tr>
+        <tr><td>Habilidades</td><td>Lo que defenderías en una entrevista. Sin barras de porcentaje ni "nivel 8/10"</td></tr>
+        <tr><td>Formación</td><td>Autodidacta: cursos relevantes terminados. El título va si lo tienes; su ausencia no se disculpa</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">LinkedIn y presencia mínima</p>
+    <p>LinkedIn es un CV que los reclutadores buscan de forma activa: el titular con rol y
+    especialidad (no "aspirante a"), la sección "Acerca de" en primera persona con un par de
+    logros, proyectos destacados fijados, y la ubicación puesta como abierta a remoto. La
+    presencia mínima que hace diferencia: un sitio propio de una página y <em>un</em> artículo
+    técnico sobre algo que construiste. No hace falta ser creador de contenido; hace falta que
+    quien te busca encuentre algo con sustancia.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Carta de presentación <span>· cuándo vale la pena</span></p>
+    <p>La mayoría de los procesos remotos no la piden, y una genérica ("estimado reclutador,
+    me postulo a...") no suma nada. Vale la pena escribir una cuando responde a algo específico
+    del aviso —por qué ese producto, una conexión real con la empresa, o para explicar un
+    quiebre en tu trayectoria (cambio de carrera, pausa)—. Tres párrafos como máximo; la primera
+    línea decide si se lee el resto.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Sitio propio de una página <span>· qué va y qué no</span></p>
+    <p>No necesita ser elaborado: quién eres en una frase, dos o tres proyectos con su enlace
+    vivo, cómo contactarte, y opcionalmente un enlace a un artículo que escribiste. Un dominio
+    propio (barato, con tu nombre) suma más credibilidad que el subdominio gratuito de una
+    plantilla. Lo que resta: animaciones que tardan en cargar, texto de relleno tipo "sobre mí"
+    sin sustancia, o un blog vacío con un solo post de hace años.</p>
+    <p class="why"><b>por qué importa</b>Es la pieza que amplía el CV para quien quiere
+    profundizar treinta segundos más. Si no existe, esa curiosidad se pierde ahí.</p>
+  </div>
+
+  <div class="diagram">ANATOMÍA DEL CV DE UNA PÁGINA
+
+  +----------------------------------------------------------+
+  | Nombre · Rol objetivo · Ciudad (abierto a remoto)         |
+  | correo · LinkedIn · GitHub · sitio propio                 |
+  +----------------------------------------------------------+
+  | RESUMEN (2-3 líneas): quién eres + un logro que pese      |
+  +----------------------------------------------------------+
+  | EXPERIENCIA (orden cronológico inverso)                   |
+  |   Rol — Empresa/cliente                       [fechas]    |
+  |   · viñeta de impacto (verbo + qué + resultado medible)   |
+  |   · viñeta de impacto                                     |
+  +----------------------------------------------------------+
+  | PROYECTOS (2-3, con demo + repo)                          |
+  +----------------------------------------------------------+
+  | HABILIDADES (solo lo que defenderías en vivo)             |
+  +----------------------------------------------------------+
+  | FORMACIÓN                                                 |
+  +----------------------------------------------------------+
+  Una columna, texto real, sin tablas ni cajas — así lo lee el ATS.</div>
+
+  <div class="note">
+    <span class="label">Palabras clave sin mentir</span>
+    <p>Usa los términos de la oferta solo si puedes respaldarlos en una conversación. Poner
+    "Kubernetes" porque una vez seguiste un tutorial se cae en la primera pregunta y quema la
+    entrevista entera. Es mejor un CV honesto que pasa a tres procesos que uno inflado que
+    revienta en todos.</p>
+  </div>
+</section>
+
+<section class="block" id="entrevistas">
+  <span class="sec-num">04</span>
+  <h2>El proceso de entrevista completo</h2>
+  <p class="lead">
+    Una entrevista técnica es una secuencia de etapas, cada una con un evaluador distinto que
+    busca una cosa distinta. Saber qué mide cada etapa te dice qué preparar y evita que
+    falles una por no entender las reglas.
+  </p>
+
+  <div class="diagram">ESTRUCTURA TÍPICA (varía por empresa; los bloques, no)
+
+  0 - Recruiter screen        ~30 min   encaje general, expectativa de sueldo, motivación
+      |
+  1 - Screening técnico       45-60 min 1 ejercicio de código medio en vivo, o take-home
+      |
+  2 - Take-home (a veces)     2-4 h     proyecto pequeño; se evalúa código Y decisiones
+      |
+  3 - Onsite / panel virtual  medio día en bloques:
+      |-- Coding 1-2          45 min c/u  estructuras de datos, "piensa en voz alta"
+      |-- System design       45-60 min   diseñar un sistema (para mid / senior)
+      |-- Behavioral (STAR)   45 min      conflicto, fracaso, impacto, colaboración
+      |-- Hiring manager      30-45 min   contexto del equipo + TUS preguntas
+      |
+  4 - Debrief + oferta        interno; luego negociación de sueldo/condiciones</div>
+
+  <div class="concept">
+    <p class="term">Recruiter screen</p>
+    <p>Llamada corta con alguien de reclutamiento, no técnico. Confirma que el rol y tú
+    encajan en lo básico: seniority, ubicación/zona horaria, expectativa de compensación,
+    por qué te interesa. Prepara un rango de sueldo (mira <code class="inline">levels.fyi</code>
+    y Get on Board antes) y un resumen de dos minutos de tu trayectoria.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Take-home</p>
+    <p>Un ejercicio para hacer en casa en unas horas. Se evalúa el código (claridad, tests,
+    estructura) <em>y</em> el <code class="inline">README</code> donde explicas qué asumiste,
+    qué dejaste fuera y por qué. Pon un límite de tiempo y sé explícito sobre él: "invertí 3
+    horas; con más habría añadido X".</p>
+    <p class="why"><b>por qué importa</b>Es la etapa que más se parece al trabajo real y donde
+    un autodidacta con proyectos suele brillar. Tratarla como "solo código" y omitir el
+    razonamiento es el error más común.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Live coding</p>
+    <p>Resolver un problema mientras alguien mira. Lo que se evalúa no es solo llegar a la
+    respuesta: es cómo aclaras el enunciado, cómo piensas en voz alta, cómo pruebas tu código
+    y cómo reaccionas a una pista. Un candidato que comunica su proceso y no llega al óptimo
+    a menudo pasa por encima de uno que lo resuelve en silencio.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Behavioral &nbsp;·&nbsp; método STAR</p>
+    <p>Preguntas sobre tu pasado: "cuéntame de un conflicto", "de un proyecto que falló", "de
+    una vez que tuviste que convencer a alguien". Se responden con <strong>STAR</strong>:
+    Situación (contexto breve), Tarea (tu responsabilidad), Acción (qué hiciste tú, no el
+    equipo), Resultado (qué pasó, qué aprendiste). Ten tres o cuatro historias reales
+    preparadas; sirven para casi cualquier pregunta.</p>
+    <p class="why"><b>por qué importa</b>Esta etapa elimina candidatos técnicamente
+    competentes por igual de seguido que la de código. "No se me ocurre ningún conflicto" se
+    lee como falta de experiencia o de autoconciencia.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Preguntar bien &nbsp;·&nbsp; red flags de la empresa</p>
+    <p>Tus preguntas también te evalúan, y a la vez te protegen. Buenas: "¿por qué está
+    abierta esta posición?", "¿cómo se ve un buen primer trimestre?", "¿qué es lo más difícil
+    del equipo hoy?". Señales de alarma del otro lado: proceso caótico o interminable, no
+    saben describir el rol, evasivos con el sueldo hasta el final, "prueba" que es trabajo
+    real gratis, hablan mal de quien se fue.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Negociar la oferta</p>
+    <p>Casi toda oferta inicial tiene margen. Reglas simples: nunca des el primer número si
+    puedes evitarlo ("prefiero conocer el rango que manejan para el rol"); si ya diste un rango,
+    negocia sobre la oferta escrita, no sobre lo que dijeron por teléfono; y si tienes otra
+    oferta real, decirlo con honestidad ("tengo otra propuesta en curso") suele mover el número
+    más que cualquier argumento. Negociar con respeto no arriesga la oferta; casi ninguna empresa
+    la retira por eso.</p>
+    <p class="why"><b>por qué importa</b>El número que aceptas ancla los siguientes: subidas,
+    bonos y a veces el salario del próximo trabajo se calculan como porcentaje de este. No
+    negociar la primera oferta es una decisión que se paga por años.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Verificación de referencias</p>
+    <p>Antes de dar el contacto de un excolega o exjefe, avísale y dile qué rol estás postulando
+    para que su respuesta esté alineada. Elige referencias que puedan hablar de tu trabajo real
+    (no solo de que eres simpático): alguien que revisó tu código, alguien que dependió de una
+    entrega tuya. Si no tienes referencias formales de empleo —común en freelance puro— un
+    cliente que responda por ti cumple la misma función.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Preguntas trampa comunes</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Pregunta</th><th>Qué buscan en realidad</th></tr></thead>
+      <tbody>
+        <tr><td>"¿Cuál es tu mayor debilidad?"</td><td>Autoconciencia real, no una fortaleza disfrazada ("soy demasiado perfeccionista")</td></tr>
+        <tr><td>"¿Por qué quieres dejar tu trabajo actual?"</td><td>Que no hables mal de nadie y que la razón sea sobre ti, no una queja</td></tr>
+        <tr><td>"¿Dónde te ves en 5 años?"</td><td>Que tengas dirección, no una respuesta memorizada de LinkedIn</td></tr>
+        <tr><td>"¿Tienes preguntas para mí?"</td><td>Que sí las tengas — no preguntar nada es la peor respuesta posible</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">Antes de la entrevista <span>· la preparación logística importa</span></p>
+    <p>Investiga el producto de la empresa y prueba usarlo si es posible; ten dos o tres
+    preguntas propias listas (no genéricas); revisa la conexión, el micrófono y el entorno con
+    antelación si es virtual; y ten agua cerca. Ninguno de estos puntos es sobre habilidad
+    técnica, y aun así una mala conexión o llegar sin saber qué hace la empresa cuesta más
+    puntos de los que parece.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Después de un rechazo</span>
+    <p>Pide feedback concreto —a veces lo dan— y no lo tomes como veredicto: mucho es ruido
+    (timing, un candidato interno, encaje de zona horaria). Anota qué preguntas te costaron,
+    prepáralas, y reaplica en 6-12 meses si el lugar te interesaba. Un "no" solo cierra la
+    puerta si la cierras tú con mala actitud.</p>
+  </div>
+</section>
+
+<section class="block" id="algoritmos-entrevista">
+  <span class="sec-num">05</span>
+  <h2>Algoritmos para entrevista, sin obsesión</h2>
+  <p class="lead">
+    Las preguntas de tipo LeetCode son un juego con reglas propias. No miden si eres buen
+    ingeniero; miden si preparaste este juego. La estrategia es aprender los patrones que se
+    repiten, no acumular problemas resueltos.
+  </p>
+
+  <div class="concept">
+    <p class="term">Los ~15 patrones que cubren el 80%</p>
+    <p>Casi todos los problemas de entrevista son una variación de un puñado de técnicas.
+    Reconocer el patrón es el 90% de la solución.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Patrón</th><th>Se reconoce cuando…</th></tr></thead>
+      <tbody>
+        <tr><td>Dos punteros</td><td>Array/string ordenado, buscas un par o inviertes en sitio</td></tr>
+        <tr><td>Ventana deslizante</td><td>Subarreglo/substring contiguo "más largo/más corto que cumple X"</td></tr>
+        <tr><td>Búsqueda binaria (y variantes)</td><td>Espacio ordenado, o "el mínimo valor que funciona"</td></tr>
+        <tr><td>Hash map / conteo</td><td>"¿Existe?", frecuencias, deduplicar, pares que suman K</td></tr>
+        <tr><td>Punteros rápido/lento</td><td>Lista enlazada: ciclo, punto medio, k-ésimo desde el final</td></tr>
+        <tr><td>BFS / DFS</td><td>Árbol o grafo: recorrer, contar componentes, camino más corto sin pesos</td></tr>
+        <tr><td>Backtracking</td><td>Generar todas las combinaciones/permutaciones/particiones válidas</td></tr>
+        <tr><td>Programación dinámica</td><td>"Cuántas formas", "mínimo/máximo hasta aquí", subproblemas que se repiten</td></tr>
+        <tr><td>Heap / top-K</td><td>"Los K más grandes/frecuentes", fusionar K listas, mediana en flujo</td></tr>
+        <tr><td>Intervalos</td><td>Rangos que se solapan: fusionar, insertar, salas de reuniones</td></tr>
+        <tr><td>Orden topológico</td><td>Dependencias, "¿se puede completar?", secuencia de cursos</td></tr>
+        <tr><td>Union-find</td><td>Grupos que se unen dinámicamente, detectar ciclo en grafo no dirigido</td></tr>
+        <tr><td>Sumas de prefijos</td><td>Muchas consultas de "suma del rango i..j"</td></tr>
+        <tr><td>Greedy</td><td>Elegir el óptimo local en cada paso y demostrar que basta</td></tr>
+        <tr><td>Bit a bit</td><td>Conjuntos pequeños como máscara, XOR para el elemento único</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cómo practicar <span>· no 500 problemas</span></p>
+    <p>Unos 50 a 75 problemas <em>bien entendidos</em> —por qué funciona ese patrón, no la
+    solución memorizada— rinden más que 400 pasados de largo. Usa una lista curada como mapa
+    (NeetCode 150, o el enfoque de <em>Grokking</em>). Después de resolver, cierra todo y
+    reescribe la solución de memoria; a la semana, vuelve a intentarla. Repetición espaciada,
+    igual que un idioma.</p>
+    <p class="why"><b>por qué importa</b>El objetivo no es haber visto el problema exacto —eso
+    es lotería— sino reconocer a qué patrón pertenece uno nuevo en los primeros dos minutos.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Pensar en voz alta &nbsp;·&nbsp; del brute-force al óptimo</p>
+    <p>La rutina que esperan: repetir el enunciado con tus palabras, dar un par de ejemplos
+    (incluido un caso borde), proponer la solución de fuerza bruta y decir su complejidad,
+    identificar el desperdicio, mejorarla, y solo entonces programar. Verbalizar cada paso no
+    es teatro: es lo que se evalúa. Practícalo grabándote la voz.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cuándo esto importa y cuándo no</p>
+    <p>Pesa mucho en las grandes tecnológicas y en empresas que copian su proceso. Pesa poco o
+    nada en la mayoría del freelance y en muchas <em>startups</em>, donde te evalúan con un
+    take-home realista o mirando tu portafolio. Calibra cuánto tiempo le metes según a dónde
+    apuntas; no hipoteques meses en LeetCode si tu camino es cliente directo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Mock interviews <span>· con quién practicar</span></p>
+    <p>Resolver en silencio en tu casa no entrena lo que realmente se evalúa: pensar en voz alta
+    con alguien mirando. Opciones que sirven, de más a menos exigente: una entrevista simulada
+    con otro desarrollador (intercambio: tú le haces una a él), una plataforma de mock interviews
+    con entrevistadores de la industria, o grabarte resolviendo y narrando en voz alta y
+    reverla después. Las tres baten a "hacer un problema más" sin decir una palabra.</p>
+    <p class="why"><b>por qué importa</b>El error más caro en esta entrevista no es no saber el
+    algoritmo; es quedarse mudo mientras se piensa. Eso solo se corrige practicando con
+    presión social real.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Complejidad Big-O <span>· chuleta rápida</span></p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Notación</th><th>Se ve en...</th><th>Ejemplo</th></tr></thead>
+      <tbody>
+        <tr><td>O(1)</td><td>Acceso directo</td><td>Leer una posición de array, hash map</td></tr>
+        <tr><td>O(log n)</td><td>Se descarta la mitad en cada paso</td><td>Búsqueda binaria, árbol balanceado</td></tr>
+        <tr><td>O(n)</td><td>Un paso por elemento</td><td>Recorrer un array una vez</td></tr>
+        <tr><td>O(n log n)</td><td>Dividir y ordenar</td><td>Merge sort, quicksort promedio</td></tr>
+        <tr><td>O(n²)</td><td>Comparar cada par</td><td>Bucles anidados, bubble sort</td></tr>
+        <tr><td>O(2ⁿ)</td><td>Todas las combinaciones</td><td>Backtracking sin poda, subconjuntos</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Nombrar la complejidad de tu solución sin que te lo
+    pidan —y la del "antes" y el "después" al optimizar— es una señal de nivel que pesa tanto
+    como la solución misma.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cuando te atascas en vivo</p>
+    <p>Pasa a todo el mundo, incluso preparado. La salida no es el silencio: verbaliza dónde
+    estás atascado ("sé que necesito reducir esto de O(n²), pero no veo cómo todavía"), prueba
+    con un ejemplo más pequeño a mano, o pide una pista concreta en vez de "no sé, ayuda". Un
+    entrevistador casi siempre prefiere ayudarte a avanzar que ver diez minutos de silencio;
+    pedir una pista bien enmarcada no resta puntos como se cree.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">El presupuesto realista</span>
+    <p>De cuatro a ocho semanas, una hora casi todos los días, cubriendo los patrones de
+    arriba en orden de frecuencia. Más allá de eso el retorno cae rápido. Si llevas 300
+    problemas y sigues nervioso, el problema es la práctica de comunicar bajo presión, no que
+    falten problemas.</p>
+  </div>
+</section>
+
+<section class="block" id="system-design-entrevista">
+  <span class="sec-num">06</span>
+  <h2>La entrevista de diseño de sistemas</h2>
+  <p class="lead">
+    No es una prueba de conocimiento enciclopédico. Es una simulación de una reunión de
+    diseño: te dan un enunciado vago, y evalúan cómo lo acotas, cómo razonas los trade-offs y
+    cómo comunicas. La estructura importa tanto como el contenido.
+  </p>
+
+  <div class="diagram">GUION DE UNA SESIÓN DE ~45 MIN
+
+  min 0-5    Aclarar     requisitos funcionales + no funcionales (escala, latencia, SLA)
+  min 5-10   Estimar     usuarios/día, peticiones/s, lectura:escritura, almacenamiento/año
+  min 10-15  API         los endpoints principales y su contrato
+  min 15-30  Diseño alto  cajas y flechas: cliente -> balanceador -> servicio -> BD;
+                          dónde entra caché, cola, CDN, réplicas
+  min 30-40  Profundizar  el subsistema que pida el entrevistador (sharding, idempotencia,
+                          consistencia, cómo evitas duplicados...)
+  min 40-45  Trade-offs   cuello de botella, qué se rompe primero, qué harías con más tiempo</div>
+
+  <div class="concept">
+    <p class="term">Aclarar requisitos primero</p>
+    <p>Antes de dibujar nada: ¿quiénes son los usuarios y qué hacen? ¿qué features entran en
+    esta conversación y cuáles no? ¿cuánta escala? ¿importa más que esté siempre disponible o
+    que los datos sean siempre exactos? Escribe las respuestas en una esquina de la pizarra.</p>
+    <p class="why"><b>por qué importa</b>Saltar directo a la solución es el fallo que más
+    hunde esta entrevista. Un sistema para mil usuarios y uno para diez millones no se parecen
+    en nada; diseñar sin preguntar la escala demuestra justo lo que quieren descartar.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estimar a ojo <span>· back-of-the-envelope</span></p>
+    <p>Cálculos gruesos y en voz alta: si hay 10&nbsp;M de usuarios activos al día y cada uno
+    hace 20 acciones, son 200&nbsp;M de peticiones/día, ~2&nbsp;300 por segundo de media,
+    quizá 10&nbsp;000 en pico. Con eso decides si un solo servidor basta o necesitas repartir.
+    Nadie espera precisión; esperan que sepas convertir una idea en números de orden de
+    magnitud.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Dibujar cajas, profundizar donde pidan</p>
+    <p>Empieza con el diagrama más simple que cumpla los requisitos: cliente, balanceador,
+    servicio de aplicación, base de datos. Luego el entrevistador te empujará a una parte
+    —"¿y si la base no aguanta las escrituras?"— y ahí desarrollas: réplicas, particionado,
+    cola para absorber picos, caché para lecturas. Sigue sus pistas; son el guion.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Trade-offs explícitos</p>
+    <p>Cada decisión tiene un costo y lo tienes que nombrar: "añadir caché mejora la latencia
+    de lectura pero introduce el problema de invalidación"; "una cola desacopla los servicios
+    pero ahora tengo que manejar mensajes duplicados". Un diseño presentado como si no tuviera
+    desventajas se lee como inexperiencia.</p>
+    <p class="why"><b>por qué importa</b>El trabajo real de un ingeniero senior es elegir qué
+    problema prefiere tener. Esta entrevista mide exactamente esa habilidad.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Vocabulario mínimo que hay que dominar</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Término</th><th>En una frase</th></tr></thead>
+      <tbody>
+        <tr><td>CAP theorem</td><td>Con una partición de red, eliges consistencia o disponibilidad; no ambas</td></tr>
+        <tr><td>Consistencia eventual</td><td>Todas las réplicas convergen al mismo valor, pero no al instante</td></tr>
+        <tr><td>Sharding / particionado</td><td>Repartir los datos entre varias bases según una clave</td></tr>
+        <tr><td>Idempotencia</td><td>Repetir la misma petición no cambia el resultado más de una vez</td></tr>
+        <tr><td>Balanceo de carga</td><td>Repartir peticiones entre varias instancias del mismo servicio</td></tr>
+        <tr><td>Caché (write-through / write-back)</td><td>Cuándo se actualiza el caché respecto al dato real</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Estos términos son el idioma de la entrevista. No
+    necesitas un ensayo de cada uno, pero usarlos con precisión en la conversación distingue a
+    quien entiende de quien memorizó un diagrama.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Errores comunes que hunden la entrevista</p>
+    <p>Diseñar para una escala que nadie pidió (sobre-ingeniería para tres usuarios); quedarse
+    callado dibujando en vez de narrar cada caja mientras la agregas; defender el primer diseño
+    a toda costa en vez de ajustarlo cuando el entrevistador señala un problema; y olvidar el
+    dato más simple —qué hace el sistema, para quién— por saltar directo a colas y
+    microservicios porque suenan bien.</p>
+  </div>
+
+  <div class="diagram">MINI EJEMPLO RESUELTO · acortador de URLs
+
+  Requisitos: crear enlace corto -> largo, 100M enlaces/mes, lectura >> escritura
+
+  cliente -> [balanceador] -> [servicio API] -> [caché: enlaces populares]
+                                     |                    |
+                                     v                    v
+                             [BD: id corto -> URL]    (hit -> responde sin tocar BD)
+
+  Generar el id corto: contador distribuido + base62, no UUID (muy largo).
+  Escritura: 1 vez por enlace. Lectura: cada clic -> optimizar con caché.
+  Siguiente pregunta típica: "¿y si el enlace se vuelve viral?" -> ahí se
+  habla de invalidación de caché y de límites de tasa (rate limiting).</div>
+
+  <div class="note">
+    <span class="label">De dónde sale el material</span>
+    <p>El contenido técnico está en la guía de Backend §7-8 (arquitectura y sistemas
+    distribuidos) y en la de DevOps (escalado, balanceo, observabilidad). Para el formato de
+    la entrevista en sí: <em>System Design Interview</em> de Alex Xu y el repositorio
+    <em>system-design-primer</em>. Practica diseñando en voz alta sistemas que ya conoces
+    —un acortador de URLs, un feed, una cola de trabajos— hasta que el guion salga solo.</p>
+  </div>
+</section>
+
+<section class="block" id="freelance-arranque">
+  <span class="sec-num">07</span>
+  <h2>Arrancar como freelance internacional</h2>
+  <p class="lead">
+    Vender tu trabajo directo a clientes de fuera es un modelo distinto al empleo y a la
+    agencia. Cambia quién consigue el cliente, quién absorbe el riesgo y dónde está tu techo.
+    Esta sección es el mapa de esos modelos y de dónde salen los primeros clientes.
+  </p>
+
+  <div class="concept">
+    <p class="term">Empleo &nbsp;vs&nbsp; agencia &nbsp;vs&nbsp; freelance</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Dimensión</th><th>Empleo</th><th>Agencia</th><th>Freelance por plataforma</th><th>Freelance directo</th></tr></thead>
+      <tbody>
+        <tr><td>Ingreso</td><td>Fijo</td><td>Fijo o variable</td><td>Variable</td><td>Variable, mayor techo</td></tr>
+        <tr><td>Estabilidad</td><td>Alta</td><td>Media</td><td>Baja al principio</td><td>Media, sube con la cartera</td></tr>
+        <tr><td>Esfuerzo de venta</td><td>Ninguno</td><td>Lo hace la agencia</td><td>Medio (perfil, propuestas)</td><td>Alto (tú generas la demanda)</td></tr>
+        <tr><td>Comisión / gasto encima</td><td>—</td><td>La agencia toma su parte</td><td>La plataforma cobra un porcentaje</td><td>Cero, pero tú haces todo el trabajo no facturable</td></tr>
+        <tr><td>Eliges con quién trabajas</td><td>Poco</td><td>Poco</td><td>Algo</td><td>Mucho</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">Nicho + oferta concreta</p>
+    <p>"Desarrollador full-stack disponible" compite con todo el planeta y no le dice nada a
+    nadie. "Integro modelos de lenguaje en productos SaaS existentes: chat con tus datos,
+    extracción de documentos, evaluación de calidad" es una oferta que un cliente concreto
+    reconoce como su problema. El nicho puede ser por tecnología, por industria o por tipo de
+    entregable; lo importante es que reduzca a quién le hablas.</p>
+    <p class="why"><b>por qué importa</b>Sin nicho eres una <em>commodity</em> y compites por
+    precio contra tarifas de países con costo de vida menor. Con nicho compites por encaje, y
+    ahí el precio deja de ser lo primero.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Plataforma &nbsp;vs&nbsp; directo &nbsp;vs&nbsp; referido</p>
+    <p>Las <strong>plataformas</strong> (abajo) te dan acceso a demanda ya existente a cambio
+    de una comisión y de competir a la vista de todos; sirven para las primeras reseñas.
+    <strong>Directo</strong> (tu red, tu contenido, correo con contexto) da mejor margen y
+    mejores clientes pero tú generas cada oportunidad. <strong>Referido</strong> es el mejor
+    de todos: llega con confianza prestada y sin competencia. La mayoría empieza mezclando
+    plataforma + referido y migra a directo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Plataformas freelance <span>· panorama real</span></p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Plataforma</th><th>Cómo es</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Upwork</strong></td><td>Volumen alto, competencia global, cobra comisión. Útil para las primeras reseñas; hay que filtrar mucho aviso malo</td></tr>
+        <tr><td><strong>Toptal</strong></td><td>Filtro de entrada exigente (varias pruebas). Tarifas altas y flujo constante una vez dentro</td></tr>
+        <tr><td><strong>Contra</strong></td><td>Sin comisión al freelancer; gira en torno a tu perfil y portafolio</td></tr>
+        <tr><td><strong>Braintrust</strong></td><td>Red que cobra al cliente, no al talento. Roles más de contrato largo que de proyecto suelto</td></tr>
+        <tr><td><strong>Gun.io · Lemon.io · A.Team</strong></td><td>Curadas, matching a roles de semanas o meses, foco en dev con experiencia</td></tr>
+        <tr><td><strong>CloudDevs · Codementor</strong></td><td>Matching regional (LATAM incluido) y trabajos cortos o mentoría</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">Salir del pozo "sin reseñas"</p>
+    <p>El primer cliente es el más caro de conseguir porque nadie quiere ser el primero.
+    Formas de romperlo: un par de trabajos pequeños y bien acotados a precio de entrada (no
+    gratis), un proyecto para alguien de tu red que sí te conoce, o convertir una contribución
+    de open source en una recomendación. Dos o tres entregas con testimonio cambian por
+    completo tu tasa de respuesta.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estructura legal mínima para facturar</p>
+    <p>Para empezar, la mayoría no necesita una empresa: como persona natural en Chile se
+    documenta con boleta de honorarios. Formalizar una sociedad (SpA u otra) tiene sentido más
+    adelante, cuando el volumen de facturación o el tipo de cliente lo justifica. Qué régimen
+    conviene y cuándo cambiar depende de tu situación concreta; esto lo confirma un contador, no
+    esta guía (ver la nota de la §9 sobre impuestos, y la skill <code class="inline">accounting-chile</code>
+    en este entorno como primer mapa).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El primer contrato <span>· qué cláusulas no pueden faltar</span></p>
+    <p>No hace falta un documento de veinte páginas. Un contrato mínimo cubre: alcance (o
+    referencia a la propuesta aceptada, ver §8), precio y forma de pago con fechas, quién es
+    dueño del código al terminar (normalmente el cliente, tras el pago final), qué pasa si
+    alguna parte cancela a mitad de camino, y confidencialidad si aplica. Redáctalo una vez,
+    guárdalo como plantilla, y ajústalo por proyecto.</p>
+    <p class="why"><b>por qué importa</b>El contrato no es para el cliente que confía en ti; es
+    para el diez por ciento de los casos donde algo se tuerce, y ahí es donde salva la relación
+    o el cobro.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Errores típicos del freelance principiante</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Error</th><th>Por qué duele</th></tr></thead>
+      <tbody>
+        <tr><td>Empezar a trabajar antes de tener nada firmado</td><td>Sin contrato ni anticipo, no hay nada que te proteja si el cliente desaparece</td></tr>
+        <tr><td>Cotizar por instinto sin desglosar el trabajo</td><td>El alcance mal estimado es la causa número uno de trabajar gratis</td></tr>
+        <tr><td>Aceptar cualquier cliente por miedo a no tener otro</td><td>Un mal cliente ocupa el tiempo que le quitas a uno bueno</td></tr>
+        <tr><td>No guardar nada por escrito de lo acordado en llamada</td><td>La memoria de "lo que dijimos" difiere entre las partes casi siempre</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <h4>Dónde buscar — portales y comunidades</h4>
+  <p>Lista curada. Verifica que sigan activos y revisa sus condiciones antes de apoyarte en
+  cualquiera; en este dominio los sitios cambian de dueño y de modelo con frecuencia.</p>
+  <div class="table-scroll"><table>
+    <thead><tr><th>Recurso</th><th>Qué es / para qué</th></tr></thead>
+    <tbody>
+      <tr><th colspan="2">Remoto global — empleo</th></tr>
+      <tr><td><a href="https://weworkremotely.com/" target="_blank" rel="noopener">We Work Remotely</a></td><td>El tablón de empleo remoto más grande; puestos de producto establecido</td></tr>
+      <tr><td><a href="https://remoteok.com/" target="_blank" rel="noopener">RemoteOK</a></td><td>Alto volumen, filtros por stack y zona horaria, muchas startups</td></tr>
+      <tr><td><a href="https://wellfound.com/" target="_blank" rel="noopener">Wellfound</a> (ex AngelList Talent)</td><td>Startups; postulas con perfil, a veces trato directo con el fundador</td></tr>
+      <tr><td><a href="https://www.workingnomads.com/" target="_blank" rel="noopener">Working Nomads</a></td><td>Agregador curado por categoría</td></tr>
+      <tr><td><a href="https://himalayas.app/" target="_blank" rel="noopener">Himalayas</a></td><td>Empresas 100% remotas, con datos de zona horaria y beneficios</td></tr>
+      <tr><td><a href="https://arc.dev/" target="_blank" rel="noopener">Arc.dev</a></td><td>Matching para dev remoto, con proceso de verificación</td></tr>
+      <tr><td><a href="https://www.welcometothejungle.com/en" target="_blank" rel="noopener">Welcome to the Jungle</a> / <a href="https://uk.welcometothejungle.com/" target="_blank" rel="noopener">Otta</a></td><td>Descubrimiento de roles con buen filtro por tipo de empresa y cultura. Otta fue adquirida por Welcome to the Jungle en 2024 y hoy opera bajo esa marca</td></tr>
+      <tr><td><a href="https://www.workatastartup.com/" target="_blank" rel="noopener">Y Combinator — Work at a Startup</a></td><td>Una postulación llega a cientos de startups de YC</td></tr>
+      <tr><td><a href="https://news.ycombinator.com/submitted?id=whoishiring" target="_blank" rel="noopener">Hacker News — "Who is hiring?"</a></td><td>Hilo mensual (primer día hábil); muchas ofertas remotas sin intermediario</td></tr>
+      <tr><th colspan="2">Freelance / contrato</th></tr>
+      <tr><td><a href="https://www.upwork.com/" target="_blank" rel="noopener">Upwork</a> · <a href="https://www.toptal.com/" target="_blank" rel="noopener">Toptal</a> · <a href="https://contra.com/" target="_blank" rel="noopener">Contra</a></td><td>Ver tabla de plataformas arriba</td></tr>
+      <tr><td><a href="https://www.usebraintrust.com/" target="_blank" rel="noopener">Braintrust</a> · <a href="https://gun.io/" target="_blank" rel="noopener">Gun.io</a> · <a href="https://lemon.io/" target="_blank" rel="noopener">Lemon.io</a></td><td>Redes de contrato para dev con experiencia</td></tr>
+      <tr><td><a href="https://www.a.team/" target="_blank" rel="noopener">A.Team</a></td><td>Equipos armados por proyecto; roles de varios meses</td></tr>
+      <tr><td><a href="https://clouddevs.com/" target="_blank" rel="noopener">CloudDevs</a> · <a href="https://www.codementor.io/" target="_blank" rel="noopener">Codementor</a></td><td>Matching regional; trabajos cortos y mentoría de pago</td></tr>
+      <tr><th colspan="2">LATAM / español</th></tr>
+      <tr><td><a href="https://www.getonbrd.com/" target="_blank" rel="noopener">Get on Board</a> (getonbrd.com)</td><td>El más fuerte en Chile; ofertas locales y remotas, con rango de sueldo publicado</td></tr>
+      <tr><td><a href="https://torre.ai/" target="_blank" rel="noopener">Torre.ai</a></td><td>Red profesional y matching con foco en América</td></tr>
+      <tr><td><a href="https://talently.tech/" target="_blank" rel="noopener">Talently</a></td><td>Empleo tech para LATAM, muchas vacantes remotas regionales</td></tr>
+      <tr><td><a href="https://www.bne.cl/" target="_blank" rel="noopener">Bolsa Nacional de Empleo</a> (SENCE)</td><td>Portal público de empleo en Chile; menos tech, útil para conocer el piso del mercado local</td></tr>
+      <tr><td>Comunidades: <a href="https://devschile.cl/" target="_blank" rel="noopener">Devs Chile</a>, <a href="https://frontend.cafe/" target="_blank" rel="noopener">Frontend Café</a></td><td>Discord/Slack con canal de ofertas y red directa; el referido suele salir de aquí</td></tr>
+      <tr><th colspan="2">Tech remoto con foco en IA</th></tr>
+      <tr><td><a href="https://ai-jobs.net/" target="_blank" rel="noopener">ai-jobs.net</a></td><td>Bolsa específica de roles de IA/ML/datos, muchos remotos</td></tr>
+      <tr><td><a href="https://cerebralvalley.ai/" target="_blank" rel="noopener">Cerebral Valley</a> — jobs</td><td>Tablón ligado a la comunidad de startups de IA (canal de empleo dentro de su comunidad)</td></tr>
+      <tr><td><a href="https://builtin.com/" target="_blank" rel="noopener">builtin.com</a></td><td>Empleo tech por ciudad y remoto, con perfiles de empresa</td></tr>
+      <tr><th colspan="2">Señales de mercado — informarse, no postular</th></tr>
+      <tr><td><a href="https://www.levels.fyi" target="_blank" rel="noopener">levels.fyi</a></td><td>Rangos de compensación reales por empresa, nivel y ubicación</td></tr>
+      <tr><td><a href="https://www.teamblind.com" target="_blank" rel="noopener">Blind</a></td><td>Foro anónimo de empleados; útil para leer entre líneas sobre una empresa</td></tr>
+      <tr><td><a href="https://www.reddit.com/r/cscareerquestions/" target="_blank" rel="noopener">r/cscareerquestions</a> · <a href="https://www.reddit.com/r/forhire/" target="_blank" rel="noopener">r/forhire</a></td><td>Experiencias de proceso y de tarifas; filtra el drama</td></tr>
+      <tr><td><a href="https://survey.stackoverflow.co" target="_blank" rel="noopener">Stack Overflow Developer Survey</a> · <a href="https://stateofjs.com/en-US" target="_blank" rel="noopener">State of JS</a></td><td>Qué stacks suben y bajan, y qué se paga mejor, a nivel agregado</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">Cómo usar los portales</span>
+    <p>Son el canal con la tasa de éxito más baja de todos. El orden que funciona:
+    red y referidos &rarr; contribución visible a open source &rarr; contenido propio que te
+    hace encontrable &rarr; portales. Aplicar a 5 ofertas bien elegidas, con mensaje adaptado
+    y algo que demuestre encaje, rinde más que 50 postulaciones a ciegas.</p>
+  </div>
+</section>
+
+<section class="block" id="ventas-propuestas">
+  <span class="sec-num">08</span>
+  <h2>Descubrimiento, propuesta y cierre</h2>
+  <p class="lead">
+    Entre "un cliente te escribe" y "empiezas a trabajar" hay un proceso: entender su
+    problema, decidir si te conviene, y presentar una propuesta que se pueda aprobar sin otra
+    reunión. Hacerlo bien evita la mayoría de los proyectos que salen mal.
+  </p>
+
+  <div class="concept">
+    <p class="term">Llamada de descubrimiento</p>
+    <p>La primera conversación es para <em>escuchar</em>, no para vender. Preguntas: ¿qué
+    problema de negocio hay detrás de lo que pides? ¿qué pasa si no se resuelve? ¿qué han
+    intentado antes? ¿quién decide y quién paga? ¿para cuándo? ¿hay presupuesto asignado?
+    Toma notas y repite lo que entendiste al final para confirmar.</p>
+    <p class="why"><b>por qué importa</b>La propuesta que mandas después se basa en esta
+    llamada. Si no entendiste el problema real, cotizarás la solución equivocada y el proyecto
+    arrancará torcido.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Calificar al cliente</p>
+    <p>No todo cliente que puede pagar te conviene. Señales de que sí: sabe qué problema tiene,
+    hay un decisor claro, el plazo es realista, el presupuesto existe, te tratan como a un
+    profesional. Señales de alarma: el alcance cambia en cada mensaje, "es un proyecto chico
+    pero con potencial de mucho más", regatean antes de ver la propuesta, quieren empezar "ya"
+    sin contrato, hablan mal de su proveedor anterior.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Cliente que califica</th><th>Bandera roja</th></tr></thead>
+      <tbody>
+        <tr><td>Describe el problema en términos de negocio</td><td>Te trae una lista de tareas y quiere presupuesto sin contexto</td></tr>
+        <tr><td>Hay un decisor identificable en la conversación</td><td>"Tengo que consultarlo con varios" en cada punto</td></tr>
+        <tr><td>Acepta un anticipo y un contrato simple</td><td>Presiona para empezar sin nada firmado</td></tr>
+        <tr><td>El plazo tiene holgura</td><td>"Para ayer", y la culpa del retraso será tuya</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">La propuesta que se aprueba</p>
+    <p>Una página o dos, estructura fija: <strong>problema</strong> (en las palabras del
+    cliente) &rarr; <strong>objetivo</strong> medible &rarr; <strong>alcance</strong>
+    (entregables numerados) &rarr; <strong>fuera de alcance</strong> &rarr;
+    <strong>plan/hitos</strong> &rarr; <strong>inversión</strong> y forma de pago &rarr;
+    <strong>supuestos</strong> &rarr; validez y cómo se acepta. La sección de "fuera de
+    alcance" es la más importante de todas.</p>
+  </div>
+
+  <div class="diagram">ANATOMÍA DE UNA PROPUESTA
+
+  +-- PROPUESTA ------------------------------------------------------+
+  | 1. Contexto / problema   lo que el cliente dijo, en sus palabras  |
+  |                          -> demuestra que escuchaste             |
+  | 2. Objetivo              el resultado medible, no la lista de     |
+  |                          tareas                                   |
+  | 3. Alcance               entregables concretos, numerados         |
+  | 4. Fuera de alcance      lo que NO incluye  <- la parte que       |
+  |                          evita el 80% de los conflictos           |
+  | 5. Plan / hitos          fases con fecha aproximada               |
+  | 6. Inversión             precio + forma de pago (con anticipo)    |
+  | 7. Supuestos             lo que necesitas del lado del cliente    |
+  | 8. Validez + aceptación  "vale 14 días" + cómo se acepta          |
+  +------------------------------------------------------------------+</div>
+
+  <pre><span class="c"># Propuesta — API de sincronización de inventario</span>
+Preparada para: [Cliente]   ·   Fecha: [ ]   ·   Válida hasta: [+14 días]
+
+<span class="c">## 1. Problema</span>
+El stock de la tienda y el del sitio se actualizan a mano; hay quiebres y
+sobreventa 2-3 veces por semana.
+
+<span class="c">## 2. Objetivo</span>
+Que ambos sistemas reflejen el mismo stock con menos de 5 min de desfase.
+
+<span class="c">## 3. Alcance</span>
+- Servicio que lee el POS cada 5 min y actualiza el sitio.
+- Panel para resolver conflictos a mano.
+- Documentación y traspaso.
+
+<span class="c">## 4. Fuera de alcance</span>
+- Cambios en el POS del cliente.
+- Integración con un tercer canal (marketplace).
+- Soporte 24/7.
+
+<span class="c">## 5. Plan</span>
+Semana 1-2  conexión y lectura    ·    Semana 3  escritura + panel
+Semana 4    pruebas y traspaso
+
+<span class="c">## 6. Inversión</span>
+[monto] — 40% al aceptar, 30% al cierre de la semana 2, 30% a la entrega.
+
+<span class="c">## 7. Supuestos</span>
+El cliente entrega credenciales de API del POS en 3 días hábiles y un
+contacto técnico para dudas.
+
+<span class="c">## 8. Aceptación</span>
+Responder este correo con "aprobado" y pagar el anticipo.</pre>
+
+  <div class="concept">
+    <p class="term">"Es caro" &nbsp;·&nbsp; contrato &nbsp;·&nbsp; anticipo</p>
+    <p>Ante "es caro": no bajes el precio, baja el alcance ("puedo ajustarme a ese
+    presupuesto quitando el panel de conflictos y dejándolo para una fase 2"). Un contrato
+    mínimo —alcance, precio, pago, propiedad del código, qué pasa si alguien cancela— en una
+    o dos páginas basta para la mayoría de proyectos. Anticipo siempre: un porcentaje al
+    aceptar, antes de escribir la primera línea. Si el cliente se niega a un anticipo
+    razonable, esa es la respuesta a si trabajar con él.</p>
+    <p class="why"><b>por qué importa</b>El anticipo filtra a los clientes que no iban en
+    serio y te cubre el trabajo si el proyecto se cae a la mitad, que pasa más de lo que
+    parece.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Descubrir el presupuesto sin preguntar directo</p>
+    <p>"¿Cuánto presupuesto tienen?" a menudo no obtiene respuesta honesta. Funciona mejor dar
+    un marco: "para un proyecto de este alcance, otros clientes han invertido en un orden de
+    magnitud de [rango orientativo]; ¿eso encaja con lo que tenían pensado, o el presupuesto va
+    por otro lado?". Eso permite que el cliente corrija sin sentir que reveló un número exacto,
+    y te ahorra construir una propuesta que rechazarán solo por el monto.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Objeciones más allá del precio</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Objeción</th><th>Qué suele haber detrás</th></tr></thead>
+      <tbody>
+        <tr><td>"Necesito pensarlo"</td><td>No quedó claro el valor, o hay un decisor que falta convencer</td></tr>
+        <tr><td>"¿Por qué tú y no una agencia?"</td><td>Duda sobre continuidad si te enfermas o te vas — responde con un plan de contingencia</td></tr>
+        <tr><td>"¿Puedes empezar sin anticipo?"</td><td>Prueba para ver cuánto puedes ceder — sostener el anticipo filtra al cliente serio</td></tr>
+        <tr><td>Silencio tras enviar la propuesta</td><td>Casi nunca es un no; hace falta un seguimiento, no repetir la propuesta</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Tratar toda objeción como si fuera de precio te hace
+    bajar el número cuando el problema real era otro, y regalas margen sin resolver la duda de
+    fondo.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Nunca afirmar condiciones sin confirmar</span>
+    <p>En una conversación B2B no digas un precio, un plazo, una cobertura ni una garantía que
+    no puedas sostener. Si te preguntan en la llamada "¿cuánto costaría?", la respuesta es un
+    rango con supuestos explícitos y "lo cierro en la propuesta", no un número al aire.
+    Separa siempre lo <em>confirmado</em> (está por escrito y acordado), lo <em>estimado</em>
+    (tu cálculo, con margen) y lo <em>pendiente</em> (falta un dato del cliente). Un número
+    dicho a la ligera se convierte en un compromiso en la cabeza del cliente.</p>
+  </div>
+</section>
+
+<section class="block" id="precio">
+  <span class="sec-num">09</span>
+  <h2>Poner precio y cobrar desde Chile</h2>
+  <p class="lead">
+    El precio no es un número que se adivina: sale de tu costo real, del mercado y del valor
+    que creas para el cliente. Y cobrar a un cliente de fuera tiene su propia mecánica de
+    moneda e impuestos que conviene entender antes del primer contrato.
+  </p>
+
+  <div class="concept">
+    <p class="term">Cuatro modelos de cobro</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Modelo</th><th>Cobras por</th><th>Riesgo de mala estimación</th><th>Incentiva</th><th>Úsalo cuando</th></tr></thead>
+      <tbody>
+        <tr><td>Por hora</td><td>Horas trabajadas</td><td>Lo asume el cliente</td><td>Transparencia; poco premio a ir rápido</td><td>Alcance incierto, soporte, exploración</td></tr>
+        <tr><td>Por proyecto</td><td>Entregable cerrado</td><td>Lo asumes tú</td><td>Terminar eficiente; defender el alcance</td><td>Alcance claro y acotado</td></tr>
+        <tr><td>Retainer</td><td>Bloque de horas o disponibilidad al mes</td><td>Compartido</td><td>Relación estable, ingreso predecible</td><td>Mantenimiento y trabajo recurrente</td></tr>
+        <tr><td>Value-based</td><td>Una proporción del valor que generas</td><td>Lo asumes tú (alto)</td><td>Foco en el resultado de negocio</td><td>El impacto en dinero es claro y atribuible a ti</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="diagram">CÓMO SE REPARTE EL RIESGO
+
+  por hora       [cliente ##########################          ] tú paga si tardas de más
+  por proyecto   [          tú ############################### ] tú comes el exceso de horas
+  retainer       [ compartido #############   ############### ] ambos ganan estabilidad
+  value-based    [               tú ######################### ] ganas mucho o poco según
+                                                                el resultado del cliente
+
+  Principiante: empieza por hora o por proyecto acotado. El value-based
+  necesita que puedas medir el impacto y que el cliente lo acepte por escrito.</div>
+
+  <div class="concept">
+    <p class="term">Cómo poner el número</p>
+    <p>Tres referencias que se cruzan: tu <strong>costo real</strong> (lo que necesitas ganar
+    al mes dividido por las horas que de verdad puedes facturar —no las 160 del mes, más bien
+    la mitad—, más impuestos y períodos sin cliente); el <strong>mercado</strong> (qué se paga
+    por tu perfil y para clientes de ese país); y el <strong>valor</strong> (si tu trabajo le
+    ahorra o le genera una cifra grande, eso mueve el techo). El precio final está en algún
+    punto donde las tres se tocan.</p>
+    <p class="why"><b>por qué importa</b>Cotizar solo por "lo que cobra la gente que conozco"
+    te ancla al mercado local. El mismo perfil, facturando a un cliente de otra economía, se
+    mueve en otro rango; ignorarlo es dejar dinero sobre la mesa.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Subir la tarifa</p>
+    <p>Se sube al cotizar al <em>siguiente</em> cliente, no a mitad de un proyecto en curso.
+    El momento: cuando tienes más demanda que capacidad, cuando acumulaste resultados
+    medibles que mostrar, o cuando tu tarifa quedó por debajo del mercado. A los clientes de
+    retainer se les avisa con antelación y se les da una razón, no un ultimátum.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Scope creep <span>· y cómo cortarlo</span></p>
+    <p>El alcance que crece pedido a pedido —"ya que estás, ¿podrías también...?"— es lo que
+    convierte un proyecto rentable en uno que trabajas gratis. Se corta con la sección "fuera
+    de alcance" de la propuesta y con una regla: todo pedido nuevo es una mini-propuesta
+    ("eso lo puedo hacer; suma <em>x</em> días y <em>y</em> al presupuesto"). No regales "esto
+    rapidito" tres veces; la cuarta ya es tu trabajo esperado.</p>
+    <p class="why"><b>por qué importa</b>El cliente casi nunca pide de mala fe; simplemente no
+    ve el costo. Nombrarlo cada vez, sin drama, mantiene el proyecto sano y la relación
+    también.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cobrar de fuera <span>· moneda dura y transferencias</span></p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Vía</th><th>Qué es</th><th>Nota</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Wise</strong></td><td>Cuenta multi-moneda; recibes USD/EUR con datos de cuenta locales y conviertes al tipo de cambio real</td><td>Comisión baja y visible; muy usada por freelancers</td></tr>
+        <tr><td><strong>Payoneer</strong></td><td>Recibir pagos de plataformas y de clientes; tarjeta y retiro a banco local</td><td>Varias plataformas (p. ej. Upwork) pagan por aquí de forma nativa</td></tr>
+        <tr><td><strong>Deel</strong> (y otras EOR)</td><td>El cliente te contrata como <em>contractor</em> formal: contrato, factura y pago mensual gestionados</td><td>Útil cuando el cliente exige "compliance"; suele cobrar comisión al cliente</td></tr>
+        <tr><td>Transferencia SWIFT directa</td><td>De su banco al tuyo</td><td>Funciona, pero comisiones intermedias y demora variables; pacta por escrito quién paga los cargos</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="concept">
+    <p class="term">La cuenta detrás de una tarifa por hora</p>
+    <p>Un cálculo de fondo, sin poner cifras: parte del ingreso anual que necesitas, súmale lo
+    que se va en impuestos y en meses sin cliente (casi nadie factura los doce meses llenos), y
+    divide por las horas que de verdad puedes facturar al año —no las horas trabajadas: las que
+    un cliente paga, descontando ventas, administración y tiempo sin proyecto—. El número que
+    resulta suele ser bastante más alto que "sueldo dividido por 160 horas al mes", que es el
+    error más común al pasar de empleado a freelance.</p>
+    <p class="why"><b>por qué importa</b>Cotizar sobre el sueldo que ganabas como empleado
+    ignora que ahí no pagabas tú los períodos sin trabajo, las vacaciones ni la gestión
+    comercial. Es la razón número uno por la que un freelance nuevo termina cobrando menos que
+    en su empleo anterior.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Retainers <span>· cómo estructurarlos</span></p>
+    <p>Un retainer vende disponibilidad o un bloque de horas al mes, no un entregable. Para que
+    funcione para ambos lados: define qué pasa con las horas no usadas (¿se acumulan? ¿se
+    pierden?), un tiempo de respuesta esperado, y una cláusula de salida con aviso previo de
+    ambas partes. Es el modelo que más estabiliza el ingreso, pero solo rinde con un cliente que
+    de verdad tiene trabajo recurrente, no con uno que llena el bloque una vez cada dos meses.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Errores de pricing más comunes</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Error</th><th>Consecuencia</th></tr></thead>
+      <tbody>
+        <tr><td>Cotizar por hora un alcance que el cliente cree cerrado</td><td>El cliente se lleva una sorpresa en la factura; se rompe la confianza</td></tr>
+        <tr><td>No incluir revisiones/rondas de cambio en el alcance</td><td>El proyecto "cerrado" nunca termina de cerrarse</td></tr>
+        <tr><td>Bajar el precio en vez del alcance ante "es caro"</td><td>Ancla tu tarifa hacia abajo con ese cliente para siempre</td></tr>
+        <tr><td>No cobrar anticipo "porque parece buena persona"</td><td>El anticipo no es sobre confianza, es sobre compromiso real</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Impuestos en Chile — habla con un contador</span>
+    <p>Como persona natural, prestar servicios se documenta con <strong>boleta de
+    honorarios</strong>, que lleva una retención o un PPM que después se ajusta en la
+    declaración anual de renta. Si facturas con empresa, entran IVA y primera categoría, con
+    otras obligaciones. Las reglas, los porcentajes y los topes cambian de un año a otro y
+    dependen de tu situación: esto lo define un contador, no esta guía. No tomes decisiones
+    de precio ni de estructura legal a partir de cifras de memoria. (En este entorno, la
+    skill <code class="inline">accounting-chile</code> sirve como primer mapa antes de la
+    reunión con el profesional.)</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Rangos de mercado — dónde mirar el dato real</span>
+    <p>No hay una tarifa "correcta"; el rango depende de stack, nicho, país del cliente y de
+    la evidencia que puedas mostrar. Para números concretos y actuales:
+    <code class="inline">levels.fyi</code> (compensación por empresa, nivel y ubicación) y
+    Get on Board (rangos publicados del mercado chileno y LATAM). Cualquier cifra de esta guía
+    sería orden de magnitud y estaría desactualizada; ve a la fuente.</p>
+  </div>
+</section>
+
+<section class="block" id="trabajo-remoto">
+  <span class="sec-num">10</span>
+  <h2>Trabajo remoto y asincronía real</h2>
+  <p class="lead">
+    Trabajar en remoto no es "lo mismo pero por videollamada". Es un modo de operación donde
+    lo escrito es la fuente de verdad, el progreso se comunica sin que lo pidan, y no estar
+    conectado a la misma hora deja de ser un problema.
+  </p>
+
+  <div class="concept">
+    <p class="term">Comunicación escrita primero</p>
+    <p>En un equipo distribuido, lo que no está escrito no existe: se pierde, se malinterpreta
+    y no lo puede leer quien entró después. Escribir bien —una decisión con su contexto, un
+    problema con lo que ya probaste, un resumen de reunión— es la habilidad que más separa a
+    un buen remoto de uno que genera fricción. Tu inglés B2 escrito ya te alcanza para esto;
+    lo que hay que entrenar es la estructura, no el idioma.</p>
+    <p class="why"><b>por qué importa</b>El equipo evalúa tu confiabilidad por la calidad de
+    tus mensajes tanto como por tu código. Un mensaje confuso genera tres de vuelta y erosiona
+    la confianza a distancia.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Documentar el porqué, no solo el qué</p>
+    <p>Cuando tomas una decisión técnica, deja escrito por qué elegiste esa opción y qué
+    descartaste. En el mensaje del commit, en el PR, en una nota corta de decisión. Dentro de
+    tres meses —tuya o de otro— nadie recuerda el contexto, solo el resultado.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Actualizaciones sin que las pidan</p>
+    <p>Al final de tu jornada, sin que nadie pregunte: qué avancé, qué sigue, qué me bloquea,
+    algo que el equipo deba saber. Tres o cuatro líneas. Elimina casi todos los "¿cómo vas?"
+    y hace que un cliente que no te ve confíe en que el trabajo avanza.</p>
+    <p class="why"><b>por qué importa</b>El silencio en remoto se interpreta como problema. La
+    actualización proactiva compra una enorme cantidad de tranquilidad por muy poco esfuerzo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Zonas horarias y solapamiento</p>
+    <p>Con un cliente en otro continente casi nunca coinciden las jornadas completas. La
+    práctica: acordar una franja fija de solape —tres o cuatro horas— y reservarla para lo
+    síncrono (decisiones, revisiones, dudas con muchas incógnitas). Todo lo demás va
+    asíncrono, sin esperar respuesta inmediata.</p>
+  </div>
+
+  <div class="diagram">SOLAPE ENTRE ZONAS HORARIAS
+
+           06        09        12        15        18        21
+  Tú       |=========#############################|
+  Cliente  |         .........#############################.....|
+                              +--- solape útil --+
+
+  Acuerda 3-4 h de solape fijo. Dentro: llamadas y decisiones.
+  Fuera: mensajes que el otro lee cuando entra, sin bloquearte.</div>
+
+  <div class="concept">
+    <p class="term">No estar "siempre conectado"</p>
+    <p>Responder a cualquier hora enseña al cliente a esperarlo siempre, y termina en
+    resentimiento y en trabajo peor. Define un horario, apaga las notificaciones fuera de él,
+    y comunícalo una vez de forma clara. La disponibilidad de urgencia real, si aplica, se
+    pacta y se cobra aparte.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Las herramientas del oficio remoto, por categoría</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Categoría</th><th>Para qué</th></tr></thead>
+      <tbody>
+        <tr><td>Mensajería async</td><td>El registro escrito del equipo; canales por tema, no un chat único desordenado</td></tr>
+        <tr><td>Documentos compartidos</td><td>Decisiones y contexto que sobreviven a la memoria de una llamada</td></tr>
+        <tr><td>Tablero de tareas</td><td>Qué se está haciendo, sin necesitar preguntar a nadie</td></tr>
+        <tr><td>Videollamada</td><td>Reservada para lo síncrono de verdad (ver el concepto siguiente)</td></tr>
+        <tr><td>Grabación de pantalla</td><td>Explicar algo visual sin agendar una reunión</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>La herramienta específica importa menos que la
+    disciplina de usar cada categoría para lo que es. El problema casi nunca es "nos falta una
+    herramienta"; es meter todo en el chat porque es lo más rápido de abrir.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Reuniones que valen la pena, y las que no</p>
+    <p>Vale una reunión cuando hay una decisión real que tomar entre varias personas, cuando el
+    tema es delicado (dar una mala noticia, resolver un conflicto), o para conocerse al inicio
+    de una relación de trabajo. No vale una reunión para "dar una actualización de estado" —eso
+    es un mensaje escrito— ni para "alinear" algo que ya está escrito en un documento que nadie
+    leyó. Cada reunión sin agenda clara es una señal de que algo debería haberse escrito antes.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Trabajar con clientes de distintas culturas</p>
+    <p>El estilo de comunicación varía más de lo que parece: equipos de EE.UU. suelen ser
+    directos y valoran la iniciativa visible; equipos del norte de Europa privilegian la
+    documentación exhaustiva y las decisiones por consenso; equipos asiáticos pueden preferir
+    jerarquía más marcada y menos confrontación directa en público. Ninguna generalización
+    reemplaza observar a tu cliente específico, pero llegar advertido de que "directo" en una
+    cultura puede leerse como brusco en otra evita fricciones tontas en las primeras semanas.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Síncrono vs asíncrono — la regla rápida</span>
+    <p>Si un tema necesita más de tres idas y vueltas por texto, salta a una llamada de diez
+    minutos y escribe el resumen después. Lo síncrono es para lo ambiguo, lo delicado y lo que
+    requiere conocerse; lo asíncrono, para el estado, las preguntas con respuesta clara y todo
+    lo que conviene dejar por escrito.</p>
+  </div>
+</section>
+
+<section class="block" id="comunicacion">
+  <span class="sec-num">11</span>
+  <h2>Comunicación técnica con no técnicos</h2>
+  <p class="lead">
+    Buena parte de tu valor como profesional está en traducir: convertir un problema técnico
+    en una decisión de negocio que el cliente pueda tomar, y dar noticias difíciles de forma
+    que se puedan gestionar en vez de sufrir.
+  </p>
+
+  <div class="concept">
+    <p class="term">Traducir técnico &harr; negocio</p>
+    <p>El cliente no decide sobre "refactorizar el módulo de pagos"; decide sobre costo,
+    riesgo y tiempo. Tu trabajo es convertir lo uno en lo otro.</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Lo que dices en técnico</th><th>Cómo se traduce a una decisión</th></tr></thead>
+      <tbody>
+        <tr><td>"Hay que refactorizar el módulo de pagos"</td><td>"Arreglarlo ahora toma una semana; si esperamos, cada cambio futuro de pagos costará el doble y sube el riesgo de un error de cobro"</td></tr>
+        <tr><td>"Esta consulta es O(n²)"</td><td>"Con los clientes de hoy va bien; al triple, el reporte tarda minutos y se cae. Lo tratamos antes o después de la campaña, no durante"</td></tr>
+        <tr><td>"Tenemos deuda técnica"</td><td>"Atajos que tomamos para llegar a la fecha y que ahora nos frenan. Propongo dedicar un día por sprint a pagarla"</td></tr>
+        <tr><td>"No se puede"</td><td>"No en el plazo actual con la calidad necesaria. Opción A: menos alcance, misma fecha. Opción B: alcance completo, dos semanas más"</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Un cliente que entiende el trade-off toma una
+    decisión y la sostiene. Uno al que le dijeron "no se puede" busca a otro que le diga que
+    sí.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Malas noticias, temprano</p>
+    <p>Un retraso, un supuesto que se cayó, un costo que apareció: se comunica en cuanto lo
+    sabes, no cuando ya no hay margen. El mensaje trae tres cosas: qué pasó, qué impacto tiene,
+    y qué propones hacer. Nunca solo el problema.</p>
+    <p class="why"><b>por qué importa</b>Una mala noticia temprana es un ajuste de plan; la
+    misma noticia tarde es una crisis y una traición de confianza. La diferencia no está en
+    los hechos, está en cuándo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estimar sin mentir</p>
+    <p>Da un rango, no un número único: "entre 3 y 5 días". Lista dos o tres supuestos ("si la
+    API del cliente responde como está documentada"). Di qué lo haría cambiar. Y no cedas a
+    la presión de bajar la estimación en la reunión: el trabajo tarda lo que tarda, y
+    prometer menos solo adelanta el momento de la mala noticia.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Code review como acto social</p>
+    <p>Revisar el código de otro es una interacción con una persona, no solo con un diff.
+    Al criticar: sobre el código, no sobre quien lo escribió; distingue lo que bloquea de lo
+    que es preferencia ("<em>nit:</em>"); explica el porqué; reconoce lo que está bien. Al
+    recibir: no lo tomes como ataque, pregunta si no entiendes la objeción, y si no estás de
+    acuerdo argumenta una vez y luego decide si es una colina por la que vale la pena
+    discutir.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Decir que no</p>
+    <p>Se puede rechazar un pedido sin cerrar la puerta: "eso no entra en el alcance actual,
+    pero lo anoto para una fase 2"; "no lo recomiendo por <em>x</em>; si aún así lo quieres,
+    lo hacemos y lo dejo documentado". Un "sí" a todo termina en un proyecto sin foco, sin
+    margen y sin tu criterio, que es justo lo que el cliente estaba pagando.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Escribir un buen issue o reporte de bug</p>
+    <p>Un reporte útil tiene: qué esperabas que pasara, qué pasó en realidad, pasos exactos para
+    reproducirlo, y contexto (versión, entorno, desde cuándo). "Esto no funciona" obliga a quien
+    lo lee a hacer de detective antes de poder ayudar. La misma estructura sirve para pedir
+    ayuda a un compañero o a un cliente: cuanto más fácil reproduces el problema, más rápido
+    llega la solución.</p>
+    <p class="why"><b>por qué importa</b>Un reporte mal escrito no solo retrasa la solución;
+    entrena al equipo a tomarse tus reportes menos en serio con el tiempo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Dar y recibir feedback en 1:1s</p>
+    <p>Al dar feedback: específico (una situación concreta, no "siempre haces..."), a tiempo (no
+    tres meses después), y sobre el comportamiento, no sobre la persona. Al recibirlo: resiste
+    la primera reacción defensiva, pide un ejemplo si es vago, y separa lo que puedes cambiar de
+    lo que es simplemente una preferencia de estilo del otro. Un 1:1 donde nadie da feedback
+    real es una reunión desperdiciada.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Presentar algo técnico a quien decide el presupuesto</p>
+    <p>La estructura que funciona: empieza por la conclusión o recomendación (no por el
+    proceso), sigue con el porqué en dos o tres puntos, y deja el detalle técnico para quien
+    pregunte. El orden inverso —explicar todo el razonamiento antes de la conclusión— es el que
+    usan los ingenieros por instinto y el que más pierde a una audiencia de negocio en los
+    primeros treinta segundos.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Herramienta de apoyo</span>
+    <p>En este entorno, la skill <code class="inline">tech-to-stakeholder</code> ayuda a armar
+    estos mensajes —traducir un tema técnico a impacto de negocio, estructurar una mala
+    noticia, presentar opciones— cuando la comunicación con el cliente es delicada o de alto
+    riesgo.</p>
+  </div>
+</section>
+
+<section class="block" id="crecer">
+  <span class="sec-num">12</span>
+  <h2>Crecer sin estancarse ni quemarse</h2>
+  <p class="lead">
+    Una carrera larga en tecnología no se sostiene con esfuerzo bruto. Se sostiene aprendiendo
+    en el trabajo, construyendo una red real, y sabiendo cuándo cambiar y cuándo parar antes
+    de que el cuerpo lo decida por ti.
+  </p>
+
+  <div class="concept">
+    <p class="term">Aprender en el trabajo, a propósito</p>
+    <p>El crecimiento no llega solo por acumular años. Elige tareas que estén un poco por
+    encima de lo que ya dominas. Lee el código de las personas más fuertes de tu equipo o
+    proyecto. Después de cada entrega, dedica media hora a anotar qué harías distinto. El
+    trabajo diario es el mejor curso disponible, pero solo si lo tratas como tal.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Side projects &nbsp;·&nbsp; escribir &nbsp;·&nbsp; hablar</p>
+    <p>Un proyecto propio terminado enseña —y muestra— más que cinco a medias. Un post corto
+    por proyecto (el problema, <em>una</em> decisión difícil, qué aprendiste) te obliga a
+    entender de verdad y te hace encontrable. Presentar en un meetup local, aunque sean diez
+    personas, acelera todo lo anterior y construye reputación.</p>
+    <p class="why"><b>por qué importa</b>Escribir y hablar en público es el multiplicador de
+    red más barato que existe: en vez de buscar clientes y empleadores uno por uno, haces que
+    te encuentren con el contexto ya establecido.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Red de contactos real</p>
+    <p>No es coleccionar conexiones; es mantener relación con excolegas y con gente que
+    conociste en comunidades, y ayudar antes de necesitar algo. Los referidos —el mejor canal
+    de trabajo, según la §1— salen de esa red años después, no de un mensaje enviado el día
+    que te quedaste sin proyecto.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Mentoría en los dos sentidos</p>
+    <p>Tener a alguien más avanzado que te dé perspectiva acorta años de prueba y error.
+    Enseñar a alguien más nuevo te obliga a ordenar lo que sabes y te da visibilidad. Ninguna
+    de las dos requiere un programa formal: una conversación cada pocas semanas alcanza.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cuándo cambiar de trabajo o de cliente</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th>Señal de que es hora de moverse</th></tr></thead>
+      <tbody>
+        <tr><td>Llevas 6-12 meses sin aprender nada nuevo y no hay plan para que cambie</td></tr>
+        <tr><td>El único camino de crecimiento o de mejor pago es irte</td></tr>
+        <tr><td>Tu compensación quedó muy por debajo del mercado (verifícalo en levels.fyi / Get on Board)</td></tr>
+        <tr><td>No respetan tu tiempo fuera de horario de forma sistemática</td></tr>
+        <tr><td>El producto o la forma de operar del cliente te generan un conflicto que no baja</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Quedarse por inercia tiene un costo compuesto: cada
+    año sin crecer es un año de ventaja que ganan otros. Señal de quedarte: sigues
+    aprendiendo, te pagan bien, y el trabajo te deja energía para lo tuyo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Vía técnica (IC) o vía de gestión — el fork de carrera</p>
+    <div class="table-scroll"><table>
+      <thead><tr><th></th><th>Individual contributor (IC) senior/staff</th><th>Gestión (tech lead / manager)</th></tr></thead>
+      <tbody>
+        <tr><td>Trabajo diario</td><td>Diseño técnico, código en lo crítico, mentoría</td><td>Personas, prioridades, quitar obstáculos al equipo</td></tr>
+        <tr><td>Se mide por</td><td>Impacto técnico y decisiones que sostienen</td><td>Lo que el equipo entrega y qué tan bien</td></tr>
+        <tr><td>Encaja si</td><td>Tu energía viene de resolver problemas técnicos difíciles</td><td>Tu energía viene de que otros crezcan y el equipo funcione</td></tr>
+      </tbody>
+    </table></div>
+    <p class="why"><b>por qué importa</b>Ninguna vía es un ascenso sobre la otra; son trabajos
+    distintos. Elegir gestión porque "es lo que sigue" sin que te interese de verdad produce
+    managers infelices y equipos peor liderados.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Pedir un aumento o revisar tu tarifa</p>
+    <p>Se pide con evidencia, no con necesidad: un registro de impacto (ver el concepto
+    siguiente), una comparación de mercado actualizada (levels.fyi, Get on Board), y una
+    conversación agendada para eso, no metida al final de otra. Si la respuesta es no, pide qué
+    tendría que ser distinto para que sí, y una fecha para retomarlo — un no sin condiciones es
+    una señal en sí misma.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El "brag document" <span>· registro de impacto</span></p>
+    <p>Una nota simple, actualizada cada mes, con lo que resolviste y su efecto: un problema que
+    destrabaste, una decisión que sostuviste, un número que mejoró. Sirve para tres cosas que de
+    memoria fallan: la evaluación de desempeño, negociar sueldo o tarifa, y actualizar el CV sin
+    reconstruir seis meses de memoria en una tarde.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Especializarse vs diversificarse a mitad de carrera</p>
+    <p>No es una elección de una sola vez. Los primeros años conviene explorar (distintos
+    stacks, distintos tipos de proyecto) para descubrir dónde tienes ventaja real y dónde
+    disfrutas el trabajo. A partir de ahí, profundizar en una especialidad concreta —la barra
+    vertical del perfil T-shaped de la §1— suele pagar más que seguir ampliando lo horizontal
+    indefinidamente. Volver a diversificar más adelante también es válido, típicamente al pasar
+    de IC a un rol donde hay que abarcar más superficie del sistema.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Burnout — señales tempranas</span>
+    <p>No aparece de golpe. Las señales que preceden al colapso: cinismo hacia un trabajo que
+    antes te importaba, cansancio que el fin de semana ya no repara, y rendimiento que baja
+    aunque metas más horas. Se previene con límites reales (horario, notificaciones apagadas),
+    variedad en las tareas y descanso de verdad —no con una semana de vacaciones al año que
+    hace de parche—. Si ya reconoces dos de las tres, trátalo ahora, no "después del
+    proyecto".</p>
+  </div>
+</section>
+
+
+      <section class="block" id="curriculo">
+        <span class="sec-num">13</span>
+        <h2>Currículo: libros y recursos</h2>
+        <p class="lead">
+          Pocos libros, mucho artículo y newsletter — este tema envejece rápido.
+          <span class="rl-tag free">gratis</span> es libre online;
+          <span class="rl-tag paid">pago</span> cuesta;
+          <span class="rl-tag lvl">nivel</span> indica enfoque.
+        </p>
+
+        <div class="stage">
+          <h4>Etapa 0 · El oficio y la mentalidad</h4>
+          <div class="book"><span class="t">The Pragmatic Programmer</span> — <span class="a">Hunt &amp; Thomas</span> <span class="rl-tag lvl">base</span><span class="d">Ya recomendado en la guía de Backend. Los hábitos de la profesión; casi todos lo han leído. En <a href="https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/" target="_blank" rel="noopener">pragprog.com</a>.</span></div>
+          <div class="book"><span class="t">The Passionate Programmer</span> — <span class="a">Chad Fowler</span> <span class="rl-tag lvl">carrera</span><span class="d">Tratar la carrera como un producto: en qué invertir, cómo destacar, cuándo cambiar. En <a href="https://pragprog.com/titles/cfcar2/the-passionate-programmer-2nd-edition/" target="_blank" rel="noopener">pragprog.com</a>.</span></div>
+          <div class="book"><span class="t">The Coding Career Handbook</span> — <span class="a">Shawn "swyx" Wang</span> <span class="rl-tag paid">pago</span><span class="d">De junior a senior con foco en "aprender en público" y construir superficie de suerte. Muy accionable. En <a href="https://learninpublic.org/" target="_blank" rel="noopener">learninpublic.org</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 1 · Conseguir el trabajo o el cliente</h4>
+          <div class="book"><span class="t">The Tech Resume Inside Out</span> — <span class="a">Gergely Orosz</span> <span class="rl-tag free">gratis</span><span class="d">CV para ingeniería, del ATS al humano. PDF gratuito en su web. La referencia. En <a href="https://thetechresume.com/free-pdf.html" target="_blank" rel="noopener">thetechresume.com</a>.</span></div>
+          <div class="book"><span class="t">Cracking the Coding Interview</span> — <span class="a">Gayle Laakmann McDowell</span> <span class="rl-tag lvl">entrevistas</span><span class="d">El estándar para la entrevista de algoritmos. Úsalo como mapa de temas, no lo hagas entero. En <a href="https://www.gayle.com" target="_blank" rel="noopener">gayle.com</a>.</span></div>
+          <div class="book"><span class="t">System Design Interview, vol. 1 y 2</span> — <span class="a">Alex Xu</span> <span class="rl-tag lvl">entrevistas</span><span class="d">El formato de la entrevista de diseño, con casos resueltos. Se apoya en las guías de Backend y DevOps. En <a href="https://bytebytego.com" target="_blank" rel="noopener">bytebytego.com</a>.</span></div>
+          <div class="book"><span class="t">"Salary Negotiation" + "Don't Call Yourself A Programmer"</span> — <span class="a">Patrick McKenzie (kalzumeus.com)</span> <span class="rl-tag free">gratis</span><span class="d">Dos ensayos que cambian cuánto te pagan. Léelos antes de tu próxima oferta. En <a href="https://www.kalzumeus.com/greatest-hits/" target="_blank" rel="noopener">kalzumeus.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 2 · Freelance y trabajar para ti</h4>
+          <div class="book"><span class="t">MAKE</span> — <span class="a">Pieter Levels (levels.io)</span> <span class="rl-tag paid">pago</span><span class="d">Construir productos e ingresos como desarrollador solo, sin inversión. Crudo y práctico. En <a href="https://readmake.com/" target="_blank" rel="noopener">readmake.com</a>.</span></div>
+          <div class="book"><span class="t">Company of One</span> — <span class="a">Paul Jarvis</span> <span class="rl-tag lvl">negocio</span><span class="d">Por qué "más grande" no es la única meta; negocio de una persona, sostenible.</span></div>
+          <div class="book"><span class="t">The Freelancer's Bible</span> — <span class="a">Sara Horowitz</span> <span class="rl-tag lvl">referencia</span><span class="d">Contratos, impuestos, clientes difíciles, seguro. Enfoque EE.UU. pero los principios sirven. En <a href="https://www.hachettebookgroup.com/titles/sara-horowitz/the-freelancers-bible/9780761175056/" target="_blank" rel="noopener">hachettebookgroup.com</a>.</span></div>
+          <div class="book"><span class="t">Deep Work</span> — <span class="a">Cal Newport</span> <span class="rl-tag lvl">productividad</span><span class="d">Proteger el tiempo de concentración, clave cuando nadie te organiza el día. En <a href="https://calnewport.com/deep-work-rules-for-focused-success-in-a-distracted-world/" target="_blank" rel="noopener">calnewport.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 3 · Crecer y no estancarse</h4>
+          <div class="book"><span class="t">Staff Engineer</span> — <span class="a">Will Larson (staffeng.com)</span> <span class="rl-tag free">gratis</span><span class="d">Qué hay después de "senior" en la vía técnica. Historias reales gratis en la web. En <a href="https://staffeng.com/book/" target="_blank" rel="noopener">staffeng.com</a>.</span></div>
+          <div class="book"><span class="t">The Manager's Path</span> — <span class="a">Camille Fournier</span> <span class="rl-tag lvl">liderazgo</span><span class="d">Si en algún momento tiras a gestión: de tech lead a director, cada escalón. En <a href="https://www.oreilly.com/library/view/the-managers-path/9781491973882/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">The Pragmatic Engineer</span> — <span class="a">Gergely Orosz, newsletter</span> <span class="rl-tag paid">parte pago</span><span class="d">Cómo funcionan por dentro los equipos de ingeniería y el mercado laboral tech. Mucho contenido gratis. En <a href="https://newsletter.pragmaticengineer.com/" target="_blank" rel="noopener">newsletter.pragmaticengineer.com</a>.</span></div>
+        </div>
+
+        <h3>Comunidades y datos de mercado</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Para qué</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://www.levels.fyi" target="_blank" rel="noopener">levels.fyi</a></td><td>Rangos de compensación reales por empresa, nivel y ubicación. El dato antes de negociar</td></tr>
+            <tr><td><a href="https://www.teamblind.com" target="_blank" rel="noopener">Blind</a></td><td>Foro anónimo verificado por empresa; ofertas, procesos, cultura interna. Filtra el ruido</td></tr>
+            <tr><td><a href="https://staffeng.com" target="_blank" rel="noopener">StaffEng</a> · <a href="https://www.reddit.com/r/ExperiencedDevs/" target="_blank" rel="noopener">r/ExperiencedDevs</a></td><td>La vía técnica senior y práctica profesional, sin humo de junior</td></tr>
+            <tr><td><a href="https://www.reddit.com/r/cscareerquestions/" target="_blank" rel="noopener">r/cscareerquestions</a> · <a href="https://www.reddit.com/r/forhire/" target="_blank" rel="noopener">r/forhire</a></td><td>Preguntas de carrera y contratación directa freelance</td></tr>
+            <tr><td><a href="https://survey.stackoverflow.co" target="_blank" rel="noopener">Stack Overflow Developer Survey</a></td><td>Foto anual del mercado: qué se paga, qué se usa, cómo se trabaja</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="block" id="plan-90">
+        <span class="sec-num">14</span>
+        <h2>Un plan de 90 días</h2>
+        <p class="lead">
+          La guía no sirve si se queda en lectura. Un arranque concreto para pasar de
+          "quiero trabajar afuera" a "tengo conversaciones reales".
+        </p>
+        <div class="diagram">MES 1 — poner la casa en orden
+  · 2-3 proyectos del portafolio con caso de estudio y deploy vivo (§2)
+  · CV en inglés que pasa ATS + LinkedIn reescrito (§3)
+  · perfil de GitHub: README, pins, contribuciones visibles
+  · decidir nicho y oferta concreta de una frase (§7)
+
+MES 2 — abrir el canal
+  · lista de 30 empresas/clientes objetivo (§7) — no postular todavía
+  · contribuir a 1-2 proyectos open source del nicho
+  · 1 artículo técnico publicado (algo que ya resolviste)
+  · pedir 3 conversaciones informales (ex-colegas, comunidades)
+  · perfil en 2 plataformas freelance + 2 bolsas remotas (§7, §currículo)
+
+MES 3 — aplicar en serie corta
+  · 5 postulaciones bien hechas por semana, no 50 a ciegas
+  · practicar 1 mock de entrevista técnica y 1 de diseño por semana (§4-§6)
+  · para cada "no": anotar qué faltó y ajustar
+  · primera llamada de descubrimiento con un cliente potencial (§8)</div>
+        <div class="note">
+          <span class="label">La métrica del trimestre</span>
+          <p>No es "cuántas postulaciones enviaste". Es <strong>cuántas conversaciones reales
+          tuviste</strong> — entrevistas, llamadas de descubrimiento, charlas con gente del
+          nicho. Si al día 90 tienes cero, el problema está en el canal (§7), no en tu nivel
+          técnico.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Carrera + Freelance de Punta a Punta</strong> — guía hermana de la serie
+    <em>Atlas</em>. La única que no es sobre código: sobre conseguir que te paguen bien por
+    escribirlo, desde otro país.</p>
+    <p>Plataformas, tarifas de mercado, procesos de contratación y reglas fiscales cambian y
+    dependen del país. Verifica cualquier cifra concreta (usa levels.fyi y Get on Board para el
+    dato real) y consulta a un contador para lo tributario. Los libros y recursos son referencia
+    amplia, no una lista cerrada.</p>
+  </div>
+</footer>

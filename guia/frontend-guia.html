@@ -1,0 +1,1939 @@
+<title>Front-end de Punta a Punta</title>
+<meta name="description" content="Guía de estudio de desarrollo front-end para autodidactas, profundidad media: cómo el navegador pinta una página, modelos de render (CSR/SSR/SSG/ISR/streaming), estado y reactividad, hidratación, bundling, CSS a escala, accesibilidad y rendimiento percibido (Core Web Vitals) — más un currículo de libros y cursos y un laboratorio sin registro.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #23272e;
+    --ink: #e7e5df;
+    --ink-soft: #b9bdc6;
+    --muted: #8b919c;
+    --line: #333842;
+    --line-soft: #2a2f37;
+    --accent: #4bb7a8;
+    --accent-soft: #16302d;
+    --accent-ink: #7fd3c7;
+    --rust: #d98a5f;
+    --rust-soft: #35241b;
+    --code-bg: #10131a;
+    --code-ink: #d9e2ec;
+    --code-comment: #7b8798;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-inner { padding: clamp(2.4rem, 6vw, 4.2rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem) 0 5rem; }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: 244px minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.88rem; border-left: 2px solid var(--line); padding-left: 1rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  nav.toc p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.7rem;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: flex; flex-direction: column; gap: 0.1rem; }
+  nav.toc a {
+    display: block; padding: 0.3rem 0.4rem; color: var(--ink-soft); text-decoration: none;
+    border-radius: 5px; counter-increment: toc; transition: background 0.15s, color 0.15s;
+  }
+  nav.toc a::before {
+    content: counter(toc, decimal-leading-zero); font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--muted); margin-right: 0.55rem;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+  nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 979px) {
+    nav.toc {
+      position: static; border-left: none; border: 1px solid var(--line); border-radius: 10px;
+      padding: 1.1rem 1.2rem; background: var(--surface); max-height: none;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 1rem; }
+  }
+
+  main { min-width: 0; }
+  section.block { scroll-margin-top: 2rem; padding-top: 1rem; }
+  section.block + section.block { margin-top: 3.4rem; border-top: 1px solid var(--line-soft); padding-top: 2.6rem; }
+  .sec-num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--accent-ink); }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.55rem, 4vw, 2.1rem);
+    line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; margin: 0.3rem 0 1rem;
+  }
+  h3 { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 1.16rem; margin: 2rem 0 0.6rem; letter-spacing: -0.005em; }
+  h4 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.86rem;
+    letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-soft); margin: 1.4rem 0 0.5rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  main a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  .lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 66ch; }
+  ul, ol.body-list { max-width: 68ch; padding-left: 1.2rem; margin: 0 0 1rem; }
+  li { margin: 0.35rem 0; }
+
+  code.inline {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.08em 0.36em; color: var(--ink);
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-ink);
+    font-size: 0.82rem; line-height: 1.6; padding: 1rem 1.15rem; border-radius: 9px; overflow-x: auto;
+    margin: 0 0 1.2rem; border: 1px solid rgba(255,255,255,0.06);
+  }
+  pre .c { color: var(--code-comment); }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  .concept { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 1.1rem 1.25rem; margin: 0 0 0.9rem; }
+  .concept .term {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.95rem;
+    color: var(--accent-ink); margin: 0 0 0.35rem;
+  }
+  .concept .term span { color: var(--muted); font-weight: 400; }
+  .concept p { margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .concept p:first-of-type { margin-top: 0; }
+  .concept .why { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.9rem; color: var(--ink-soft); }
+  .concept .why b {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 0.1rem;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.85rem 1.1rem;
+    border-radius: 0 8px 8px 0; margin: 0 0 1.3rem; font-size: 0.94rem;
+  }
+  .note.rust { border-left-color: var(--rust); background: var(--rust-soft); }
+  .note p { margin: 0; max-width: none; }
+  .note p + p { margin-top: 0.5rem; }
+  .note .label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-ink); display: block; margin-bottom: 0.25rem;
+  }
+  .note.rust .label { color: var(--rust); }
+
+  .diagram {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; line-height: 1.5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 1rem 1.15rem;
+    overflow-x: auto; white-space: pre; color: var(--ink-soft); margin: 0 0 1.3rem;
+  }
+
+  .chip {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; white-space: nowrap;
+  }
+  .chip.t1 { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* Reading list */
+  .stage { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 1.15rem 1.3rem; margin: 0 0 1rem; }
+  .stage > h4 { margin: 0 0 0.6rem; color: var(--accent-ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 0.5rem; }
+  .stage > p { font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.7rem; }
+  .book { padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  .book:last-child { border-bottom: none; }
+  .book .t { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 600; }
+  .book .a { color: var(--muted); }
+  .book .d { display: block; color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.1rem; }
+  .rl-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.08rem 0.38rem; border-radius: 3px; margin-left: 0.35rem; white-space: nowrap; vertical-align: 0.08em;
+  }
+  .rl-tag.free { background: var(--accent-soft); color: var(--accent-ink); }
+  .rl-tag.paid { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .rl-tag.lvl { background: var(--rust-soft); color: var(--rust); }
+
+  .project { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 0 0 1.8rem; box-shadow: var(--shadow); }
+  .project-head { padding: 1.2rem 1.4rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .project-head .stack {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 0.3rem;
+  }
+  .project-head h3 { margin: 0 0 0.4rem; font-size: 1.28rem; font-family: "IBM Plex Serif", Georgia, serif; }
+  .project-head p { margin: 0; font-size: 0.95rem; color: var(--ink-soft); max-width: none; }
+  .project-body { padding: 0.6rem 1.4rem 1.4rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line-soft); }
+  .phase:last-of-type { border-bottom: none; }
+  .phase .pn {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 5px; padding: 0.1rem 0.4rem; height: fit-content; white-space: nowrap;
+  }
+  .phase .pt { font-weight: 600; font-size: 0.95rem; grid-column: 2; }
+  .phase .pd { grid-column: 2; font-size: 0.92rem; color: var(--ink-soft); }
+  .phase .pd code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; }
+  .learn { margin-top: 1rem; font-size: 0.9rem; background: var(--accent-soft); color: var(--accent-ink); padding: 0.7rem 0.95rem; border-radius: 8px; }
+  .learn b { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
+
+  footer.foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.5rem 0 3.5rem; font-size: 0.9rem; color: var(--muted); }
+  footer.foot p { max-width: 66ch; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <p class="kicker">Guía de estudio · Desarrollo Front-end · edición media</p>
+    <h1>Front-end de Punta a Punta</h1>
+    <p class="standfirst">
+      El modelo mental del navegador y del framework: cómo se pinta una página, qué modelo de
+      render resuelve qué problema, cómo funciona el estado y la reactividad, qué es hidratar,
+      cómo se entrega el código, CSS a escala, accesibilidad y rendimiento percibido — más un
+      currículo ordenado y un laboratorio para tocar cada concepto en el navegador.
+    </p>
+    <div class="meta-row">
+      <span class="tag">para autodidactas</span>
+      <span class="tag">conceptos &gt; sintaxis</span>
+      <span class="tag">13 secciones</span>
+      <span class="tag">profundidad media</span>
+      <span class="tag">laboratorio sin registro</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p>Índice</p>
+      <ol>
+        <li><a href="#render">Cómo el navegador pinta una página</a></li>
+        <li><a href="#modelo-render">Modelos de render</a></li>
+        <li><a href="#estado">Estado y reactividad</a></li>
+        <li><a href="#hidratacion">Hidratación y sus problemas</a></li>
+        <li><a href="#bundling">Bundling y entrega</a></li>
+        <li><a href="#css">CSS a escala</a></li>
+        <li><a href="#a11y">Accesibilidad</a></li>
+        <li><a href="#rendimiento">Rendimiento percibido</a></li>
+        <li><a href="#testing-fe">Testing de front-end</a></li>
+        <li><a href="#i18n">i18n y localización</a></li>
+        <li><a href="#design-systems">Design systems y tokens</a></li>
+        <li><a href="#curriculo">Currículo: libros y cursos</a></li>
+        <li><a href="#laboratorio">Laboratorio: tocar el concepto en el navegador</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+<section class="block" id="render">
+  <span class="sec-num">01</span>
+  <h2>Cómo el navegador pinta una página</h2>
+  <p class="lead">
+    Entre el HTML que llega por la red y los píxeles en pantalla hay una tubería fija de etapas. Saber
+    en qué etapa cae cada cambio explica por qué animar <code class="inline">transform</code> va fluido
+    y animar <code class="inline">width</code> traba el scroll.
+  </p>
+
+  <div class="concept">
+    <p class="term">Parseo: bytes → tokens → nodos → DOM <span>· construcción del árbol</span></p>
+    <p>El navegador recibe bytes, los decodifica según la codificación declarada, el tokenizador
+    reconoce etiquetas y atributos, y el constructor de árbol arma el DOM: una estructura en memoria,
+    no el texto. El parser de HTML es tolerante: cierra etiquetas que faltan y sigue.</p>
+    <p class="why"><b>por qué importa</b>Un <code class="inline">&lt;script&gt;</code> sin
+    <code class="inline">async</code> ni <code class="inline">defer</code> detiene el parser hasta
+    descargar y ejecutar ese script: el DOM deja de crecer mientras tanto.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">CSS → CSSOM <span>· bloqueante para pintar</span></p>
+    <p>El CSS se parsea a otro árbol, el CSSOM, con la cascada ya resuelta. El navegador no pinta nada
+    hasta tener todo el CSS que podría aplicar, porque una regla al final de la hoja puede cambiarlo
+    todo. Sin esta espera verías un destello de página sin estilo en cada carga.</p>
+    <p class="why"><b>por qué importa</b>El CSS crítico va en línea o en un archivo pequeño y temprano;
+    el resto se difiere. Una hoja de estilos gigante retrasa el primer pixel de toda la página.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Render tree <span>· solo lo visible</span></p>
+    <p>DOM y CSSOM se combinan en el árbol de render, que contiene únicamente los nodos que se van a
+    dibujar con su estilo calculado. <code class="inline">display:none</code> deja el nodo fuera del
+    árbol; <code class="inline">visibility:hidden</code> lo mantiene (ocupa espacio, no se ve).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Layout (reflow) <span>· geometría</span></p>
+    <p>Calcula la posición y el tamaño exactos de cada caja, en cascada desde la raíz y en función del
+    viewport. Cambiar dimensiones, márgenes, tipografía o insertar nodos obliga a recalcular este nodo
+    y, casi siempre, a sus vecinos y ancestros. Es la etapa más cara.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Paint y composite <span>· píxeles y capas</span></p>
+    <p><strong>Paint</strong> rellena píxeles: color, texto, bordes, sombras, en una o varias capas.
+    <strong>Composite</strong> ensambla esas capas en la imagen final; puede correr en la GPU y en un
+    hilo aparte. <code class="inline">transform</code> y <code class="inline">opacity</code> solo tocan
+    composite: no recalculan geometría ni repintan.</p>
+    <p class="why"><b>por qué importa</b>Animar propiedades de composite se hace en el hilo del
+    compositor y sigue a 60 fps aunque el hilo principal esté ocupado con JavaScript.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Hilo principal vs hilo compositor</p>
+    <p>El hilo principal hace parseo, ejecución de JS, layout y paint: una sola cola. Si una tarea de
+    JS tarda 300 ms, durante 300 ms no hay respuesta a clics ni layout. El hilo compositor mueve capas
+    ya pintadas (scroll, animaciones de transform) sin depender del principal.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Critical rendering path</p>
+    <p>La secuencia mínima para el primer pixel útil: HTML → DOM, CSS → CSSOM, render tree, layout,
+    paint. Optimizarla es reducir el número de recursos que bloquean, su tamaño y mejorar su orden de
+    llegada. Todo lo demás (imágenes below-the-fold, JS de interacción) puede esperar.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Layout thrashing</span>
+    <p>Leer una propiedad geométrica (<code class="inline">offsetHeight</code>,
+    <code class="inline">getBoundingClientRect()</code>) justo después de escribir estilos fuerza al
+    navegador a hacer layout de inmediato para darte un valor correcto. Hazlo dentro de un bucle y
+    provocas decenas de reflows sincrónicos por frame. Agrupa todas las lecturas primero y luego todas
+    las escrituras.</p>
+  </div>
+
+  <div class="diagram">BYTES          TOKENS          ÁRBOLES              RENDER TREE       LAYOUT         PAINT          COMPOSITE
+─────          ──────          ───────              ───────────       ──────         ─────          ─────────
+
+HTML  ─► tokenizador ─► nodos ─► DOM  ┐
+                                      ├─► render tree ─► geometría ─► capas de  ─► pantalla
+CSS   ─► tokenizador ─────────► CSSOM ┘    (solo lo       (posición    píxeles       (GPU / hilo
+                                           visible)       y tamaño)                  compositor)
+
+        └────────────── hilo principal (JS · parseo · layout · paint) ──────────────┘   └─ hilo compositor ─┘
+                                                                          transform / opacity entran aquí ──┘</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Propiedad CSS</th><th>Etapa más profunda que dispara</th><th>Costo al animar</th></tr></thead>
+    <tbody>
+      <tr><td><code class="inline">transform</code>, <code class="inline">opacity</code></td><td>Composite</td><td>Barato — apto para 60 fps</td></tr>
+      <tr><td><code class="inline">filter</code></td><td>Paint (compuesto en GPU)</td><td>Medio</td></tr>
+      <tr><td><code class="inline">color</code>, <code class="inline">background</code>, <code class="inline">box-shadow</code>, <code class="inline">border-radius</code>, <code class="inline">visibility</code></td><td>Paint</td><td>Medio — repinta el área, no recalcula geometría</td></tr>
+      <tr><td><code class="inline">width</code>, <code class="inline">height</code>, <code class="inline">padding</code>, <code class="inline">margin</code>, <code class="inline">top</code>/<code class="inline">left</code>, <code class="inline">font-size</code>, <code class="inline">line-height</code></td><td>Layout (reflow)</td><td>Caro — propaga a vecinos y ancestros</td></tr>
+      <tr><td><code class="inline">display</code>, <code class="inline">position</code>, insertar o quitar nodos</td><td>Layout global</td><td>El más caro</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="modelo-render">
+  <span class="sec-num">02</span>
+  <h2>Dónde se genera el HTML</h2>
+  <p class="lead">
+    La misma página se puede armar en el navegador, en el servidor por petición, en el build, o por
+    trozos. Cada modelo mueve el trabajo a otro momento y cambia qué ve el usuario mientras espera.
+  </p>
+
+  <div class="concept">
+    <p class="term">CSR · client-side rendering <span>· la SPA clásica</span></p>
+    <p>El servidor manda un HTML casi vacío y un bundle de JavaScript; el navegador construye la
+    interfaz al ejecutarlo. Hasta que ese JS descarga, parsea y corre, la pantalla está en blanco.
+    Resuelve el desarrollo de apps muy interactivas con una sola base de código, pero el TTI llega
+    tarde y el HTML no sirve para buscadores ni para compartir.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">SSR · server-side rendering</p>
+    <p>El servidor ejecuta el framework por cada petición y devuelve el HTML ya con contenido. El
+    usuario ve algo útil antes de que el JS cargue (el LCP llega temprano), a cambio de un TTFB más
+    alto y de gastar CPU del servidor en cada request. Sigue necesitando hidratación para volverse
+    interactivo.</p>
+    <p class="why"><b>por qué importa</b>Es la opción por defecto cuando el contenido es dinámico o
+    personalizado y además tiene que indexarse.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">SSG · static site generation</p>
+    <p>El HTML se genera una vez, en el build, y se sirve como archivo estático desde una CDN. TTFB
+    mínimo, escala sin esfuerzo, casi sin costo de servidor. El límite: si algo cambia hay que
+    reconstruir, y un sitio de 100 000 páginas tarda en compilar.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">ISR · incremental static regeneration</p>
+    <p>SSG con fecha de caducidad: la página estática se sirve desde la CDN y se regenera en segundo
+    plano cuando pasa su intervalo de revalidación o se dispara un webhook. Da la velocidad del
+    estático a catálogos grandes que cambian a ritmo moderado, sin reconstruir todo el sitio.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Streaming SSR y React Server Components</p>
+    <p>El servidor envía primero un <em>shell</em> (cabecera, layout, esqueletos) y va enviando el
+    resto del HTML en trozos a medida que los datos están listos; el navegador los pinta al llegar.
+    Con RSC, algunos componentes se renderizan solo en el servidor y nunca mandan su JS al cliente.
+    Resuelve el caso de una página cuyos datos lentos bloqueaban todo lo demás.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">El costo del JavaScript</span>
+    <p>Un megabyte de JS no cuesta lo mismo que un megabyte de imagen. La imagen se decodifica fuera
+    del hilo principal; el JS hay que descargarlo, parsearlo, compilarlo y ejecutarlo, y todo eso
+    ocurre en el hilo principal, compitiendo con la interacción del usuario. Por eso el modelo de
+    render se elige mirando cuánto JS obliga a enviar, no solo el TTFB.</p>
+  </div>
+
+  <div class="diagram">                 0 ────────────────────────────────────────────────────────►  tiempo
+
+CSR        req │▓ HTML casi vacío │········ descarga + parse + exec del JS ········│ render │ hidrata │ ● interactivo
+               └ TTFB bajo         └──────────── pantalla en blanco ─────────────┘                    LCP y TTI tardíos
+
+SSR        req │▓▓▓▓ HTML con contenido │ ● visible │········ descarga JS ········│ hidrata │ ● interactivo
+               └ TTFB más alto           LCP temprano                                       TTI medio
+
+Streaming  req │▓ shell │ ● shell visible │ chunk │ chunk │ chunk │ hidrata por islas │ ● interactivo
+               └ TTFB bajo                 el contenido llega a trozos, no todo de golpe</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Modelo</th><th>TTFB</th><th>LCP</th><th>TTI</th><th>Costo servidor</th><th>Cuándo usarlo</th></tr></thead>
+    <tbody>
+      <tr><td>CSR</td><td>Bajo</td><td>Tardío</td><td>Tardío</td><td>Mínimo (archivos estáticos)</td><td>Apps tras login, dashboards, poco SEO</td></tr>
+      <tr><td>SSR</td><td>Alto (render por request)</td><td>Temprano</td><td>Medio</td><td>Alto (CPU por petición)</td><td>Contenido dinámico y personalizado que necesita SEO</td></tr>
+      <tr><td>SSG</td><td>Mínimo (CDN)</td><td>Temprano</td><td>Medio</td><td>Casi nulo</td><td>Blogs, documentación, marketing: cambia poco</td></tr>
+      <tr><td>ISR</td><td>Mínimo (CDN + revalidación)</td><td>Temprano</td><td>Medio</td><td>Bajo (regenera en segundo plano)</td><td>Catálogos grandes que cambian a ritmo moderado</td></tr>
+      <tr><td>Streaming SSR / RSC</td><td>Bajo (el shell sale ya)</td><td>Temprano</td><td>Progresivo</td><td>Medio</td><td>Páginas pesadas con partes de datos lentos</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">Prerender parcial <span>· shell estático + huecos dinámicos</span></p>
+    <p>El caso incómodo: una página de producto es casi toda cacheable (fotos, descripción,
+    reseñas) salvo dos datos —el stock y el precio con el descuento del usuario. Con SSR entera
+    pagas render por petición por el 5 % que cambia; con SSG no puedes mostrar el stock real. El
+    prerender parcial genera en el build el HTML estático de todo lo que no cambia y deja
+    <em>agujeros</em> marcados que se rellenan por streaming en cada petición. El usuario recibe al
+    instante el shell desde la CDN y ve llegar los trozos dinámicos un momento después. Es la misma
+    idea del streaming SSR llevada al límite: la frontera estático/dinámico deja de ser "la página"
+    y pasa a ser "la región del árbol".</p>
+    <p class="why"><b>por qué importa</b>Evita la falsa elección entre "todo estático" y "todo por
+    request" en páginas que son mayormente lo primero con un par de datos de lo segundo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Dónde corre el servidor: origen, región y edge</p>
+    <p>"SSR" no dice <em>dónde</em>. En el <strong>origen</strong> (un servidor Node en una región):
+    acceso normal a la base de datos, sin límites raros, pero un usuario en otro continente suma la
+    latencia de ida y vuelta a esa región. En el <strong>edge</strong> (cientos de ubicaciones
+    cerca del usuario): TTFB bajísimo y geolocalización barata, a cambio de un runtime recortado
+    (sin APIs de Node completas, límites de CPU y de tamaño) y de que tu base de datos sigue en una
+    región —una consulta desde el edge puede ser más lenta que desde el origen. Regla habitual:
+    edge para middleware, redirecciones, A/B testing y personalización ligera; origen para lo que
+    habla mucho con la base de datos.</p>
+  </div>
+</section>
+
+<section class="block" id="estado">
+  <span class="sec-num">03</span>
+  <h2>Estado y reactividad</h2>
+  <p class="lead">
+    Casi todo bug de interfaz es un problema de estado: dónde vive, quién lo puede cambiar y cómo se
+    entera la vista. Antes de elegir una librería, hay que saber qué tipo de estado se está guardando.
+  </p>
+
+  <h3>LOS CUATRO TIPOS DE ESTADO</h3>
+
+  <div class="concept">
+    <p class="term">Estado local <span>· del componente</span></p>
+    <p>Un valor que solo le importa a un componente: si un menú está abierto, el texto de un input sin
+    enviar. Vive en <code class="inline">useState</code> (o equivalente) y se pierde al desmontar. Se
+    comparte hacia abajo por props.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estado de servidor <span>· cache de datos remotos</span></p>
+    <p>Los datos que en realidad son del backend y el cliente solo tiene prestados: la lista de
+    pedidos, el perfil del usuario. No es "estado" en sentido estricto, es una cache. Librerías como
+    React Query o SWR gestionan por ti la clave, la revalidación, el estado de carga y error, y el
+    deduplicado de peticiones. Tratarlo como estado local lleva a datos rancios y a refetch manual en
+    todas partes.</p>
+    <p class="why"><b>por qué importa</b>Separar la cache de servidor del estado de UI elimina la
+    mayoría del "estado global" que la gente cree necesitar.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estado en la URL <span>· la fuente compartible</span></p>
+    <p>Filtros, pestaña activa, término de búsqueda, paginación: si quieres que un enlace copiado
+    reproduzca la misma vista, ese estado va en la query string o en la ruta. Sobrevive a la recarga y
+    al botón atrás. Guardarlo solo en memoria rompe el compartir y la navegación.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estado global <span>· contexto o store</span></p>
+    <p>Lo que muchos componentes lejanos necesitan leer y escribir: tema, sesión, carrito. Vive en un
+    contexto o en un store (Zustand, Redux, signals globales). Úsalo solo cuando pasar props se
+    vuelve absurdo, porque todo lo que toca el store se vuelve candidato a re-render.</p>
+  </div>
+
+  <h3>CÓMO SABE EL FRAMEWORK QUÉ REDIBUJAR</h3>
+
+  <div class="concept">
+    <p class="term">VDOM + diffing <span>· React, versiones previas de Vue</span></p>
+    <p>Al cambiar el estado, el framework vuelve a ejecutar la función del componente, produce un
+    árbol virtual nuevo, lo compara con el anterior y aplica al DOM real solo la diferencia. Es
+    predecible pero re-ejecuta componentes enteros aunque cambie un dato pequeño.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Signals <span>· Solid, Svelte 5, Vue 3, Angular</span></p>
+    <p>Un valor reactivo sabe exactamente qué partes de la vista lo leyeron. Al cambiar, actualiza
+    solo esos nodos del DOM, sin re-ejecutar el componente ni hacer diff. Más eficiente por defecto, a
+    cambio de un modelo mental distinto sobre cuándo se lee un valor.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Dirty checking <span>· AngularJS histórico</span></p>
+    <p>Tras cada evento, el framework recorre todos los datos observados y compara con el valor
+    anterior para ver qué cambió. Simple de entender, caro cuando la lista de cosas a vigilar crece.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Derivar &gt; sincronizar</p>
+    <p>Si un valor se puede calcular a partir de otro (el total a partir de los ítems, el "hay
+    errores" a partir de la lista de errores), calcúlalo en el render. No lo guardes en otro estado
+    que hay que mantener en sincronía: esa sincronización es una fuente inagotable de bugs de "se
+    quedó con el valor viejo".</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">El objeto inline como prop</span>
+    <p>Pasar <code class="inline">style={{ margin: 8 }}</code> o
+    <code class="inline">onClick={() =&gt; f()}</code> crea un objeto o función nueva en cada render.
+    Para el diffing es una referencia distinta cada vez, así que el hijo memoizado se vuelve a
+    renderizar igual. Con muchos hijos, eso es una lista entera repintándose por nada. Se estabiliza
+    con <code class="inline">useMemo</code>/<code class="inline">useCallback</code> o sacando el objeto
+    fuera del componente.</p>
+  </div>
+
+  <div class="diagram">VDOM + DIFFING                                   SIGNALS
+──────────────                                   ───────
+
+acción del usuario                               acción del usuario
+      │                                                │
+      ▼                                                ▼
+setState(x)                                       signal.set(x)
+      │                                                │
+      ▼                                                ▼
+re-render del componente (y de sus hijos)         el nodo del DOM que leyó la señal
+      │                                          se actualiza solo
+      ▼                                                │
+árbol virtual nuevo                                    ▼
+      │                                          1 operación puntual
+      ▼                                          (sin diff, sin re-render)
+diff contra el árbol anterior
+      │
+      ▼
+patch mínimo al DOM real</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Tipo</th><th>Quién es dueño</th><th>Cuándo se pierde</th><th>Cómo se comparte</th></tr></thead>
+    <tbody>
+      <tr><td>Local</td><td>El componente</td><td>Al desmontar el componente o recargar</td><td>Por props hacia abajo, o subiéndolo al ancestro común</td></tr>
+      <tr><td>Servidor (cache)</td><td>El backend; el cliente solo cachea</td><td>Al invalidar, al expirar el TTL, o al recargar sin persistencia</td><td>Por clave de query: cualquier componente pide la misma clave</td></tr>
+      <tr><td>URL</td><td>La barra de direcciones</td><td>Al navegar fuera sin haberlo guardado</td><td>Copiando el enlace; sobrevive recarga y botón atrás</td></tr>
+      <tr><td>Global</td><td>La aplicación</td><td>Al recargar, salvo persistencia explícita</td><td>Cualquier componente suscrito, sin pasar props</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">Formularios: controlados vs no controlados</p>
+    <p>Un input <strong>controlado</strong> tiene su <code class="inline">value</code> atado al
+    estado del framework: cada tecla dispara un render y el estado es la única fuente de verdad.
+    Necesario cuando la UI tiene que reaccionar a cada tecla (validación en vivo, contador de
+    caracteres, formatear un teléfono a medida que se escribe). Un input <strong>no controlado</strong> deja que el DOM guarde su propio
+    valor y lo lees al enviar (por <code class="inline">ref</code> o
+    <code class="inline">FormData</code>): cero renders por tecla, más simple, y es lo que hacen por
+    debajo las librerías de formularios modernas para no repintar el formulario entero en cada
+    pulsación. La <strong>validación</strong> se hace en el envío o al salir del campo
+    (<code class="inline">blur</code>), no en cada tecla, y —esto es lo que se olvida— se
+    <strong>repite en el servidor</strong>: la del cliente es cortesía para el usuario, no una
+    barrera de seguridad.</p>
+    <p class="why"><b>por qué importa</b>Hacer todo controlado por defecto es la causa número uno de
+    formularios lentos: un formulario de treinta campos que se re-renderiza completo con cada
+    carácter.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Optimistic UI</p>
+    <p>Al dar "me gusta", la interfaz pinta el corazón lleno y sube el contador <em>antes</em> de
+    que el servidor responda, asumiendo que va a salir bien. Si sale bien, ya está; si falla, se
+    revierte al estado anterior y se avisa. Hace que acciones de latencia media se sientan
+    instantáneas. Requiere: guardar el estado previo para poder deshacer, una clave estable para
+    no duplicar si el usuario repite, y decidir qué operaciones lo merecen —un "me gusta" sí, un
+    "transferir dinero" no. Las librerías de estado de servidor traen primitivas para esto
+    (<em>mutación optimista</em> con <em>rollback</em> automático al error).</p>
+  </div>
+</section>
+
+<section class="block" id="hidratacion">
+  <span class="sec-num">04</span>
+  <h2>Hidratación y sus alternativas</h2>
+  <p class="lead">
+    Cuando el HTML llega renderizado desde el servidor, sigue siendo texto muerto: no responde a
+    clics. Hidratar es el paso que lo vuelve interactivo, y es más caro de lo que parece.
+  </p>
+
+  <div class="concept">
+    <p class="term">Qué es hidratar</p>
+    <p>El navegador ya pintó el HTML del servidor. Ahora descarga el JS del framework, vuelve a
+    construir el árbol de componentes en memoria, lo empareja con el DOM existente, adjunta los
+    listeners de eventos y reconstruye el estado inicial. Recién entonces la página responde.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El costo: el árbol se construye dos veces</p>
+    <p>El servidor ya hizo el trabajo de renderizar, y el cliente lo repite entero solo para
+    "engancharse" al HTML. En full hydration ese trabajo es proporcional a toda la página, no a la
+    parte interactiva, y ocurre en el hilo principal.</p>
+    <p class="why"><b>por qué importa</b>Cuanto más grande la página, más tarda en volverse usable,
+    aunque el 90% sea contenido estático que nunca necesitaba JS.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Uncanny valley <span>· se ve listo, no lo está</span></p>
+    <p>Entre que el HTML se pinta y que termina la hidratación, la página parece completamente
+    funcional pero ignora los clics. El usuario pulsa un botón, no pasa nada, vuelve a pulsar. Es peor
+    que una pantalla de carga honesta porque rompe la expectativa.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Islands <span>· Astro, Fresh</span></p>
+    <p>La página es HTML estático salvo componentes concretos marcados como interactivos (un carrusel,
+    un buscador). Solo esas "islas" reciben JS y se hidratan; el resto nunca bloquea. El costo:
+    decidir qué es isla y que las islas no comparten estado con facilidad.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Hidratación parcial y progresiva</p>
+    <p>Se envía todo el JS pero se hidrata por prioridad: primero lo visible o lo que el usuario está
+    por tocar, después el resto, en ratos libres del hilo principal. Mejora la latencia del primer
+    input sin cambiar el modelo de la app.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Resumability <span>· Qwik</span></p>
+    <p>En vez de rehacer el árbol en el cliente, el servidor serializa todo el estado y los handlers
+    dentro del HTML. El cliente arranca con casi cero JS y solo descarga el código de un handler
+    cuando de verdad se interactúa con él. TTI teórico inmejorable, a cambio de un modelo mental nuevo
+    y de serializar mucho en el HTML.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">RSC <span>· componentes que nunca hidratan</span></p>
+    <p>Los React Server Components se renderizan solo en el servidor y no envían su JS al cliente. Los
+    componentes de cliente siguen hidratando; los de servidor son, en la práctica, HTML con datos. La
+    frontera servidor/cliente pasa a ser una decisión de arquitectura.</p>
+  </div>
+
+  <div class="diagram">PÁGINA CON ISLANDS
+
+┌───────────────────────────────────────────────┐
+│  Cabecera · logo · navegación        (estático)│
+├───────────────────────────────────────────────┤
+│  Artículo · texto · imágenes         (estático)│
+│                                                │
+│     ┌────────────────────────┐                 │
+│     │  Buscador   ● isla JS  │  ◄─ hidrata     │
+│     └────────────────────────┘                 │
+│                                                │
+│  Más texto                           (estático)│
+│     ┌────────────────────────┐                 │
+│     │  Carrusel   ● isla JS  │  ◄─ hidrata     │
+│     └────────────────────────┘                 │
+├───────────────────────────────────────────────┤
+│  Pie · enlaces                       (estático)│
+└───────────────────────────────────────────────┘
+  JS enviado = solo el de las dos islas, no el de la página entera</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Enfoque</th><th>JS enviado</th><th>TTI</th><th>Complejidad</th></tr></thead>
+    <tbody>
+      <tr><td>Full hydration</td><td>Todo el árbol + el framework</td><td>Peor: bloquea hasta hidratar todo</td><td>Baja: un solo modelo</td></tr>
+      <tr><td>Islands</td><td>Solo el de los componentes marcados</td><td>Bueno: el resto nunca bloquea</td><td>Media: definir islas, estado no compartido</td></tr>
+      <tr><td>Parcial / progresiva</td><td>Todo, pero hidrata por prioridad</td><td>Medio: mejora el primer input</td><td>Media-alta: orquestar el orden</td></tr>
+      <tr><td>Resumability</td><td>Casi cero al inicio; se baja al interactuar</td><td>El mejor en teoría</td><td>Alta: modelo nuevo, serializar todo el estado</td></tr>
+      <tr><td>RSC</td><td>Cero para los componentes de servidor</td><td>Bueno: solo hidratan los de cliente</td><td>Media: gestionar la frontera</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">Error de hidratación <span>· el HTML del servidor no coincide con el del cliente</span></p>
+    <p>Al hidratar, el framework espera encontrar en el DOM exactamente el árbol que él acaba de
+    generar en memoria. Si no coincide —el servidor pintó una fecha con su zona horaria y el
+    cliente con otra, se usó <code class="inline">Math.random()</code> o
+    <code class="inline">Date.now()</code> en el render, se leyó
+    <code class="inline">window</code> o <code class="inline">localStorage</code> que en el servidor
+    no existen, o hay HTML inválido como un <code class="inline">&lt;div&gt;</code> dentro de un
+    <code class="inline">&lt;p&gt;</code> que el navegador "arregla"— el framework avisa y, según el
+    caso, descarta el HTML del servidor y vuelve a renderizar en cliente, perdiendo la ventaja del
+    SSR justo en esa parte.</p>
+    <p class="why"><b>por qué importa</b>Es de los bugs más comunes al pasar de CSR a SSR y a veces
+    solo se nota como un parpadeo o un salto de layout. El arreglo: no usar valores no
+    deterministas en el render, aplazar lo que depende del navegador a un efecto tras el montaje, y
+    validar el HTML.</p>
+  </div>
+</section>
+
+<section class="block" id="bundling">
+  <span class="sec-num">05</span>
+  <h2>Módulos, bundling y carga</h2>
+  <p class="lead">
+    El código se escribe en cientos de archivos y el navegador tiene que recibir unos pocos, en el
+    orden correcto, cacheables. Entre medio hay un compilador que decide qué va en cada paquete.
+  </p>
+
+  <div class="concept">
+    <p class="term">De módulos a bundle</p>
+    <p>El bundler parte de un punto de entrada, sigue cada <code class="inline">import</code>, arma el
+    grafo de dependencias y lo empaqueta en archivos que el navegador puede pedir. Sin esto tendrías
+    cientos de peticiones en cascada, cada una esperando a la anterior.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Tree-shaking <span>· requiere ESM</span></p>
+    <p>Eliminar del bundle el código que nadie importa. Solo funciona con módulos ES
+    (<code class="inline">import</code>/<code class="inline">export</code> estáticos), porque el
+    bundler necesita saber en tiempo de compilación qué se usa. Con <code class="inline">require()</code>
+    dinámico de CommonJS no puede, y se lleva todo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Code-splitting <span>· lazy + Suspense</span></p>
+    <p>Cortar el bundle en trozos que se cargan cuando hacen falta: por ruta (cada página su chunk) o
+    por componente (<code class="inline">import()</code> dinámico dentro de un
+    <code class="inline">&lt;Suspense&gt;</code> para un modal o un editor pesado). El usuario no baja
+    el código de páginas que no visita.</p>
+    <p class="why"><b>por qué importa</b>Es la palanca más directa sobre el TTI: menos JS en la carga
+    inicial, menos tiempo de parseo y ejecución en el hilo principal.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">HTTP caching <span>· hash de contenido + immutable</span></p>
+    <p>Cada chunk se nombra con un hash de su contenido (<code class="inline">app.9f3a1c.js</code>). Si
+    el contenido no cambia, la URL no cambia y el navegador lo sirve de cache con
+    <code class="inline">Cache-Control: immutable</code>, sin siquiera revalidar. Si cambia, cambia la
+    URL y se descarga solo ese chunk. Por eso conviene separar el código que cambia poco del que
+    cambia en cada deploy.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">preload y prefetch</p>
+    <p><code class="inline">preload</code> le dice al navegador que un recurso de esta página es
+    urgente y lo suba ya (la fuente, el chunk de la ruta actual).
+    <code class="inline">prefetch</code> baja en segundo plano, con baja prioridad, algo que
+    probablemente haga falta después (el chunk de la ruta a la que el usuario va a navegar).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El costo real de una dependencia</p>
+    <p>No es solo los kilobytes: es descargar, parsear y ejecutar. Una librería de fechas completa
+    para formatear una fecha, o toda una librería de utilidades para usar dos funciones, infla el
+    bundle y el tiempo de arranque. Mide antes de añadir, y prefiere módulos que se puedan
+    tree-shakear.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Por qué los bundlers nuevos son rápidos</p>
+    <p>esbuild (Go) y Turbopack o el núcleo de Vite (Rust) están escritos en lenguajes compilados con
+    paralelismo real, frente a las herramientas antiguas en JavaScript de un solo hilo. Vite además,
+    en desarrollo, no hace bundle: sirve módulos ES nativos al navegador y solo transpila el archivo
+    que pides. Menos trabajo y en paralelo.</p>
+  </div>
+
+  <div class="diagram">GRAFO DE MÓDULOS                 CHUNKS                    CACHE BUCKETS
+───────────────                 ──────                    ────────────
+
+entry ─┬─ Button ──┐
+       │           ├─► app.[hash].js      ─────────────►  cambia en cada deploy
+       ├─ Card ─────┘
+       │
+       ├─ route/home ──────────► home.[hash].js   ──────►  cambia si tocas esa ruta
+       ├─ route/checkout ─────► checkout.[hash].js ─────►  cambia si tocas esa ruta
+       │
+       └─ react, react-dom ───► vendor.[hash].js  ──────►  estable entre deploys
+          date-fns, zod                                    (immutable, cache larga)</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Estrategia de split</th><th>Qué separa</th><th>Trade-off</th></tr></thead>
+    <tbody>
+      <tr><td>Por ruta</td><td>Un chunk por página</td><td>Simple y efectivo; cada navegación nueva descarga su chunk</td></tr>
+      <tr><td>Vendor / framework</td><td>Dependencias estables en su propio chunk</td><td>Cachea muy bien; actualizar una lib invalida todo el vendor</td></tr>
+      <tr><td>Dinámico (en interacción)</td><td>Modales, editores, gráficos pesados</td><td>Difiere lo que no se ve; riesgo de spinner al abrir si no hay prefetch</td></tr>
+      <tr><td>Componente compartido</td><td>Código común a varias rutas</td><td>Evita duplicación; demasiados chunks = overhead de requests y peor compresión</td></tr>
+      <tr><td>Sin split</td><td>Todo en un bundle</td><td>Menos requests y mejor compresión; el usuario baja código que no usa</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">Módulos duplicados y el tamaño real del bundle</p>
+    <p>Dos dependencias que usan versiones distintas de una tercera (dos versiones de la librería de
+    fechas, dos de un cliente HTTP) se empaquetan las dos: el bundle carga código repetido que
+    nadie pidió. Se detecta con un analizador visual del bundle
+    (<em>treemap</em> de qué ocupa cada módulo) y se arregla alineando versiones o con
+    <em>dedupe</em>. Mirar ese treemap tras cada cambio grande de dependencias es la forma más
+    barata de no despertar un día con 400 KB extra sin saber de dónde salieron.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Content Security Policy y el front</span>
+    <p>Una CSP es una cabecera (<code class="inline">Content-Security-Policy</code>) que le dice al
+    navegador de qué orígenes puede cargar scripts, estilos, imágenes y a dónde puede conectarse.
+    Bien hecha, un XSS que logre inyectar un <code class="inline">&lt;script&gt;</code> no se
+    ejecuta porque su origen no está permitido. Impacta al bundling: no puedes usar
+    <code class="inline">eval</code> ni <code class="inline">new Function</code> (algunos modos de
+    dev de los bundlers los usan), los estilos y scripts en línea necesitan un <em>nonce</em> o un
+    <em>hash</em> que el servidor inyecta en cada respuesta, y todo CDN de terceros hay que
+    listarlo explícitamente. Empezar el proyecto con una CSP en modo <em>report-only</em> cuesta
+    poco; añadirla a una app madura llena de scripts inline es semanas de trabajo.</p>
+  </div>
+</section>
+
+<section class="block" id="css">
+  <span class="sec-num">06</span>
+  <h2>CSS a escala</h2>
+  <p class="lead">
+    El CSS de una página pequeña es trivial; el de un producto con años encima es donde se pierde el
+    control. El problema no es la sintaxis, es que todo es global y el orden importa.
+  </p>
+
+  <h3>EL MODELO</h3>
+
+  <div class="concept">
+    <p class="term">Cascada, especificidad, herencia</p>
+    <p>Cuando varias reglas afectan al mismo elemento, gana una según: origen e importancia, luego
+    especificidad (un id pesa más que una clase, una clase más que un tipo), y a igualdad, la que
+    aparece más tarde en la hoja. La herencia es aparte: algunas propiedades
+    (<code class="inline">color</code>, <code class="inline">font</code>) pasan del padre al hijo si no
+    se declaran.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El problema de escala</p>
+    <p>Todo selector es global. Dos personas llaman <code class="inline">.card</code> a cosas
+    distintas y colisionan. Nadie se atreve a borrar una regla por miedo a romper algo lejano, así que
+    el archivo solo crece (dead CSS). Y como el orden decide, mover un import cambia el aspecto de
+    páginas que nadie tocó.</p>
+    <p class="why"><b>por qué importa</b>Cada enfoque moderno de CSS existe para atacar una de estas
+    tres cosas: colisión, código muerto o dependencia del orden.</p>
+  </div>
+
+  <h3>ENFOQUES</h3>
+
+  <div class="concept">
+    <p class="term">BEM <span>· convención de nombres</span></p>
+    <p><code class="inline">.bloque__elemento--modificador</code>. Evita colisiones por disciplina
+    humana, no por herramienta: si alguien no la sigue, vuelve el problema. Cero costo en runtime.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Utility-first <span>· Tailwind</span></p>
+    <p>Clases atómicas de un solo propósito (<code class="inline">flex</code>,
+    <code class="inline">pt-4</code>) compuestas en el HTML. Colisión imposible, el compilador purga lo
+    no usado, CSS final pequeño y estable. El costo: el marcado se llena de clases y la curva inicial
+    es real.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">CSS Modules</p>
+    <p>Escribes CSS normal en un archivo <code class="inline">.module.css</code>; el build renombra
+    cada clase con un hash único por archivo. Scope local sin cambiar de lenguaje, sin runtime. El
+    dead code se detecta por archivo, no regla a regla.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">CSS-in-JS <span>· runtime vs zero-runtime</span></p>
+    <p>Estilos co-locados con el componente en JS. En <strong>runtime</strong> (styled-components) la
+    librería serializa e inyecta reglas al renderizar: comodidad a cambio de trabajo en cada render.
+    En <strong>zero-runtime</strong> (vanilla-extract, Linaria) los estilos se extraen a un
+    <code class="inline">.css</code> estático en el build: misma co-locación, sin costo en el cliente.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Estilos scoped <span>· Vue, Svelte</span></p>
+    <p>El compilador del componente añade un atributo único a sus elementos y acota cada selector a
+    ese atributo. Scope automático dentro del archivo de componente, costo mínimo.</p>
+  </div>
+
+  <h3>HERRAMIENTAS DE CONTROL</h3>
+
+  <div class="concept">
+    <p class="term">Contención <span><code class="inline">contain</code>, <code class="inline">content-visibility</code></span></p>
+    <p><code class="inline">contain</code> le promete al navegador que lo que pasa dentro de un
+    elemento no afecta al layout de fuera, así puede saltarse esa subárbol al recalcular.
+    <code class="inline">content-visibility: auto</code> le dice que no gaste render en lo que está
+    fuera de pantalla hasta que se acerque.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Capas de cascada <span><code class="inline">@layer</code></span></p>
+    <p>Permite declarar el orden de prioridad entre grupos de estilos (reset, framework, componentes,
+    utilidades) de forma explícita, en vez de depender del orden de los archivos o de subir la
+    especificidad para ganar. Domestica el "quién gana".</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Container queries</p>
+    <p>Aplicar estilos según el ancho del contenedor del componente, no del viewport. Un mismo
+    componente de tarjeta se adapta igual esté en una barra lateral estrecha o en una rejilla ancha,
+    sin saber nada de la página. Es lo que las media queries no podían hacer.</p>
+  </div>
+
+  <div class="diagram">CÓMO GANA UNA REGLA   (se evalúa en este orden, y en el primer desempate para)
+
+  1. ORIGEN E IMPORTANCIA     user-agent  <  autor  <  autor !important  <  usuario !important
+        │
+        ▼
+  2. @layer                   sin capa gana a con capa; entre capas, el orden declarado
+        │
+        ▼
+  3. ESPECIFICIDAD            inline (1,0,0,0)  >  #id (0,1,0,0)  >  .clase (0,0,1,0)  >  tipo (0,0,0,1)
+        │
+        ▼
+  4. ORDEN DE APARICIÓN       a igualdad de todo lo anterior, gana la última declarada</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Enfoque</th><th>Colisión de nombres</th><th>Dead code</th><th>DX</th><th>Costo runtime</th></tr></thead>
+    <tbody>
+      <tr><td>BEM</td><td>Evitada por disciplina</td><td>Difícil de detectar</td><td>Verboso; depende del equipo</td><td>Nulo</td></tr>
+      <tr><td>Utility-first</td><td>Imposible (clases atómicas)</td><td>El compilador purga</td><td>Rápido tras la curva; HTML cargado</td><td>Nulo (CSS estático)</td></tr>
+      <tr><td>CSS Modules</td><td>Imposible (hash por archivo)</td><td>Por archivo, no por regla</td><td>Familiar; lo resuelve el build</td><td>Nulo</td></tr>
+      <tr><td>CSS-in-JS runtime</td><td>Imposible (scoped)</td><td>Muere con el componente</td><td>Co-locación cómoda</td><td>Sí: inyecta al renderizar</td></tr>
+      <tr><td>CSS-in-JS zero-runtime</td><td>Imposible</td><td>Se extrae en build</td><td>Co-locado y tipado</td><td>Nulo</td></tr>
+      <tr><td>Scoped (SFC)</td><td>Imposible (atributo por componente)</td><td>Por componente</td><td>Integrado al archivo</td><td>Mínimo</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="a11y">
+  <span class="sec-num">07</span>
+  <h2>Accesibilidad</h2>
+  <p class="lead">
+    El navegador construye, junto al DOM, un segundo árbol que describe la página a las tecnologías de
+    asistencia. Programar para accesibilidad es programar ese árbol, y casi siempre el HTML correcto
+    ya lo hace bien.
+  </p>
+
+  <div class="concept">
+    <p class="term">El árbol de accesibilidad <span>· paralelo al DOM</span></p>
+    <p>Por cada nodo relevante del DOM, el navegador expone un objeto con su <em>rol</em> (qué es),
+    su <em>nombre</em> (cómo se llama), su <em>estado</em> (marcado, expandido, deshabilitado) y sus
+    propiedades. El lector de pantalla no ve tu CSS: lee este árbol a través de la API de
+    accesibilidad del sistema operativo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">HTML semántico primero</p>
+    <p>Un <code class="inline">&lt;button&gt;</code> ya trae rol de botón, foco con el tabulador,
+    activación con Enter y Espacio, y estado deshabilitado. Un
+    <code class="inline">&lt;div onclick&gt;</code> no trae nada de eso: para un lector de pantalla es
+    texto, no un control. Reconstruir todo eso a mano es trabajo y casi siempre queda peor.</p>
+    <p class="why"><b>por qué importa</b>La mayoría de los problemas de accesibilidad se resuelven
+    eligiendo el elemento correcto, antes de tocar ARIA.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">ARIA <span>· roles, estados, propiedades</span></p>
+    <p>Atributos que ajustan lo que el elemento comunica al árbol de accesibilidad cuando el HTML no
+    alcanza (widgets complejos: <code class="inline">tablist</code>, <code class="inline">combobox</code>).
+    ARIA no añade comportamiento: <code class="inline">role="button"</code> no hace que responda a
+    Enter, eso lo pones tú. Y un ARIA mal puesto miente al usuario.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Foco <span>· orden, trampa, visibilidad</span></p>
+    <p>El orden de tabulación sigue el orden del DOM: si lo reordenas visualmente con CSS, el foco se
+    vuelve caótico. En un modal el foco debe quedar <em>atrapado</em> dentro mientras está abierto y
+    volver al disparador al cerrar. <code class="inline">:focus-visible</code> muestra el anillo de
+    foco al navegar con teclado y no al hacer clic. Un <em>skip link</em> deja saltar la navegación
+    repetida.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Contraste <span>· WCAG AA</span></p>
+    <p>El texto normal necesita una relación de contraste de al menos <strong>4.5:1</strong> con su
+    fondo; el texto grande (a partir de 18.66&nbsp;px en negrita o 24&nbsp;px normal) y los elementos
+    de interfaz, al menos <strong>3:1</strong>. El gris claro sobre blanco es la falla más común, y
+    afecta a cualquiera bajo el sol, no solo a personas con baja visión.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Teclado completo y lectores de pantalla</p>
+    <p>Todo lo que se hace con ratón se tiene que poder hacer con teclado: Tab para moverse, Enter y
+    Espacio para activar, Escape para cerrar, flechas dentro de un grupo. El lector de pantalla narra
+    el elemento enfocado leyendo rol, nombre y estado ("Enviar, botón"; "Aceptar términos, casilla,
+    no marcada").</p>
+  </div>
+
+  <div class="concept">
+    <p class="term"><code class="inline">prefers-reduced-motion</code></p>
+    <p>Media query que expone la preferencia del sistema de reducir movimiento. Animaciones grandes,
+    parallax y transiciones bruscas pueden causar mareo y náusea a personas con trastornos
+    vestibulares. Respetarla es cambiar esas animaciones por un fundido corto o quitarlas.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Primera regla de ARIA: no usar ARIA</span>
+    <p>Si existe un elemento HTML nativo con la semántica y el comportamiento que necesitas, úsalo en
+    vez de recrearlo con un <code class="inline">&lt;div&gt;</code> y atributos ARIA. Un ARIA
+    incorrecto (un <code class="inline">role</code> que no corresponde, un
+    <code class="inline">aria-hidden</code> sobre algo enfocable) deja al usuario de lector de pantalla
+    peor que si no hubiera nada: le describe una interfaz que no existe. No ARIA es mejor que ARIA
+    mal.</p>
+  </div>
+
+  <div class="diagram">DOM                         ÁRBOL DE ACCESIBILIDAD          API DE ACCESIBILIDAD        LECTOR DE PANTALLA
+───                         ──────────────────────          del sistema operativo       ──────────────────
+
+&lt;button&gt;Enviar&lt;/button&gt;  ─►  rol: button, nombre: Enviar  ─►   UIA (Windows)          ─►  "Enviar, botón"
+&lt;a href="/x"&gt;Ir&lt;/a&gt;      ─►  rol: link, nombre: Ir       ─►   AX  (macOS)            ─►  "Ir, enlace"
+&lt;div onclick&gt;X&lt;/div&gt;      ─►  (sin rol → texto)           ─►   AT-SPI (Linux)         ─►  "X"   (no dice que actúa)
+&lt;img alt="Logo"&gt;          ─►  rol: image, nombre: Logo     ─►                          ─►  "Logo, imagen"
+&lt;input aria-invalid&gt;      ─►  estado: inválido             ─►                          ─►  "... entrada no válida"</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Rol ARIA</th><th>Elemento HTML nativo equivalente</th><th>Qué trae gratis el nativo</th></tr></thead>
+    <tbody>
+      <tr><td><code class="inline">role="button"</code></td><td><code class="inline">&lt;button&gt;</code></td><td>Foco, Enter/Espacio, estado deshabilitado</td></tr>
+      <tr><td><code class="inline">role="link"</code></td><td><code class="inline">&lt;a href&gt;</code></td><td>Foco, activación, menú contextual, arrastrar</td></tr>
+      <tr><td><code class="inline">role="checkbox"</code></td><td><code class="inline">&lt;input type="checkbox"&gt;</code></td><td>Estado marcado, toggle con Espacio</td></tr>
+      <tr><td><code class="inline">role="navigation"</code></td><td><code class="inline">&lt;nav&gt;</code></td><td>Punto de referencia para saltar</td></tr>
+      <tr><td><code class="inline">role="main"</code></td><td><code class="inline">&lt;main&gt;</code></td><td>Punto de referencia; destino del skip link</td></tr>
+      <tr><td><code class="inline">role="banner"</code> / <code class="inline">contentinfo"</code></td><td><code class="inline">&lt;header&gt;</code> / <code class="inline">&lt;footer&gt;</code> de página</td><td>Puntos de referencia</td></tr>
+      <tr><td><code class="inline">role="list"</code> / <code class="inline">listitem"</code></td><td><code class="inline">&lt;ul&gt;</code> / <code class="inline">&lt;li&gt;</code></td><td>Recuento ("lista, 5 elementos")</td></tr>
+      <tr><td><code class="inline">role="dialog"</code></td><td><code class="inline">&lt;dialog&gt;</code></td><td>Gestión de foco y Escape nativos</td></tr>
+      <tr><td><code class="inline">role="heading"</code> <code class="inline">aria-level</code></td><td><code class="inline">&lt;h1&gt;</code>–<code class="inline">&lt;h6&gt;</code></td><td>Navegación por encabezados</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">Formularios accesibles</p>
+    <p>Cada campo necesita un <code class="inline">&lt;label&gt;</code> asociado por
+    <code class="inline">for</code>/<code class="inline">id</code> (o envolviendo al input): un
+    <em>placeholder</em> no es una etiqueta —desaparece al escribir y suele fallar el contraste. El
+    mensaje de error se enlaza con <code class="inline">aria-describedby</code> apuntando al
+    <code class="inline">id</code> del texto de error, y el campo se marca
+    <code class="inline">aria-invalid="true"</code>; así el lector de pantalla narra "Correo,
+    edición, no válido, el correo no tiene arroba" al enfocar. Los campos obligatorios llevan
+    <code class="inline">required</code>. Al enviar con errores, el foco se mueve al primer campo
+    fallido o a un resumen de errores enlazado a cada campo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Anuncios dinámicos <span><code class="inline">aria-live</code></span></p>
+    <p>El lector de pantalla narra lo que está enfocado; no se entera de que apareció un toast, de
+    que la búsqueda ya trae 12 resultados o de que se guardó el borrador. Una <em>región en
+    vivo</em> (<code class="inline">aria-live="polite"</code> para lo no urgente,
+    <code class="inline">"assertive"</code> para lo que interrumpe, o roles como
+    <code class="inline">status</code> y <code class="inline">alert</code>) hace que el navegador
+    anuncie los cambios de su contenido. Truco de implementación: el contenedor con
+    <code class="inline">aria-live</code> tiene que existir en el DOM <em>antes</em> de meterle
+    texto —si lo creas y lo rellenas a la vez, muchos lectores no lo anuncian.</p>
+  </div>
+</section>
+
+<section class="block" id="rendimiento">
+  <span class="sec-num">08</span>
+  <h2>Rendimiento percibido</h2>
+  <p class="lead">
+    El rendimiento que importa no es un número de laboratorio, es lo que siente un usuario real en su
+    móvil de gama media. Google lo resume en tres métricas y las usa para rankear.
+  </p>
+
+  <div class="concept">
+    <p class="term">Core Web Vitals <span>· LCP, INP, CLS</span></p>
+    <p><strong>LCP</strong> (Largest Contentful Paint): cuánto tarda en pintarse el elemento más
+    grande del viewport; bueno por debajo de <strong>2.5&nbsp;s</strong>. <strong>INP</strong>
+    (Interaction to Next Paint): la latencia de la interacción más lenta de toda la visita; bueno por
+    debajo de <strong>200&nbsp;ms</strong>. Reemplazó a FID como métrica oficial en marzo de 2024 por
+    medir toda la visita y no solo el primer input. <strong>CLS</strong> (Cumulative Layout Shift):
+    cuánto se mueve el contenido de forma inesperada; bueno por debajo de <strong>0.1</strong>.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Imágenes <span>· suelen ser el LCP y el CLS</span></p>
+    <p>Formatos modernos (AVIF, luego WebP, con JPEG de reserva) pesan bastante menos.
+    <code class="inline">srcset</code> deja al navegador elegir la resolución según pantalla.
+    <code class="inline">loading="lazy"</code> difiere las de abajo del pliegue. Y
+    <strong>siempre</strong> ancho y alto explícitos (o <code class="inline">aspect-ratio</code>): sin
+    eso, la imagen empuja el texto al cargar y dispara el CLS.</p>
+    <p class="why"><b>por qué importa</b>La imagen hero suele ser el elemento LCP; optimizarla mueve
+    la métrica más que cualquier otra cosa.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Fuentes <span>· FOUT vs FOIT</span></p>
+    <p>Mientras la fuente web carga, el navegador o muestra texto con una fuente de sistema y luego
+    cambia (FOUT, <em>flash of unstyled text</em>) o no muestra texto (FOIT, <em>flash of invisible
+    text</em>). <code class="inline">font-display</code> controla cuál:
+    <code class="inline">swap</code> prioriza ver texto, <code class="inline">optional</code> evita el
+    salto tardío. Ayuda además hacer <em>subset</em> (solo los caracteres que usas) y
+    <code class="inline">preload</code> de la fuente principal.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Skeleton vs spinner</p>
+    <p>Un spinner dice "algo pasa" sin más; un skeleton dibuja la forma del contenido que viene y hace
+    la espera más corta en la percepción, además de reservar el espacio y evitar el salto de layout.
+    La misma latencia se siente distinta según qué muestres durante la espera.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Percepción &gt; números</p>
+    <p>Mostrar el shell de inmediato, cargar primero lo visible, dar feedback instantáneo al clic
+    aunque la respuesta tarde: todo eso mejora la experiencia sin cambiar el tiempo total. El usuario
+    no cronometra, recuerda si se sintió rápido.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">RUM vs lab</p>
+    <p><strong>Lab</strong> (Lighthouse, WebPageTest): entorno controlado, reproducible, bueno para
+    depurar y para no regresionar. <strong>RUM</strong> (Real User Monitoring, el Chrome UX Report):
+    datos de usuarios reales con sus redes y dispositivos, que es lo que Google usa para rankear. El
+    lab te dice por qué; el RUM te dice si de verdad pasa.</p>
+  </div>
+
+  <div class="diagram">   0s          0.5s          1.0s          1.5s          2.0s          2.5s
+   │            │             │             │             │             │
+HTML     ████
+CSS          ██████
+JS               ████████████████
+Fuente               ██████                        ◄─ si tarda: FOIT / FOUT
+Hero .avif           ████████████████████  ● LCP ≈ 2.1 s     ◄─ objetivo &lt; 2.5 s
+Banner (tardío)                       ██   ▲ empuja el layout hacia abajo
+                                           └─ CLS 0.18   ◄─ objetivo &lt; 0.1
+                                              reservar alto/ancho lo lleva a 0</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Web Vital</th><th>Qué mide</th><th>Umbral "bueno"</th><th>Causa típica</th><th>Arreglo</th></tr></thead>
+    <tbody>
+      <tr><td>LCP</td><td>Tiempo hasta pintar el elemento más grande del viewport</td><td>&lt; 2.5 s</td><td>Imagen hero pesada, CSS/JS bloqueante, servidor lento</td><td><code class="inline">preload</code> del recurso, formatos modernos, SSR/CDN</td></tr>
+      <tr><td>INP</td><td>Latencia de la interacción más lenta de la visita (reemplazó a FID en marzo de 2024)</td><td>&lt; 200 ms</td><td>Tareas largas de JS que bloquean el hilo principal</td><td>Dividir el trabajo, ceder el hilo, menos JS, web workers</td></tr>
+      <tr><td>CLS</td><td>Suma de desplazamientos inesperados del layout</td><td>&lt; 0.1</td><td>Imágenes sin dimensiones, fuentes que recargan, banners inyectados</td><td>Ancho/alto explícitos, reservar espacio, <code class="inline">font-display</code></td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">Tareas largas y ceder el hilo <span>· la palanca de INP</span></p>
+    <p>Cualquier bloque de JavaScript que ocupe el hilo principal más de 50&nbsp;ms es una
+    <em>long task</em>: mientras corre, el navegador no puede responder a un clic ni pintar. Si el
+    usuario interactúa justo entonces, ese retraso entra en el INP. Arreglos: partir el trabajo en
+    trozos y ceder el hilo entre ellos (<code class="inline">await scheduler.yield()</code> donde
+    esté disponible, o <code class="inline">setTimeout(0)</code> / <code class="inline">postTask</code>
+    como alternativa), mover el cálculo pesado a un <em>web worker</em>, y aplazar lo que no es
+    urgente con <code class="inline">requestIdleCallback</code>. Medir una interacción real en el
+    perfil de DevTools muestra exactamente qué función la bloqueó.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Scripts de terceros</p>
+    <p>Analítica, chat de soporte, píxeles de publicidad, gestores de consentimiento: código que no
+    escribiste, que se ejecuta en tu hilo principal y que suele ser la mayor causa de INP y LCP
+    malos en sitios por lo demás cuidados. Defensa: cargarlos con <code class="inline">async</code>
+    o diferidos, después de la interacción o cuando el navegador está ocioso; considerar ejecutarlos
+    en un worker aislado; medir el coste de cada uno y quitar los que no ganan su peso; y no fiarse
+    de "es solo un snippet", porque ese snippet a menudo carga otros scripts en cadena.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">bfcache <span>· back/forward instantáneo</span></p>
+    <p>Al pulsar "atrás", el navegador puede restaurar la página anterior entera desde memoria —DOM,
+    JS, posición de scroll— en vez de recargarla: navegación instantánea y sin volver a pegar al
+    servidor. Se pierde esta ventaja si la página usa <code class="inline">unload</code>, si manda
+    <code class="inline">Cache-Control: no-store</code>, o si tiene una conexión abierta que impide
+    congelarla. DevTools tiene una prueba de bfcache que dice por qué una página no es elegible.
+    Recuperarla mejora la métrica de navegación para toda la gente que usa el botón atrás, que son
+    muchos.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Prioridad de carga <span><code class="inline">fetchpriority</code>, preload, <code class="inline">sizes</code></span></p>
+    <p>El navegador adivina la importancia de cada recurso, y a veces se equivoca: baja la imagen
+    hero (que es el LCP) con la misma prioridad que un icono del pie.
+    <code class="inline">fetchpriority="high"</code> en la imagen LCP y
+    <code class="inline">"low"</code> en lo de abajo del pliegue corrige eso.
+    <code class="inline">&lt;link rel="preload"&gt;</code> adelanta un recurso crítico que el
+    navegador descubriría tarde (una fuente referida desde el CSS). Y en imágenes responsive, un
+    atributo <code class="inline">sizes</code> mal puesto hace que el móvil baje la versión de
+    escritorio: <code class="inline">srcset</code> ofrece los anchos,
+    <code class="inline">sizes</code> le dice al navegador cuánto espacio ocupará la imagen para que
+    elija bien antes de conocer el layout.</p>
+  </div>
+</section>
+
+<section class="block" id="testing-fe">
+  <span class="sec-num">09</span>
+  <h2>Testing de front-end</h2>
+  <p class="lead">
+    Un test de front-end vale por la confianza que da al hacer un cambio, no por el porcentaje de
+    cobertura. Eso decide qué probar, con qué herramienta y en qué nivel: la mayor parte del esfuerzo
+    va donde el usuario y el componente se encuentran, no en las funciones sueltas ni en los flujos
+    de punta a punta.
+  </p>
+
+  <h3>QUÉ NIVEL PRUEBA QUÉ</h3>
+
+  <div class="concept">
+    <p class="term">Del "pirámide" al "trofeo" <span>· Kent C. Dodds</span></p>
+    <p>La pirámide de tests clásica pone muchos tests unitarios en la base, menos de integración y
+    unos pocos de punta a punta. En el front esa forma engaña: un componente aislado con todo
+    mockeado puede pasar en verde mientras la pantalla real está rota, porque lo que falla suele
+    estar en la costura entre piezas. El <strong>trofeo</strong> reordena por retorno de confianza:
+    una base pequeña de análisis estático (tipos, linter), unos pocos unitarios para lógica pura
+    compleja, el <em>grueso</em> en tests de integración de componentes que montan varias piezas
+    juntas, y una capa fina de E2E para los caminos que no se pueden perder.</p>
+    <p class="why"><b>por qué importa</b>El coste de un test no es solo escribirlo: es mantenerlo
+    cuando refactorizas. Los unitarios que espían la implementación se rompen en cada refactor sin
+    haber encontrado un solo bug; los de integración sobreviven al refactor y fallan cuando de
+    verdad algo dejó de funcionar.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">La regla de oro <span>· "prueba como lo usa el usuario"</span></p>
+    <p>Cuanto más se parezca el test a cómo se usa el software, más confianza da. En la práctica:
+    el test no sabe que existe <code class="inline">useState</code>, no llama a métodos del
+    componente, no comprueba props internas. Renderiza, busca elementos como los buscaría una
+    persona ("el botón que dice Guardar"), interactúa y verifica lo que se ve. Si un refactor no
+    cambia lo que el usuario percibe, el test no debería enterarse.</p>
+  </div>
+
+  <h3>TESTS DE COMPONENTE CON TESTING LIBRARY</h3>
+
+  <div class="concept">
+    <p class="term">Queries: por rol y nombre accesible, primero</p>
+    <p>Testing Library ordena sus <em>queries</em> por preferencia. Arriba, las que cualquiera puede
+    percibir: <code class="inline">getByRole('button', { name: /guardar/i })</code>,
+    <code class="inline">getByLabelText</code>, <code class="inline">getByText</code>,
+    <code class="inline">getByPlaceholderText</code>. Al fondo, como último recurso,
+    <code class="inline">getByTestId</code> con un <code class="inline">data-testid</code>. Buscar
+    por clase CSS ni siquiera es una opción de la API: la clase es un detalle de estilo que cambia
+    sin que cambie la interfaz.</p>
+    <p class="why"><b>por qué importa</b>Si tu componente no se puede encontrar por rol y nombre, un
+    lector de pantalla tampoco lo encuentra. El test que insiste en queries accesibles empuja el
+    marcado hacia la accesibilidad casi sin querer. El <code class="inline">testid</code> es para
+    el nodo que de verdad no tiene semántica (un contenedor de layout) y que igual necesitas
+    anclar.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term"><code class="inline">userEvent</code> vs <code class="inline">fireEvent</code></p>
+    <p><code class="inline">fireEvent.click(node)</code> dispara <em>un</em> evento de DOM y nada
+    más. Una persona que hace clic genera antes <code class="inline">pointerdown</code>,
+    <code class="inline">mousedown</code>, <code class="inline">focus</code>,
+    <code class="inline">pointerup</code>, <code class="inline">mouseup</code>,
+    <code class="inline">click</code>; al escribir dispara <code class="inline">keydown</code>,
+    actualiza el valor, dispara <code class="inline">input</code>, respeta
+    <code class="inline">maxlength</code> y el estado deshabilitado.
+    <code class="inline">userEvent</code> simula esa secuencia completa, así que descubre bugs que
+    <code class="inline">fireEvent</code> nunca toca (un handler que depende de
+    <code class="inline">focus</code>, un input que ignora el evento sintético). Es asíncrono: se
+    usa con <code class="inline">await</code> y conviene crear la instancia con
+    <code class="inline">userEvent.setup()</code> antes de renderizar.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Esperar lo asíncrono sin <code class="inline">sleep</code></p>
+    <p>Cuando algo aparece tras una petición o un estado que cambia, se usan
+    <code class="inline">findBy*</code> (query + espera hasta que exista) y
+    <code class="inline">waitFor</code> (reintenta una aserción hasta que pasa o expira). Nunca un
+    <code class="inline">setTimeout</code> fijo: en CI la máquina va más lenta y el número mágico
+    que funcionaba en tu portátil falla una de cada veinte veces. <code class="inline">act()</code>
+    envuelve las actualizaciones de estado para que el árbol se estabilice antes de la aserción;
+    la mayoría de las utilidades de Testing Library ya lo hacen por dentro.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">El anti-patrón: testear la implementación</span>
+    <p>Señales de que un test está atado a los detalles internos y no al comportamiento: usa
+    <code class="inline">container.querySelector('.foo')</code>, comprueba el estado con un
+    <em>wrapper</em> tipo <code class="inline">wrapper.state()</code>, mockea un componente hijo
+    para "aislar", o afirma que una función se llamó "una vez" cuando lo que importa es el efecto
+    visible. Todos pasan en verde con la interfaz rota y fallan en rojo con la interfaz intacta.
+    Regla práctica: si no puedes explicar el test sin nombrar una variable interna, está mal
+    escrito.</p>
+  </div>
+
+  <h3>MOCKS DE RED</h3>
+
+  <div class="concept">
+    <p class="term">MSW <span>· interceptar a nivel de red</span></p>
+    <p>Mock Service Worker intercepta las peticiones HTTP donde salen —en el navegador con la
+    Service Worker API, en Node con un interceptor de bajo nivel— en vez de sustituir
+    <code class="inline">fetch</code> o <code class="inline">axios</code> con un doble. Defines
+    <em>handlers</em> por endpoint (<code class="inline">http.get('/api/pedidos', ...)</code>) que
+    devuelven respuestas simuladas. El código de la app no cambia ni sabe que está mockeado: usa su
+    cliente HTTP real, su serialización real, sus reintentos reales.</p>
+    <p class="why"><b>por qué importa</b>Mockear el módulo (<code class="inline">jest.mock('./api')</code>)
+    prueba tu código contra tu propia idea de la API; si el backend devuelve otra forma, el test
+    sigue verde. Con MSW el mismo <em>handler</em> sirve para tests, para Storybook y para
+    desarrollar sin backend, y migrar de una librería HTTP a otra no rompe ni un test.</p>
+  </div>
+
+  <h3>E2E: PLAYWRIGHT Y CYPRESS</h3>
+
+  <div class="concept">
+    <p class="term">Qué probar de punta a punta y qué no</p>
+    <p>E2E arranca un navegador real contra la app desplegada y recorre un flujo entero: registrarse,
+    añadir al carrito y pagar, recuperar la contraseña. Son lentos, caros en CI y más frágiles, así
+    que se reservan para los <strong>caminos críticos de negocio</strong> —los que si se rompen
+    pierdes dinero o usuarios— y para verificar la integración real (auth, pasarela de pago,
+    redirecciones). No se usan para cubrir cada variante de un formulario ni cada estado de un
+    componente: eso es trabajo de los tests de integración, mil veces más rápidos.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Flakiness y cómo matarla</p>
+    <p>Un test <em>flaky</em> pasa o falla sin que el código cambie, y envenena la suite entera
+    porque la gente aprende a ignorar los rojos. Causas y arreglos: <strong>esperas fijas</strong>
+    → usar el auto-waiting (Playwright espera a que el elemento sea visible, estable y accionable
+    antes de actuar; sus <em>web-first assertions</em> reintentan solas). <strong>Selectores
+    frágiles</strong> → localizar por rol y texto (<code class="inline">getByRole</code>), no por
+    XPath ni por clases generadas. <strong>Estado compartido entre tests</strong> → cada test crea
+    y limpia sus propios datos, aislado. <strong>Orden implícito</strong> → los tests no deben
+    depender de correr en secuencia. <strong>Animaciones y tiempo real</strong> → desactivar
+    animaciones y congelar el reloj. Como red de seguridad, no como cura: <code class="inline">retries</code>
+    en CI y marcar y arreglar el test que reintenta.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Page objects y datos de prueba</p>
+    <p>El <em>page object</em> (o <em>fixture</em> en Playwright) encapsula los selectores y las
+    acciones de una pantalla —<code class="inline">loginPage.submit(user, pass)</code>— para que un
+    cambio de marcado se arregle en un sitio y no en cuarenta tests. Los <strong>datos de
+    prueba</strong> no se pinchan a mano en la UI: se siembran por API o por base de datos antes
+    del test (más rápido y fiable) y se limpian después; el usuario de prueba se crea por test o
+    por <em>worker</em> para poder correr en paralelo sin pisarse.</p>
+  </div>
+
+  <div class="diagram">EL TROFEO DE TESTS (front-end)                    coste de mantener  →  confianza que da
+─────────────────────────────
+
+            ╱‾‾‾‾‾‾‾╲          E2E            pocos · caminos críticos · navegador real
+           │  ▓▓▓▓▓  │                        lentos, algo frágiles, caros en CI
+        ╱‾‾‾‾‾‾‾‾‾‾‾‾‾‾‾╲
+       │   ▓▓▓▓▓▓▓▓▓▓▓   │     INTEGRACIÓN    ◄── el grueso del esfuerzo
+       │   ▓▓▓▓▓▓▓▓▓▓▓   │      componentes montados juntos + MSW
+        ╲___________╱             "prueba como lo usa el usuario"
+         │  ▓▓▓▓▓  │           UNITARIOS      solo lógica pura compleja (parseo, cálculo, reducers)
+      ═══╧═════════╧═══        ESTÁTICO       tipos + linter · gratis, corre en cada guardado
+</div>
+
+  <h3>MÁS ALLÁ DEL DOM</h3>
+
+  <div class="concept">
+    <p class="term">Visual regression</p>
+    <p>Los tests de DOM no ven que un margen se rompió o que el texto quedó blanco sobre blanco. La
+    regresión visual toma una captura de cada componente o página, la compara pixel a pixel con la
+    aprobada y falla si difieren más de un umbral. Chromatic (integrado con Storybook), Percy o las
+    propias <code class="inline">toHaveScreenshot</code> de Playwright. El coste: mantenimiento de
+    las <em>baselines</em> y falsos positivos por antialiasing o fuentes; se controla fijando el
+    navegador, el viewport y desactivando animaciones, y revisando los diffs como se revisa un PR.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Accesibilidad automatizada y su límite</p>
+    <p><code class="inline">axe-core</code> (vía <code class="inline">jest-axe</code>, el plugin de
+    Playwright o el addon de Storybook) escanea el DOM renderizado y detecta violaciones
+    comprobables por máquina: contraste insuficiente, <code class="inline">img</code> sin
+    <code class="inline">alt</code>, campos sin etiqueta, <code class="inline">id</code>
+    duplicados, orden de encabezados. Es barato y conviene tenerlo en cada test de componente.
+    <strong>Su límite</strong>: cubre del orden de un tercio de los criterios de WCAG. No sabe si
+    el <code class="inline">alt</code> describe bien la imagen, si el orden de foco tiene sentido,
+    si un <code class="inline">aria-label</code> miente o si el flujo con teclado es usable. Eso
+    sigue necesitando prueba manual con teclado y lector de pantalla.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Qué NO testear</p>
+    <p>La implementación (ya visto). Las <strong>librerías de terceros</strong>: no pruebas que
+    React Router navega o que la librería de fechas formatea; asumes que su propia suite lo cubre y
+    pruebas cómo <em>tu</em> código las usa. El <strong>código generado</strong> y los tipos. Los
+    <strong>estilos exactos</strong> con aserciones sobre CSS (para eso está la regresión visual).
+    Y no persigas el 100% de cobertura: la última franja suele ser <em>getters</em> triviales y
+    ramas de error imposibles, y el tiempo rinde más escribiendo un test de integración que falte.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">CI: shards, paralelización y retries</p>
+    <p>Una suite E2E de veinte minutos en serie bloquea los despliegues. Se parte en
+    <strong>shards</strong>: N máquinas corren cada una una fracción de los tests
+    (<code class="inline">--shard=1/4</code>) y el tiempo total baja casi lineal. Dentro de cada
+    máquina, varios <em>workers</em> en paralelo (limitados por CPU). Los <strong>retries</strong>
+    solo en CI, con tope de 1 o 2, y todo test que reintente se registra para arreglarlo —si no,
+    la flakiness se vuelve permanente. El <strong>trace</strong> o vídeo se guarda solo del intento
+    fallido, para depurar sin reproducir en local. Los tests de integración (miles, en Node) caben
+    en un solo <em>job</em> de un par de minutos; los que hay que trocear son los E2E.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Orden de ejecución en el pipeline</span>
+    <p>Barato y rápido primero, para fallar pronto: <em>typecheck</em> y <em>lint</em> (segundos) →
+    tests unitarios y de integración con MSW (minutos) → build → E2E y regresión visual contra el
+    <em>preview</em> desplegado (más lentos, en shards). Si el <em>typecheck</em> falla no tiene
+    sentido gastar diez minutos de E2E. Los tests de componente se pueden correr también dentro de
+    Storybook con su runner, reutilizando las <em>stories</em> como casos.</p>
+  </div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Nivel</th><th>Herramienta típica</th><th>Qué prueba</th><th>Velocidad</th><th>Fragilidad</th></tr></thead>
+    <tbody>
+      <tr><td>Estático</td><td>TypeScript, ESLint</td><td>Tipos, errores obvios, reglas de estilo</td><td>Instantáneo</td><td>Nula</td></tr>
+      <tr><td>Unitario</td><td>Vitest / Jest</td><td>Funciones puras: parseo, formato, reducers, cálculo</td><td>Milisegundos</td><td>Baja si es lógica pura</td></tr>
+      <tr><td>Integración de componente</td><td>Testing Library + MSW</td><td>Varias piezas juntas + red simulada; comportamiento visible</td><td>Decenas de ms</td><td>Baja si evita la implementación</td></tr>
+      <tr><td>E2E</td><td>Playwright, Cypress</td><td>Flujos críticos en navegador real contra la app desplegada</td><td>Segundos por test</td><td>Media — mitigada con auto-waiting y aislamiento</td></tr>
+      <tr><td>Visual</td><td>Chromatic, Percy, screenshots de Playwright</td><td>Que nada se rompió a la vista (layout, color, espaciado)</td><td>Segundos</td><td>Media — baselines y antialiasing</td></tr>
+      <tr><td>A11y automatizada</td><td>axe-core</td><td>~⅓ de WCAG: contraste, alt, labels, roles inválidos</td><td>Milisegundos</td><td>Baja; no sustituye la prueba manual</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="i18n">
+  <span class="sec-num">10</span>
+  <h2>Internacionalización y localización</h2>
+  <p class="lead">
+    Adaptar un producto a otro idioma casi nunca es "traducir los textos". Es que las fechas, los
+    números, los plurales, la dirección de la escritura y hasta el ancho de un botón cambian de
+    región en región, y que casi todo eso ya lo resuelve el navegador si no lo peleas.
+  </p>
+
+  <div class="concept">
+    <p class="term">i18n vs l10n <span>· preparar vs traducir</span></p>
+    <p><strong>Internacionalización (i18n)</strong> es el trabajo de ingeniería que se hace una vez:
+    sacar todo el texto del código a archivos de mensajes, no concatenar cadenas, delegar los
+    formatos, soportar escritura de derecha a izquierda, dejar que el layout respire cuando el texto
+    crece. <strong>Localización (l10n)</strong> es lo que se hace por cada mercado: traducir esos
+    mensajes, ajustar ejemplos y moneda, revisar imágenes y tono. Si la i18n está bien hecha, añadir
+    un idioma es un archivo nuevo; si está mal, es refactorizar la app entera.</p>
+    <p class="why"><b>por qué importa</b>El coste de la i18n se paga entero la primera vez. Empezar
+    "en un idioma y ya veremos" y meterla después significa tocar cada componente que muestra texto,
+    fecha o número.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term"><code class="inline">Intl</code> nativo <span>· no reinventes el formateo</span></p>
+    <p>El navegador trae la base de datos de locales de Unicode (CLDR) y la expone en el objeto
+    <code class="inline">Intl</code>. <code class="inline">Intl.DateTimeFormat</code> da "9 de
+    septiembre de 2026" o "September 9, 2026" o "2026年9月9日" según el locale, con su orden, sus
+    separadores y su calendario. <code class="inline">Intl.NumberFormat</code> pone el separador de
+    miles y decimales correcto (<code class="inline">1.234,56</code> en español,
+    <code class="inline">1,234.56</code> en inglés) y, con
+    <code class="inline">style: 'currency'</code>, coloca el símbolo donde va y con los decimales
+    que esa moneda usa (el yen no lleva decimales). También hay
+    <code class="inline">RelativeTimeFormat</code> ("hace 3 días"),
+    <code class="inline">ListFormat</code> ("A, B y C"),
+    <code class="inline">Collator</code> (ordenar respetando acentos y ñ) y
+    <code class="inline">PluralRules</code>.</p>
+    <p class="why"><b>por qué importa</b>Formatear a mano con <code class="inline">replace</code> y
+    plantillas parece inocente y falla en el primer locale que no imaginaste: el que usa coma
+    decimal, el que pone el símbolo de moneda detrás, el que separa los miles con un espacio fino.
+    <code class="inline">Intl</code> ya lo sabe para ~cientos de locales y no pesa nada porque va en
+    el motor.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Pluralización <span>· no hay "singular y plural"</span></p>
+    <p>El inglés tiene 2 formas (1 vs resto); el chino y el japonés, 1 sola; el árabe, 6; el ruso y
+    el polaco, 3 según la terminación del número. Un <code class="inline">if (n === 1)</code>
+    produce texto agramatical en la mayoría de los idiomas del mundo.
+    <code class="inline">Intl.PluralRules</code> devuelve la categoría
+    (<code class="inline">one</code>, <code class="inline">few</code>,
+    <code class="inline">many</code>, <code class="inline">other</code>…) y las librerías de i18n
+    la usan bajo el capó. El formato estándar para esto es <strong>ICU MessageFormat</strong>, que
+    mete la lógica dentro del propio mensaje —
+    <code class="inline">{n, plural, one {# archivo} other {# archivos}}</code>— para que el
+    traductor rellene las categorías que su idioma necesita sin tocar código.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Género, orden de palabras e interpolación</p>
+    <p>ICU MessageFormat también cubre <code class="inline">select</code> para género
+    (<code class="inline">{genero, select, female {ella} male {él} other {le}}</code>) y, sobre todo,
+    <strong>interpolación con posición libre</strong>: el traductor decide dónde caen las variables
+    dentro de su frase. "Añadiste {producto} a {lista}" en otro idioma puede necesitar el orden
+    inverso; si tu sistema concatena <code class="inline">"Añadiste " + producto + " a " + lista</code>
+    ese idioma queda roto para siempre. El mensaje se entrega con marcadores nombrados
+    (<code class="inline">{producto}</code>) y el motor los sustituye al final.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">RTL <span>· árabe, hebreo, persa, urdu</span></p>
+    <p>En estos idiomas la interfaz se refleja como en un espejo: el menú a la derecha, la flecha de
+    "atrás" apunta a la derecha, el progreso avanza hacia la izquierda. Se activa con
+    <code class="inline">&lt;html dir="rtl"&gt;</code>, pero solo funciona si el CSS usa
+    <strong>propiedades lógicas</strong>: <code class="inline">margin-inline-start</code> en vez de
+    <code class="inline">margin-left</code>, <code class="inline">padding-inline</code>,
+    <code class="inline">inset-inline-end</code>, <code class="inline">text-align: start</code>. Con
+    propiedades físicas (<code class="inline">left</code>, <code class="inline">right</code>) hay que
+    mantener dos hojas de estilo. Los iconos direccionales (flechas, "responder", lápiz de "editar"
+    a veces) se espejan con <code class="inline">transform: scaleX(-1)</code> bajo
+    <code class="inline">[dir="rtl"]</code>; los que no tienen dirección (una lupa, un corazón) se
+    dejan igual. Los números y el código embebido siguen siendo LTR dentro del texto RTL: eso lo
+    maneja el algoritmo bidireccional de Unicode, con ayuda de
+    <code class="inline">&lt;bdi&gt;</code> para datos de usuario.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Extracción de strings y el flujo con traductores</p>
+    <p>Las cadenas viven en archivos de mensajes por idioma
+    (<code class="inline">es.json</code>, <code class="inline">ar.json</code>…). Cada entrada tiene
+    una <strong>clave</strong>. Dos escuelas: clave semántica
+    (<code class="inline">checkout.payButton</code>) o el texto por defecto como clave
+    (<code class="inline">"Pagar ahora"</code>). La primera aguanta cambios de redacción sin
+    re-traducir; la segunda es más legible en el código y detecta huérfanos al instante. En
+    cualquier caso, el traductor necesita <strong>contexto</strong>: un comentario que diga si
+    "Post" es el sustantivo (publicación) o el verbo (publicar), dónde aparece, si hay límite de
+    caracteres. Una herramienta de extracción recorre el código, saca las claves a un formato que
+    la plataforma de traducción entiende, y marca lo nuevo y lo que quedó sin usar. Un
+    <em>pseudo-locale</em> (acentos falsos y texto alargado un 40%) en CI destapa strings
+    hardcodeados y layouts que no aguantan antes de encargar la traducción.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Carga de bundles por idioma</p>
+    <p>Un usuario necesita un idioma, no cuarenta. Los mensajes de cada locale se cargan por
+    <code class="inline">import()</code> dinámico según el idioma resuelto, y solo ese archivo viaja
+    al cliente. Los datos de <code class="inline">Intl</code> ya van en el navegador, así que no se
+    empaquetan. En SSR, el servidor renderiza directamente en el idioma correcto (no un idioma y
+    luego cambio en cliente, que causa parpadeo y CLS). Se precarga el locale por defecto y se
+    difieren los demás.</p>
+  </div>
+
+  <div class="diagram">RESOLVER EL IDIOMA DEL USUARIO           ANCHO DEL TEXTO POR IDIOMA (misma etiqueta)
+─────────────────────────────           ──────────────────────────────────────────
+
+  1. preferencia guardada (perfil/cookie)      EN  │Settings│              (base)
+        │  no hay                               ES  │Ajustes │              −10 %
+        ▼                                       DE  │Einstellungen│         +90 %  ◄── el botón revienta
+  2. prefijo de la URL  /es/ /ar/               FR  │Paramètres│            +40 %
+        │  no hay                               JA  │設定│                  −60 %
+        ▼                                       RU  │Настройки│             +30 %
+  3. cabecera Accept-Language del navegador
+        │  no coincide con ninguno soportado    regla: diseñar con la cadena más larga,
+        ▼                                       nunca fijar el ancho al texto en inglés
+  4. idioma por defecto del producto
+</div>
+
+  <div class="note rust">
+    <span class="label">Trampas que se repiten en cada proyecto</span>
+    <p><strong>Concatenar</strong> fragmentos traducidos para armar una frase — se rompe en cuanto
+    el orden de palabras cambia. <strong>Hardcodear formatos</strong> —
+    <code class="inline">`${d.getDate()}/${d.getMonth()+1}`</code> asume DD/MM y decimales con
+    punto. <strong>Fijar tamaños al texto en inglés</strong> — el alemán crece ~30–35 % de media y
+    títulos cortos mucho más; el botón, la pestaña y el <em>tooltip</em> tienen que estirarse.
+    <strong>Usar el locale del servidor</strong> para formatear lo que ve el usuario, en vez del
+    suyo. <strong>Olvidar el <code class="inline">lang</code></strong> en
+    <code class="inline">&lt;html&gt;</code>, que afecta a la separación silábica, a la voz del
+    lector de pantalla y a las comillas tipográficas. <strong>SEO multiidioma sin
+    <code class="inline">hreflang</code></strong>: cada versión traducida necesita etiquetas
+    <code class="inline">&lt;link rel="alternate" hreflang="es"&gt;</code> que se apunten entre sí
+    (y una <code class="inline">x-default</code>), URLs distintas por idioma y un
+    <code class="inline">sitemap</code> que las liste, o Google trata las traducciones como
+    contenido duplicado.</p>
+  </div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Necesidad</th><th>API nativa</th><th>Qué resuelve que no debes hacer a mano</th></tr></thead>
+    <tbody>
+      <tr><td>Fecha y hora</td><td><code class="inline">Intl.DateTimeFormat</code></td><td>Orden de campos, nombres de mes, calendario, zona horaria, 12/24 h</td></tr>
+      <tr><td>Números</td><td><code class="inline">Intl.NumberFormat</code></td><td>Separador de miles y decimales, dígitos por grupo, notación compacta ("1,2 M")</td></tr>
+      <tr><td>Moneda</td><td><code class="inline">Intl.NumberFormat</code> <code class="inline">style:'currency'</code></td><td>Posición y forma del símbolo, decimales propios de cada divisa</td></tr>
+      <tr><td>Tiempo relativo</td><td><code class="inline">Intl.RelativeTimeFormat</code></td><td>"hace 2 h", "en 3 días" con la gramática correcta</td></tr>
+      <tr><td>Plurales</td><td><code class="inline">Intl.PluralRules</code> + ICU</td><td>Las 1 a 6 categorías por idioma, no "singular/plural"</td></tr>
+      <tr><td>Listas</td><td><code class="inline">Intl.ListFormat</code></td><td>"A, B y C" / "A, B, and C" / conjunción vs disyunción</td></tr>
+      <tr><td>Ordenar y buscar</td><td><code class="inline">Intl.Collator</code></td><td>Acentos, ñ, mayúsculas, orden alfabético local</td></tr>
+      <tr><td>Cortar por palabra/frase</td><td><code class="inline">Intl.Segmenter</code></td><td>Idiomas sin espacios (japonés, tailandés), emoji, truncado correcto</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="design-systems">
+  <span class="sec-num">11</span>
+  <h2>Design systems y design tokens</h2>
+  <p class="lead">
+    Un design system no es una carpeta de componentes de React. Es el contrato compartido entre
+    diseño y desarrollo —los valores, los nombres, las reglas de uso y la manera de versionarlos—
+    que hace que dos personas construyendo dos pantallas distintas produzcan algo que parece el
+    mismo producto.
+  </p>
+
+  <div class="concept">
+    <p class="term">Qué es un design system de verdad</p>
+    <p>Cuatro capas, y la librería de componentes es solo una: <strong>(1) fundamentos</strong> —
+    color, tipografía, espaciado, radios, sombras, movimiento— expresados como valores nombrados;
+    <strong>(2) componentes</strong> — la implementación de botón, campo, modal, con sus estados y
+    su marcado accesible; <strong>(3) guías de uso</strong> — cuándo va un botón primario y cuándo
+    uno secundario, qué tono usa un mensaje de error, cómo se escribe un <em>placeholder</em>;
+    <strong>(4) gobernanza</strong> — quién decide, cómo se propone un cambio, cómo se publica y se
+    comunica. Sin (3) y (4), un equipo grande diverge en meses aunque tenga los componentes.</p>
+    <p class="why"><b>por qué importa</b>Los proyectos que "montan un design system" y solo hacen la
+    librería de componentes acaban con veinte tonos de gris y cuatro estilos de botón igualmente,
+    porque nada impedía inventárselos.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Design tokens <span>· los valores con nombre</span></p>
+    <p>Un token es un par nombre → valor que sustituye a los números mágicos del CSS.
+    <code class="inline">color-blue-600 = #1d4ed8</code>. Se declaran una vez, en un formato neutral,
+    y una herramienta los transforma a lo que cada plataforma necesita: custom properties de CSS,
+    constantes de JS, XML de Android, un archivo de iOS. Cambiar el azul de marca es cambiar un
+    token y republicar, no un <em>find-and-replace</em> por cientos de archivos.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Las tres capas: primitivo → semántico → de componente</p>
+    <p><strong>Primitivos</strong> (o "globales"): la paleta cruda, sin significado —
+    <code class="inline">blue-100 … blue-900</code>, <code class="inline">space-1 … space-12</code>.
+    Nadie los usa directo en un componente. <strong>Semánticos</strong> (o "de alias"): le dan
+    intención — <code class="inline">color-bg-surface</code>,
+    <code class="inline">color-text-danger</code>, <code class="inline">color-border-focus</code>,
+    <code class="inline">space-inset-md</code>. Apuntan a un primitivo.
+    <strong>De componente</strong>: el más específico, opcional —
+    <code class="inline">button-primary-bg</code>, <code class="inline">input-border-invalid</code>—
+    y apunta a un semántico. La regla: un componente consume tokens semánticos o de componente,
+    nunca primitivos.</p>
+    <p class="why"><b>por qué importa</b>Esta indirección es lo que hace posible el tema oscuro y
+    los temas de marca sin tocar un solo componente: se cambia a qué primitivo apunta cada
+    semántico y todo se recolorea.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El formato estándar: W3C / DTCG</p>
+    <p>El Design Tokens Community Group del W3C publicó su primera versión estable en octubre de
+    2025. Define una forma común: un token es un objeto con <code class="inline">$value</code> y
+    <code class="inline">$type</code> (<code class="inline">color</code>,
+    <code class="inline">dimension</code>, <code class="inline">fontFamily</code>,
+    <code class="inline">duration</code>…), y un token puede <strong>referenciar</strong> a otro por
+    su ruta (<code class="inline">"$value": "{color.blue.600}"</code>) — que es justo lo que
+    permite la capa semántica. Con ese formato, Figma, Tokens Studio, Style Dictionary, Terrazzo y
+    otras herramientas leen y escriben el mismo archivo, así que un token definido una vez viaja
+    entre diseño y código sin un exportador a medida por cada destino.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Temas como remapeo de tokens semánticos</p>
+    <p>Claro/oscuro, marca A/marca B, densidad cómoda/compacta: cada tema es un conjunto de valores
+    para los <em>mismos</em> tokens semánticos. En CSS suele implementarse con custom properties
+    redefinidas bajo un selector (<code class="inline">:root</code>,
+    <code class="inline">[data-theme="dark"]</code>, <code class="inline">@media (prefers-color-scheme)</code>).
+    El componente escribe <code class="inline">background: var(--color-bg-surface)</code> y no sabe
+    ni le importa en qué tema está. Añadir un tercer tema es una hoja de valores nueva, cero
+    cambios en componentes.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Storybook <span>· catálogo vivo</span></p>
+    <p>Storybook renderiza cada componente aislado, en todos sus estados, fuera de la app. Cada
+    <em>story</em> es una combinación de props ("Botón / primario / cargando"). Sirve tres
+    propósitos a la vez: <strong>documentación</strong> que no se desactualiza porque es el
+    componente real; <strong>banco de pruebas</strong> visual mientras lo construyes, sin navegar
+    por la app hasta el estado que te interesa; y <strong>fixtures de test</strong> — las mismas
+    stories las consumen la regresión visual, los tests de interacción (el <em>play function</em>
+    ejecuta clics y aserciones) y el escaneo de accesibilidad. Addons habituales: el de a11y
+    (axe sobre cada story), <em>controls</em> (editar props en vivo), <em>interactions</em> (paso a
+    paso del play function). Storybook 9 (2025) integró ese testing con Vitest y adelgazó bastante
+    el paquete.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El contrato con diseño</p>
+    <p>El design system funciona cuando diseño y código comparten <strong>vocabulario</strong>: si
+    en Figma la variable se llama <code class="inline">bg/surface/raised</code> y en el código
+    <code class="inline">color-bg-surface-raised</code>, una conversación sobre "el fondo de las
+    tarjetas" no necesita traducción. Las <strong>Figma variables</strong> mapean casi uno a uno
+    con los tokens DTCG, y hay flujos que sincronizan en ambos sentidos. Falta acordar
+    <strong>quién es dueño de qué</strong>: normalmente diseño posee los valores de los tokens y
+    las guías de uso; desarrollo posee la implementación, la API de los componentes y la
+    accesibilidad; y los cambios que cruzan la frontera (un token nuevo, un componente nuevo) pasan
+    por una propuesta que ambos revisan.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Versionado, publicación y migraciones</p>
+    <p>El design system se distribuye como uno o varios paquetes con versionado semántico. Un
+    cambio que rompe la API de un componente o renombra un token es <em>major</em> y llega con
+    <strong>changelog</strong> y, si se puede, un <em>codemod</em> que actualiza el código
+    consumidor automáticamente. Los tokens se publican también como paquete para que un rebranding
+    se propague por <code class="inline">npm update</code>. Sin esta disciplina, cada equipo fija su
+    versión, deja de actualizar y a los seis meses hay cinco versiones del sistema conviviendo, que
+    es peor que no tener sistema.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cuándo NO construir uno propio</p>
+    <p>Un design system completo es un producto con equipo dedicado, roadmap y mantenimiento
+    indefinido. Para la mayoría de proyectos —un equipo, un producto, sin necesidad de identidad
+    visual única— la respuesta es partir de primitivas de comportamiento sin estilo (Radix UI, React
+    Aria, Ark) o de un kit ya montado sobre ellas (shadcn/ui, que copias a tu repo y modificas), y
+    definir <em>solo</em> tu capa de tokens encima. Construir botón, <em>combobox</em>, <em>date
+    picker</em> y <em>dialog</em> accesibles desde cero cuesta meses y sale peor que lo que ya
+    existe probado. Un design system propio se justifica cuando hay varios productos que compartir,
+    una marca que expresar con precisión, o una plataforma (móvil + web + terceros) que unificar.</p>
+    <p class="why"><b>por qué importa</b>El error caro no es elegir mal la librería, es decidir
+    construir la base entera cuando el problema real eran cinco componentes y una paleta.</p>
+  </div>
+
+  <div class="diagram">FLUJO DE UN TOKEN                              LAS TRES CAPAS
+────────────────                              ─────────────
+
+Figma variables ──┐                           primitivo    color-blue-600  = #1d4ed8
+                  ├─► tokens.json (DTCG)                        │  (valor crudo, sin significado)
+  edición manual ─┘         │                                   ▼
+                            ▼                  semántico    color-bg-accent = {color.blue.600}
+                   transformador                                │  (intención; lo que cambia por tema)
+                   (Style Dictionary / Terrazzo)                ▼
+                       │      │      │         de componente  button-primary-bg = {color.bg.accent}
+                       ▼      ▼      ▼                          │  (opcional, el más específico)
+                  CSS vars  JS/TS  Android/iOS                  ▼
+                       │                        el componente:  background: var(--button-primary-bg)
+                       ▼                                         nunca toca un primitivo
+              tema claro / oscuro / marca
+              = remapear los semánticos
+</div>
+
+  <div class="note">
+    <span class="label">Señal de que el sistema está vivo (o muerto)</span>
+    <p>Vivo: los tokens semánticos crecen despacio y los primitivos casi no cambian; los PR de
+    producto usan componentes del sistema sin envolver ni parchear; hay un canal donde se proponen
+    cambios y un changelog que la gente lee. Muerto: proliferan los
+    <code class="inline">style={{ marginTop: 13 }}</code> y los
+    <code class="inline">!important</code> sobre componentes del sistema, cada equipo tiene su
+    "wrapper" del botón, y la última versión publicada es de hace meses. Un design system sin
+    gobernanza es documentación que envejece.</p>
+  </div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Capa del token</th><th>Ejemplo</th><th>Quién lo usa</th><th>Cambia cuando…</th></tr></thead>
+    <tbody>
+      <tr><td>Primitivo / global</td><td><code class="inline">blue-600</code>, <code class="inline">space-4</code>, <code class="inline">radius-lg</code></td><td>Solo la capa semántica</td><td>Se rehace la escala base (raro)</td></tr>
+      <tr><td>Semántico / alias</td><td><code class="inline">color-text-danger</code>, <code class="inline">color-bg-surface</code></td><td>Los componentes y las utilidades</td><td>Se define un tema nuevo o cambia una intención</td></tr>
+      <tr><td>De componente</td><td><code class="inline">button-primary-bg</code>, <code class="inline">input-border-invalid</code></td><td>Un único componente</td><td>Ese componente necesita desviarse del semántico</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Situación</th><th>Qué usar</th></tr></thead>
+    <tbody>
+      <tr><td>Un producto, un equipo, sin marca visual propia</td><td>Radix/React Aria + shadcn/ui + tu capa de tokens</td></tr>
+      <tr><td>Varios productos que deben verse iguales</td><td>Design system propio como paquete versionado</td></tr>
+      <tr><td>Prototipo o MVP</td><td>Una librería con estilo incluido (Mantine, MUI, Chakra); refactor después si crece</td></tr>
+      <tr><td>Web + móvil nativo + partners externos</td><td>Tokens DTCG como fuente única + implementación por plataforma</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+
+
+      <section class="block" id="curriculo">
+        <span class="sec-num">12</span>
+        <h2>Currículo: libros y cursos</h2>
+        <p class="lead">
+          Guía media: menos volumen que las hermanas de seguridad y devops. Elige uno por etapa
+          según lo que estés construyendo. <span class="rl-tag free">gratis</span> es libre o
+          legalmente gratuito online; <span class="rl-tag paid">pago</span> cuesta;
+          <span class="rl-tag lvl">nivel</span> indica dificultad.
+        </p>
+
+        <div class="stage">
+          <h4>Etapa 0 · La plataforma web de verdad</h4>
+          <p>Antes de cualquier framework: cómo funciona lo que el framework abstrae.</p>
+          <div class="book"><span class="t">MDN Web Docs</span> — <span class="a">Mozilla</span> <span class="rl-tag free">gratis</span><span class="d">La referencia de HTML, CSS y las APIs del navegador. Sus "Learn" son un curso completo y honesto. En <a href="https://developer.mozilla.org/en-US/" target="_blank" rel="noopener">MDN Web Docs</a>.</span></div>
+          <div class="book"><span class="t">web.dev/learn</span> — <span class="a">Google</span> <span class="rl-tag free">gratis</span><span class="d">Cursos por tema (CSS, Responsive, Accessibility, Performance, Images, PWA), cortos y actualizados. En <a href="https://web.dev/learn" target="_blank" rel="noopener">web.dev/learn</a>.</span></div>
+          <div class="book"><span class="t">Inside look at modern web browser</span> — <span class="a">serie de Google, 4 partes</span> <span class="rl-tag free">gratis</span><span class="d">Cómo el navegador convierte una URL en píxeles: procesos, hilos, el pipeline de render. Ilustrado. En <a href="https://developer.chrome.com/blog/inside-browser-part1/" target="_blank" rel="noopener">Chrome for Developers</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 1 · JavaScript a fondo</h4>
+          <div class="book"><span class="t">You Don't Know JS Yet</span> — <span class="a">Kyle Simpson</span> <span class="rl-tag free">gratis</span><span class="d">Las partes raras del lenguaje explicadas de verdad. Gratis en <a href="https://github.com/getify/You-Dont-Know-JS" target="_blank" rel="noopener">GitHub</a>.</span></div>
+          <div class="book"><span class="t">javascript.info</span> — <span class="a">Ilya Kantor</span> <span class="rl-tag free">gratis</span><span class="d">El tutorial moderno de JavaScript más completo. Del cero a asincronía y prototipos. En <a href="https://javascript.info" target="_blank" rel="noopener">javascript.info</a>.</span></div>
+          <div class="book"><span class="t">JavaScript: The Definitive Guide, 7ª ed.</span> — <span class="a">David Flanagan</span> <span class="rl-tag lvl">referencia</span><span class="d">Para consultar. Cubre el lenguaje y las APIs del navegador con rigor. En <a href="https://www.oreilly.com/library/view/javascript-the-definitive/9781491952016/" target="_blank" rel="noopener">O'Reilly</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 2 · CSS moderno</h4>
+          <div class="book"><span class="t">CSS in Depth, 2ª ed.</span> — <span class="a">Keith J. Grant</span> <span class="rl-tag lvl">intermedio</span><span class="d">Cascada, flexbox, grid, custom properties, contención. El libro de CSS que cierra los huecos. En <a href="https://www.manning.com/books/css-in-depth-second-edition" target="_blank" rel="noopener">Manning</a>.</span></div>
+          <div class="book"><span class="t">Every Layout</span> — <span class="a">Heydon Pickering &amp; Andy Bell</span> <span class="rl-tag paid">pago</span><span class="d">Primitivas de layout que se resuelven solas, sin media queries. Cambia cómo piensas el CSS responsivo. En <a href="https://every-layout.dev" target="_blank" rel="noopener">every-layout.dev</a>.</span></div>
+          <div class="book"><span class="t">defensivecss.dev</span> — <span class="a">Ahmad Shadeed</span> <span class="rl-tag free">gratis</span><span class="d">Colección de casos donde el CSS "se rompe" con contenido real y cómo blindarlo. En <a href="https://defensivecss.dev" target="_blank" rel="noopener">defensivecss.dev</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 3 · Un framework a fondo</h4>
+          <p>Elige uno y entiéndelo de verdad. No colecciones.</p>
+          <div class="book"><span class="t">react.dev</span> — <span class="a">docs oficiales de React</span> <span class="rl-tag free">gratis</span><span class="d">La reescritura de 2023 enseña el modelo mental (estado, efectos, cuándo re-renderiza), no solo la API. En <a href="https://react.dev" target="_blank" rel="noopener">react.dev</a>.</span></div>
+          <div class="book"><span class="t">The Road to React</span> — <span class="a">Robin Wieruch</span> <span class="rl-tag lvl">principiante</span><span class="d">Si React. Construyes una app real desde cero explicando cada decisión. En <a href="https://www.roadtoreact.com" target="_blank" rel="noopener">roadtoreact.com</a>.</span></div>
+          <div class="book"><span class="t">Docs de Svelte / Vue / Solid</span> — <span class="a">oficiales</span> <span class="rl-tag free">gratis</span><span class="d">Si eliges otro. Los tutoriales interactivos de Svelte y Solid son de los mejores que existen. En <a href="https://svelte.dev/docs" target="_blank" rel="noopener">Svelte</a>, <a href="https://vuejs.org/guide/introduction.html" target="_blank" rel="noopener">Vue</a> o <a href="https://docs.solidjs.com" target="_blank" rel="noopener">Solid</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 4 · Accesibilidad</h4>
+          <div class="book"><span class="t">web.dev/learn/accessibility</span> — <span class="a">Google</span> <span class="rl-tag free">gratis</span><span class="d">Curso completo y práctico. El mejor punto de entrada. En <a href="https://web.dev/learn/accessibility" target="_blank" rel="noopener">web.dev</a>.</span></div>
+          <div class="book"><span class="t">Inclusive Components</span> — <span class="a">Heydon Pickering</span> <span class="rl-tag free">gratis</span><span class="d">Cómo construir cada componente común (tabs, menús, cards, modales) accesible desde el diseño. Gratis online. En <a href="https://inclusive-components.design" target="_blank" rel="noopener">inclusive-components.design</a>.</span></div>
+          <div class="book"><span class="t">ARIA Authoring Practices Guide (APG)</span> — <span class="a">W3C</span> <span class="rl-tag free">gratis</span><span class="d">Patrones de referencia con el teclado y los roles correctos para cada widget. En <a href="https://www.w3.org/WAI/ARIA/apg/" target="_blank" rel="noopener">w3.org</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 5 · Rendimiento</h4>
+          <div class="book"><span class="t">web.dev/vitals + web.dev/learn/performance</span> — <span class="a">Google</span> <span class="rl-tag free">gratis</span><span class="d">La fuente sobre Core Web Vitals: qué son, cómo se miden, cómo se arreglan. En <a href="https://web.dev/articles/vitals" target="_blank" rel="noopener">web.dev/vitals</a> y <a href="https://web.dev/learn/performance" target="_blank" rel="noopener">web.dev/learn/performance</a>.</span></div>
+          <div class="book"><span class="t">High Performance Browser Networking</span> — <span class="a">Ilya Grigorik</span> <span class="rl-tag free">gratis</span><span class="d">TCP, TLS, HTTP/2 y 3 con foco en rendimiento real. Gratis online. (Ya recomendado en la guía de backend.) En <a href="https://hpbn.co" target="_blank" rel="noopener">hpbn.co</a>.</span></div>
+          <div class="book"><span class="t">infrequently.org</span> — <span class="a">Alex Russell</span> <span class="rl-tag free">gratis</span><span class="d">Ensayos con datos sobre el costo real del JavaScript en dispositivos que no son el tuyo. En <a href="https://infrequently.org" target="_blank" rel="noopener">infrequently.org</a>.</span></div>
+        </div>
+
+        
+<div class="stage">
+          <h4>Etapa 6 · Testing de front-end</h4>
+          <p>Del "por qué" al "cómo": la filosofía primero, después la herramienta.</p>
+          <div class="book"><span class="t">The Testing Trophy and Testing Classifications</span> — <span class="a">Kent C. Dodds</span> <span class="rl-tag free">gratis</span><span class="d">El ensayo que fija el modelo mental: qué nivel de test da más confianza por lo que cuesta mantenerlo. Léelo antes de escribir un solo test. En <a href="https://kentcdodds.com/blog/the-testing-trophy-and-testing-classifications" target="_blank" rel="noopener">kentcdodds.com</a>.</span></div>
+          <div class="book"><span class="t">Common mistakes with React Testing Library</span> — <span class="a">Kent C. Dodds</span> <span class="rl-tag free">gratis</span><span class="d">La lista de anti-patrones concretos (querySelector, testid abusivo, act mal usado, fireEvent en vez de userEvent). Vuelve a él cada vez que un test te pelee. En <a href="https://kentcdodds.com/blog/common-mistakes-with-react-testing-library" target="_blank" rel="noopener">kentcdodds.com</a>.</span></div>
+          <div class="book"><span class="t">Testing Library — docs</span> — <span class="a">testing-library.com</span> <span class="rl-tag free">gratis</span><span class="d">La guía de queries por prioridad, userEvent y las recetas por framework. Referencia diaria mientras escribes tests de componente. En <a href="https://testing-library.com/docs/" target="_blank" rel="noopener">testing-library.com</a>.</span></div>
+          <div class="book"><span class="t">Playwright — docs</span> — <span class="a">Microsoft</span> <span class="rl-tag free">gratis</span><span class="d">Auto-waiting, locators por rol, fixtures, trace viewer, shards en CI. La sección "Best Practices" es corta y evita la mayoría de la flakiness. En <a href="https://playwright.dev/docs/intro" target="_blank" rel="noopener">playwright.dev</a>.</span></div>
+          <div class="book"><span class="t">Mock Service Worker — docs</span> — <span class="a">mswjs.io</span> <span class="rl-tag free">gratis</span><span class="d">Cómo interceptar a nivel de red y reusar los mismos handlers en test, Storybook y desarrollo. Cuándo lo entiendes, dejas de escribir servidores mock a mano. En <a href="https://mswjs.io/docs/" target="_blank" rel="noopener">mswjs.io</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 7 · i18n, design systems y métricas</h4>
+          <p>Los temas que aparecen cuando el proyecto crece: más idiomas, más gente tocando la UI, un jefe que mira el ranking.</p>
+          <div class="book"><span class="t">MDN — <code class="inline">Intl</code></span> — <span class="a">Mozilla</span> <span class="rl-tag free">gratis</span><span class="d">La referencia de DateTimeFormat, NumberFormat, PluralRules, RelativeTimeFormat, Collator, Segmenter. Léela una vez entera: te ahorra reinventar el formateo mal. En <a href="https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Intl" target="_blank" rel="noopener">MDN</a>.</span></div>
+          <div class="book"><span class="t">Unicode CLDR y el sitio de ICU</span> — <span class="a">Unicode Consortium</span> <span class="rl-tag free">gratis</span><span class="d">De dónde salen los datos de locale y cómo funciona ICU MessageFormat (plural, select, interpolación posicional). Consúltalo al montar el flujo de mensajes con traductores. En <a href="https://cldr.unicode.org" target="_blank" rel="noopener">cldr.unicode.org</a> e <a href="https://icu.unicode.org" target="_blank" rel="noopener">icu.unicode.org</a>.</span></div>
+          <div class="book"><span class="t">Design Systems</span> — <span class="a">Alla Kholmatova</span> <span class="rl-tag paid">pago</span><span class="d">El libro sobre la parte que no es código: lenguaje compartido, patrones, gobernanza, cómo se mantiene vivo. Cuando pases de "librería de componentes" a "sistema". En <a href="https://www.smashingmagazine.com/design-systems-book/" target="_blank" rel="noopener">Smashing Magazine</a>.</span></div>
+          <div class="book"><span class="t">Storybook — docs</span> — <span class="a">storybook.js.org</span> <span class="rl-tag free">gratis</span><span class="d">Stories, addons (a11y, controls, interactions), testing con el play function. El "Tutorial" oficial monta un catálogo real en una tarde. En <a href="https://storybook.js.org/docs" target="_blank" rel="noopener">storybook.js.org</a>.</span></div>
+          <div class="book"><span class="t">Design Tokens Format Module (DTCG)</span> — <span class="a">W3C Community Group</span> <span class="rl-tag free">gratis</span> <span class="rl-tag lvl">spec</span><span class="d">La especificación (primera versión estable, oct. 2025): la forma de $value/$type y las referencias entre tokens. Léela antes de decidir el formato de tus tokens. En <a href="https://www.designtokens.org/tr/2025.10/format/" target="_blank" rel="noopener">designtokens.org</a>.</span></div>
+          <div class="book"><span class="t">web.dev — Core Web Vitals</span> — <span class="a">Google</span> <span class="rl-tag free">gratis</span><span class="d">La fuente sobre LCP, INP y CLS: qué miden, umbrales oficiales, cómo diagnosticar cada uno. Verifica aquí los números antes de citarlos: la lista de métricas cambia. En <a href="https://web.dev/articles/vitals" target="_blank" rel="noopener">web.dev</a>.</span></div>
+        </div>
+
+<h3>Cursos y práctica (gratis)</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://www.theodinproject.com" target="_blank" rel="noopener">The Odin Project</a></td><td>Currículo full-stack JavaScript completo y gratuito, orientado a proyectos. La ruta más sólida para autodidactas</td></tr>
+            <tr><td><a href="https://www.freecodecamp.org" target="_blank" rel="noopener">freeCodeCamp</a></td><td>Certificaciones gratuitas: Responsive Web Design, JavaScript Algorithms, Front End Libraries</td></tr>
+            <tr><td><a href="https://javascript30.com" target="_blank" rel="noopener">JavaScript30</a></td><td>30 proyectos en vanilla JS, sin frameworks ni librerías. Wes Bos, gratis</td></tr>
+            <tr><td><a href="https://www.frontendmentor.io" target="_blank" rel="noopener">Frontend Mentor</a></td><td>Retos con diseños profesionales (Figma + assets) para maquetar. Del nivel newbie al guru</td></tr>
+            <tr><td><a href="https://flexboxfroggy.com" target="_blank" rel="noopener">Flexbox Froggy</a> · <a href="https://cssgridgarden.com" target="_blank" rel="noopener">Grid Garden</a> · <a href="https://cssbattle.dev" target="_blank" rel="noopener">CSS Battle</a></td><td>Juegos para interiorizar flexbox, grid y CSS a fuerza de repetición</td></tr>
+            <tr><td><a href="https://scrimba.com" target="_blank" rel="noopener">Scrimba</a></td><td>Cursos interactivos (editas el código dentro del video); "Learn React" y varios son gratis</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="block" id="laboratorio">
+        <span class="sec-num">13</span>
+        <h2>Laboratorio: tocar el concepto en el navegador</h2>
+        <p class="lead">
+          Herramientas que corren en la pestaña, sin cuenta ni instalación. Y una obligatoria que
+          ya tienes instalada: las DevTools.
+        </p>
+        <div class="note">
+          <span class="label">El laboratorio principal son las DevTools</span>
+          <p>Pestaña <strong>Rendering</strong> de Chrome DevTools: activa <em>Paint flashing</em>
+          (qué se repinta), <em>Layout Shift Regions</em> (qué causa CLS), <em>Frame Rendering
+          Stats</em>. Pestaña <strong>Performance</strong>: graba una carga y ve el main thread,
+          los long tasks y dónde cae el LCP. <strong>Lighthouse</strong>: audita rendimiento,
+          accesibilidad y prácticas en un clic. Nada de lo de abajo enseña más que esto.</p>
+        </div>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Herramienta</th><th>Qué concepto de la guía vuelve tangible</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://yqnn.github.io/svg-path-editor/" target="_blank" rel="noopener">SvgPathEditor</a></td><td>§1 · §6 — manipular a mano las curvas de un <code class="inline">path</code> SVG y ver el nodo en el DOM que las representa</td></tr>
+            <tr><td><a href="https://www.tldraw.com/" target="_blank" rel="noopener">tldraw</a> · <a href="https://excalidraw.com" target="_blank" rel="noopener">Excalidraw</a></td><td>§1 · §3 — un motor de canvas con su propio árbol de nodos y estado; local-first, todo en el cliente</td></tr>
+            <tr><td><a href="https://squoosh.app/" target="_blank" rel="noopener">Squoosh</a></td><td>§8 — comparar AVIF, WebP y JPEG en calidad y peso lado a lado; el mayor factor de LCP en la práctica</td></tr>
+            <tr><td><a href="https://www.glyphrstudio.com/" target="_blank" rel="noopener">Glyphr Studio</a></td><td>§8 — cómo se construye una fuente (glifos, métricas, hinting); por qué cargar una pesa y desplaza texto</td></tr>
+            <tr><td><a href="https://www.realtimecolors.com" target="_blank" rel="noopener">Realtime Colors</a> · <a href="https://coolors.co" target="_blank" rel="noopener">Coolors</a></td><td>§6 — probar una paleta sobre una maqueta real y ver el contraste (WCAG) al instante</td></tr>
+            <tr><td><a href="https://webllm.mlc.ai/" target="_blank" rel="noopener">WebLLM</a></td><td>§5 — WebGPU + Web Workers: cómputo pesado fuera del main thread, sin congelar la interfaz</td></tr>
+            <tr><td><a href="https://component.gallery/" target="_blank" rel="noopener">The Component Gallery</a></td><td>§3 · §7 — anatomía de componentes reales de design systems, con su marcado accesible</td></tr>
+            <tr><td><a href="https://caniuse.com" target="_blank" rel="noopener">Can I Use</a></td><td>§5 · §8 — qué feature soporta cada navegador; decidir el baseline y qué polyfills valen su peso</td></tr>
+            <tr><td><a href="https://vscode.dev" target="_blank" rel="noopener">vscode.dev</a></td><td>§4 — una PWA completa: service worker, funcionamiento offline, File System Access. El modelo "app instalable" en vivo</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Front-end de Punta a Punta</strong> — guía de estudio hermana de
+    <em>Backend</em>, <em>Seguridad</em> y <em>DevOps de Punta a Punta</em>. Profundidad media:
+    el modelo mental del navegador y del framework, no un manual exhaustivo.</p>
+    <p>El ecosistema de front-end cambia rápido (frameworks, bundlers, nombres de métricas);
+    los conceptos de las secciones 1 a 8 —cómo pinta el navegador, qué es hidratar, la cascada,
+    el árbol de accesibilidad— son estables. Verifica versiones y umbrales oficiales antes de
+    decidir. Los libros y cursos son referencia amplia, no una lista cerrada.</p>
+  </div>
+</footer>

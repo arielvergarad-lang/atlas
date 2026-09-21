@@ -1,0 +1,2366 @@
+<title>DevOps de Punta a Punta</title>
+<meta name="description" content="Guía de estudio densa de DevOps e infraestructura para autodidactas: métricas DORA, control de versiones a escala, CI/CD a fondo, contenedores por dentro, Kubernetes, infraestructura como código, redes cloud, observabilidad, config y secretos, y FinOps — más un currículo de libros y cursos y un laboratorio sin registro.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+  :root[data-theme="dark"] {
+    --ground: #14161a;
+    --surface: #1c1f25;
+    --surface-2: #23272e;
+    --ink: #e7e5df;
+    --ink-soft: #b9bdc6;
+    --muted: #8b919c;
+    --line: #333842;
+    --line-soft: #2a2f37;
+    --accent: #4bb7a8;
+    --accent-soft: #16302d;
+    --accent-ink: #7fd3c7;
+    --rust: #d98a5f;
+    --rust-soft: #35241b;
+    --code-bg: #10131a;
+    --code-ink: #d9e2ec;
+    --code-comment: #7b8798;
+    --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0;
+    background: var(--ground);
+    color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px;
+    line-height: 1.65;
+    -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-inner { padding: clamp(2.4rem, 6vw, 4.2rem) 0 clamp(2rem, 5vw, 3rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif;
+    font-weight: 600; font-size: clamp(2.1rem, 6vw, 3.4rem);
+    line-height: 1.08; letter-spacing: -0.015em; text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0; }
+  .meta-row { margin-top: 1.8rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { display: grid; grid-template-columns: 1fr; gap: 2.5rem; padding: clamp(2rem, 5vw, 3.5rem) 0 5rem; }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: 244px minmax(0, 1fr); gap: 3.5rem; align-items: start; }
+  }
+
+  nav.toc { position: sticky; top: 1.5rem; align-self: start; font-size: 0.88rem; border-left: 2px solid var(--line); padding-left: 1rem; max-height: calc(100vh - 3rem); overflow-y: auto; }
+  nav.toc p {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.68rem; letter-spacing: 0.14em;
+    text-transform: uppercase; color: var(--muted); margin: 0 0 0.7rem;
+  }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; counter-reset: toc; display: flex; flex-direction: column; gap: 0.1rem; }
+  nav.toc a {
+    display: block; padding: 0.3rem 0.4rem; color: var(--ink-soft); text-decoration: none;
+    border-radius: 5px; counter-increment: toc; transition: background 0.15s, color 0.15s;
+  }
+  nav.toc a::before {
+    content: counter(toc, decimal-leading-zero); font-family: "IBM Plex Mono", ui-monospace, monospace;
+    font-size: 0.72rem; color: var(--muted); margin-right: 0.55rem;
+  }
+  nav.toc a:hover { background: var(--surface-2); color: var(--ink); }
+  nav.toc a:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+  @media (max-width: 979px) {
+    nav.toc {
+      position: static; border-left: none; border: 1px solid var(--line); border-radius: 10px;
+      padding: 1.1rem 1.2rem; background: var(--surface); max-height: none;
+    }
+    nav.toc ol { display: grid; grid-template-columns: 1fr 1fr; gap: 0.1rem 1rem; }
+  }
+
+  main { min-width: 0; }
+  section.block { scroll-margin-top: 2rem; padding-top: 1rem; }
+  section.block + section.block { margin-top: 3.4rem; border-top: 1px solid var(--line-soft); padding-top: 2.6rem; }
+  .sec-num { font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; letter-spacing: 0.1em; color: var(--accent-ink); }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.55rem, 4vw, 2.1rem);
+    line-height: 1.15; letter-spacing: -0.01em; text-wrap: balance; margin: 0.3rem 0 1rem;
+  }
+  h3 { font-family: "IBM Plex Sans", sans-serif; font-weight: 600; font-size: 1.16rem; margin: 2rem 0 0.6rem; letter-spacing: -0.005em; }
+  h4 {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.86rem;
+    letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-soft); margin: 1.4rem 0 0.5rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  main a { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  strong { font-weight: 600; }
+  .lead { font-size: 1.08rem; color: var(--ink-soft); max-width: 66ch; }
+  ul, ol.body-list { max-width: 68ch; padding-left: 1.2rem; margin: 0 0 1rem; }
+  li { margin: 0.35rem 0; }
+
+  code.inline {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.86em; background: var(--surface-2);
+    border: 1px solid var(--line-soft); border-radius: 4px; padding: 0.08em 0.36em; color: var(--ink);
+  }
+  pre {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; background: var(--code-bg); color: var(--code-ink);
+    font-size: 0.82rem; line-height: 1.6; padding: 1rem 1.15rem; border-radius: 9px; overflow-x: auto;
+    margin: 0 0 1.2rem; border: 1px solid rgba(255,255,255,0.06);
+  }
+  pre .c { color: var(--code-comment); }
+
+  .table-scroll { overflow-x: auto; margin: 0 0 1.4rem; border: 1px solid var(--line); border-radius: 10px; }
+  table { border-collapse: collapse; width: 100%; font-size: 0.9rem; background: var(--surface); }
+  th, td { text-align: left; padding: 0.6rem 0.85rem; border-bottom: 1px solid var(--line-soft); vertical-align: top; }
+  th {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.05em;
+    text-transform: uppercase; color: var(--muted); background: var(--surface-2); position: sticky; top: 0;
+  }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--ink); }
+
+  .concept { border: 1px solid var(--line); border-radius: 10px; background: var(--surface); padding: 1.1rem 1.25rem; margin: 0 0 0.9rem; }
+  .concept .term {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-weight: 600; font-size: 0.95rem;
+    color: var(--accent-ink); margin: 0 0 0.35rem;
+  }
+  .concept .term span { color: var(--muted); font-weight: 400; }
+  .concept p { margin: 0.4rem 0 0; font-size: 0.95rem; }
+  .concept p:first-of-type { margin-top: 0; }
+  .concept .why { margin-top: 0.55rem; padding-top: 0.55rem; border-top: 1px dashed var(--line); font-size: 0.9rem; color: var(--ink-soft); }
+  .concept .why b {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--muted); display: block; margin-bottom: 0.1rem;
+  }
+
+  .note {
+    border-left: 3px solid var(--accent); background: var(--accent-soft); padding: 0.85rem 1.1rem;
+    border-radius: 0 8px 8px 0; margin: 0 0 1.3rem; font-size: 0.94rem;
+  }
+  .note.rust { border-left-color: var(--rust); background: var(--rust-soft); }
+  .note p { margin: 0; max-width: none; }
+  .note p + p { margin-top: 0.5rem; }
+  .note .label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--accent-ink); display: block; margin-bottom: 0.25rem;
+  }
+  .note.rust .label { color: var(--rust); }
+
+  .diagram {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.78rem; line-height: 1.5;
+    background: var(--surface); border: 1px solid var(--line); border-radius: 9px; padding: 1rem 1.15rem;
+    overflow-x: auto; white-space: pre; color: var(--ink-soft); margin: 0 0 1.3rem;
+  }
+
+  .chip {
+    display: inline-block; font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em;
+    text-transform: uppercase; padding: 0.12rem 0.45rem; border-radius: 4px; white-space: nowrap;
+  }
+  .chip.t1 { background: var(--accent-soft); color: var(--accent-ink); }
+
+  /* Reading list */
+  .stage { border: 1px solid var(--line); border-radius: 11px; background: var(--surface); padding: 1.15rem 1.3rem; margin: 0 0 1rem; }
+  .stage > h4 { margin: 0 0 0.6rem; color: var(--accent-ink); border-bottom: 1px solid var(--line-soft); padding-bottom: 0.5rem; }
+  .stage > p { font-size: 0.92rem; color: var(--ink-soft); margin: 0 0 0.7rem; }
+  .book { padding: 0.5rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  .book:last-child { border-bottom: none; }
+  .book .t { font-family: "IBM Plex Serif", Georgia, serif; font-style: italic; font-weight: 600; }
+  .book .a { color: var(--muted); }
+  .book .d { display: block; color: var(--ink-soft); font-size: 0.88rem; margin-top: 0.1rem; }
+  .rl-tag {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.6rem; letter-spacing: 0.04em; text-transform: uppercase;
+    padding: 0.08rem 0.38rem; border-radius: 3px; margin-left: 0.35rem; white-space: nowrap; vertical-align: 0.08em;
+  }
+  .rl-tag.free { background: var(--accent-soft); color: var(--accent-ink); }
+  .rl-tag.paid { background: var(--surface-2); color: var(--muted); border: 1px solid var(--line); }
+  .rl-tag.lvl { background: var(--rust-soft); color: var(--rust); }
+
+  .project { border: 1px solid var(--line); border-radius: 12px; background: var(--surface); overflow: hidden; margin: 0 0 1.8rem; box-shadow: var(--shadow); }
+  .project-head { padding: 1.2rem 1.4rem; background: var(--surface-2); border-bottom: 1px solid var(--line); }
+  .project-head .stack {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.74rem; letter-spacing: 0.06em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 0.3rem;
+  }
+  .project-head h3 { margin: 0 0 0.4rem; font-size: 1.28rem; font-family: "IBM Plex Serif", Georgia, serif; }
+  .project-head p { margin: 0; font-size: 0.95rem; color: var(--ink-soft); max-width: none; }
+  .project-body { padding: 0.6rem 1.4rem 1.4rem; }
+  .phase { display: grid; grid-template-columns: auto 1fr; gap: 0.2rem 0.9rem; padding: 0.85rem 0; border-bottom: 1px solid var(--line-soft); }
+  .phase:last-of-type { border-bottom: none; }
+  .phase .pn {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; font-weight: 600; color: var(--accent-ink);
+    background: var(--accent-soft); border-radius: 5px; padding: 0.1rem 0.4rem; height: fit-content; white-space: nowrap;
+  }
+  .phase .pt { font-weight: 600; font-size: 0.95rem; grid-column: 2; }
+  .phase .pd { grid-column: 2; font-size: 0.92rem; color: var(--ink-soft); }
+  .phase .pd code { font-family: "IBM Plex Mono", monospace; font-size: 0.85em; background: var(--surface-2); padding: 0.05em 0.3em; border-radius: 3px; }
+  .learn { margin-top: 1rem; font-size: 0.9rem; background: var(--accent-soft); color: var(--accent-ink); padding: 0.7rem 0.95rem; border-radius: 8px; }
+  .learn b { font-family: "IBM Plex Mono", monospace; font-size: 0.68rem; letter-spacing: 0.08em; text-transform: uppercase; display: block; margin-bottom: 0.15rem; }
+
+  footer.foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.5rem 0 3.5rem; font-size: 0.9rem; color: var(--muted); }
+  footer.foot p { max-width: 66ch; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap masthead-inner">
+    <p class="kicker">Guía de estudio · DevOps e Infraestructura · edición densa</p>
+    <h1>DevOps de Punta a Punta</h1>
+    <p class="standfirst">
+      Cómo el código llega a producción y se mantiene vivo: métricas DORA, control de versiones
+      a escala, CI/CD por dentro, contenedores y Kubernetes, infraestructura como código, redes
+      cloud, observabilidad, secretos y costos — más un currículo ordenado de libros y cursos y
+      un laboratorio para tocar cada concepto en el navegador.
+    </p>
+    <div class="meta-row">
+      <span class="tag">para autodidactas</span>
+      <span class="tag">conceptos &gt; herramientas</span>
+      <span class="tag">15 secciones</span>
+      <span class="tag">~30 libros y cursos</span>
+      <span class="tag">laboratorio sin registro</span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+    <nav class="toc" aria-label="Índice">
+      <p>Índice</p>
+      <ol>
+        <li><a href="#que-es">Qué es DevOps y las métricas DORA</a></li>
+        <li><a href="#vcs">Control de versiones a escala</a></li>
+        <li><a href="#ci">Integración continua a fondo</a></li>
+        <li><a href="#cd">Entrega y despliegue continuos</a></li>
+        <li><a href="#contenedores">Contenedores por dentro</a></li>
+        <li><a href="#orquestacion">Orquestación y Kubernetes</a></li>
+        <li><a href="#iac">Infraestructura como código</a></li>
+        <li><a href="#redes-cloud">Redes cloud</a></li>
+        <li><a href="#observabilidad-ops">Observabilidad y SRE</a></li>
+        <li><a href="#config-secretos">Configuración y secretos</a></li>
+        <li><a href="#finops">Costos y FinOps</a></li>
+        <li><a href="#platform-engineering">Platform engineering</a></li>
+        <li><a href="#multirregion-dr">Multirregión y DR</a></li>
+        <li><a href="#curriculo">Currículo: libros y cursos</a></li>
+        <li><a href="#laboratorio">Laboratorio: tocar el concepto en el navegador</a></li>
+      </ol>
+    </nav>
+
+    <main>
+
+<section class="block" id="que-es">
+  <span class="sec-num">01</span>
+  <h2>DevOps no es un puesto</h2>
+  <p class="lead">
+    DevOps es una forma de organizar el trabajo para que una idea llegue a producción rápido, seguro
+    y sin heroísmos. No es un cargo ni un equipo separado: es quién es dueño de qué, y qué tan corto
+    es el ciclo entre escribir algo y ver cómo se comporta con usuarios reales.
+  </p>
+
+  <div class="concept">
+    <p class="term">El muro entre desarrollo y operaciones <span>· por qué nació</span></p>
+    <p>Durante décadas un equipo escribía el código y otro lo operaba. Sus incentivos eran opuestos:
+    desarrollo cobra por cambiar, operaciones por que nada se mueva. El resultado era un lanzamiento
+    trimestral, doloroso, de noche, con los dos equipos culpándose. DevOps borra ese muro: el que
+    construye también opera, o al menos comparte la responsabilidad y el buscapersonas.</p>
+    <p class="why"><b>por qué importa</b>Sin ownership de punta a punta, nadie siente el costo real
+    de un despliegue frágil, y por lo tanto nadie lo arregla.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Flujo <span>· flow</span></p>
+    <p>La meta es que el trabajo <em>fluya</em> en lotes pequeños y continuos, no en grandes bloques
+    que se acumulan. Un cambio chico que llega solo a producción es fácil de revisar, fácil de
+    revertir y fácil de diagnosticar si algo falla. Diez cambios juntos son un misterio cuando el
+    gráfico se cae.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Bucles de retroalimentación <span>· feedback loops</span></p>
+    <p>Cada etapa devuelve información hacia atrás lo antes posible: el linter en segundos, los tests
+    en minutos, el canary en producción en una hora, las métricas de negocio en un día. Cuanto más
+    tarde llega la señal, más caro es el error. Acortar estos bucles es la actividad central de
+    DevOps.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Las tres vías <span>· The Phoenix Project / DevOps Handbook</span></p>
+    <p><strong>Primera vía</strong>: flujo de izquierda a derecha, de dev a cliente, en lotes chicos.
+    <strong>Segunda vía</strong>: amplificar los bucles de retroalimentación de derecha a izquierda,
+    para arreglar problemas en origen. <strong>Tercera vía</strong>: cultura de experimentación y
+    aprendizaje continuo, donde fallar dentro de límites es parte del trabajo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">CALMS <span>· las cinco dimensiones</span></p>
+    <p><strong>C</strong>ultura (responsabilidad compartida, sin culpa), <strong>A</strong>utomatización
+    (todo lo repetible se automatiza), <strong>L</strong>ean (lotes pequeños, eliminar desperdicio y
+    esperas), <strong>M</strong>edición (decidir con datos, no con opiniones),
+    <strong>S</strong>haring (compartir conocimiento, herramientas y guardias). Es la lista para
+    autoevaluar si un equipo "hace DevOps" o solo compró herramientas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Las cuatro métricas DORA</p>
+    <p>El programa de investigación <em>DevOps Research and Assessment</em> (Google) identificó cuatro
+    medidas que predicen tanto el rendimiento de entrega como el del negocio. Se agrupan en dos ejes:
+    <strong>velocidad</strong> (lead time for changes, deployment frequency) y
+    <strong>estabilidad</strong> (change failure rate, time to restore service). El hallazgo clave es
+    que no hay que elegir: los equipos de élite puntúan alto en las cuatro a la vez. Ir rápido y ser
+    estable se refuerzan.</p>
+    <p class="why"><b>por qué importa</b>Dan un marcador común y neutral. En vez de discutir si el
+    equipo "va bien", se mira si el lead time bajó y si el change failure rate no subió.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Reliability <span>· la quinta métrica</span></p>
+    <p>El reporte <em>State of DevOps 2021</em> añadió una quinta dimensión: qué tan bien el servicio
+    cumple las expectativas operativas de sus usuarios (disponibilidad, latencia, corrección). Se mide
+    contra objetivos declarados (SLO, sección 09). Existe porque un equipo puede desplegar cien veces
+    al día y aun así tener un servicio poco fiable; la velocidad sin fiabilidad no es rendimiento.</p>
+  </div>
+
+  <div class="diagram">        ┌──────────────────────────────────────────────┐
+        ▼                                              │
+     PLAN ──► CODE ──► BUILD ──► TEST ──► RELEASE ──► DEPLOY
+        ▲                                              │
+        │                                              ▼
+    OBSERVE ◄──────────── OPERATE ◄────────────────────┘
+        │
+        └── métricas, logs, trazas, incidentes, feedback de usuarios
+            alimentan el siguiente PLAN
+
+   la clave no es el círculo, es su VELOCIDAD y su AMPLITUD de banda</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Métrica DORA</th><th>Qué mide</th><th>Élite</th><th>Alto</th><th>Medio</th><th>Bajo</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Lead time for changes</strong></td><td>De commit aceptado a corriendo en producción</td><td>Menos de 1 día</td><td>1 día – 1 semana</td><td>1 semana – 1 mes</td><td>1 – 6 meses</td></tr>
+      <tr><td><strong>Deployment frequency</strong></td><td>Cada cuánto se despliega a producción</td><td>Bajo demanda (varias veces al día)</td><td>1 vez/día – 1 vez/semana</td><td>1 vez/semana – 1 vez/mes</td><td>Menos de 1 vez/mes</td></tr>
+      <tr><td><strong>Change failure rate</strong></td><td>% de despliegues que degradan el servicio y exigen remedio</td><td>0–15 %</td><td>16–30 %</td><td>16–45 %</td><td>46–60 %</td></tr>
+      <tr><td><strong>Time to restore service</strong></td><td>Cuánto se tarda en recuperar el servicio tras un incidente</td><td>Menos de 1 hora</td><td>Menos de 1 día</td><td>1 día – 1 semana</td><td>1 semana – 1 mes</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">Los umbrales cambian cada año</span>
+    <p>DORA recalcula las bandas en cada edición del <em>State of DevOps Report</em> y las categorías
+    se han fusionado y renombrado de un año a otro. Los números de arriba son órdenes de magnitud
+    ampliamente citados, no una norma fija. Lo que importa es la <em>tendencia</em> de tu propio
+    equipo y no cruzar velocidad contra estabilidad: si al acelerar el deployment frequency sube el
+    change failure rate, algo del pipeline está roto.</p>
+  </div>
+</section>
+
+<section class="block" id="vcs">
+  <span class="sec-num">02</span>
+  <h2>Control de versiones a escala</h2>
+  <p class="lead">
+    Git ya lo usas. Lo que decide la velocidad de un equipo no es Git sino cómo se ramifica, cuánto
+    viven esas ramas y dónde vive el código. Estas decisiones fijan el techo de tu deployment
+    frequency antes de escribir la primera línea de pipeline.
+  </p>
+
+  <div class="concept">
+    <p class="term">Ramas de vida corta <span>· el principio</span></p>
+    <p>Una rama que vive días o semanas diverge de <code class="inline">main</code>, acumula
+    conflictos y se integra en un evento grande y arriesgado. Una rama que vive horas se fusiona antes
+    de que el mundo cambie debajo. La regla práctica: si una rama no puede llegar a
+    <code class="inline">main</code> hoy, el trabajo está mal partido.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Trunk-based development</p>
+    <p>Todos integran a un único tronco (<code class="inline">main</code>) al menos una vez al día,
+    detrás de ramas mínimas o directamente con <em>pair programming</em>. El tronco siempre está
+    desplegable. Es el modelo que DORA asocia con rendimiento de élite, porque hace imposible el
+    "merge del viernes" de diez mil líneas.</p>
+    <p class="why"><b>por qué importa</b>La integración continua de verdad —integrar de continuo—
+    solo existe si las ramas no se acumulan. Sin trunk-based, "CI" es solo un servidor que corre
+    tests.</p>
+  </div>
+  <div class="concept">
+    <p class="term">GitFlow <span>· y por qué casi nadie lo necesita</span></p>
+    <p>Un modelo con ramas permanentes (<code class="inline">develop</code>,
+    <code class="inline">release/*</code>, <code class="inline">hotfix/*</code>,
+    <code class="inline">main</code>) diseñado para software con versiones numeradas que se entrega a
+    clientes que instalan (apps de escritorio, librerías, firmware). En un servicio web que despliega
+    su propio código varias veces al día, esas ramas solo agregan ceremonia y divergencia.</p>
+  </div>
+  <div class="concept">
+    <p class="term">GitHub Flow <span>· el punto medio</span></p>
+    <p>Una rama por cambio, pull request, revisión, merge a <code class="inline">main</code>, deploy.
+    Sin ramas permanentes más allá del tronco. Es trunk-based con un paso de revisión formal;
+    funciona bien mientras las ramas sigan siendo de vida corta y el PR no se quede una semana
+    abierto.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Feature flags en vez de ramas largas</p>
+    <p>Si una funcionalidad tarda semanas, no la escondas en una rama: fusiónala a
+    <code class="inline">main</code> incompleta pero <em>apagada</em> tras un flag, y enciéndela
+    cuando esté lista. El código viaja continuamente a producción (se prueba, se compila con todo lo
+    demás) pero no se activa. Separa "desplegar" de "lanzar" (sección 04).</p>
+    <p class="why"><b>por qué importa</b>Es la única forma de hacer trunk-based con trabajo grande.
+    El costo es disciplina: los flags viejos hay que borrarlos o se vuelven deuda y rutas muertas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Conventional commits</p>
+    <p>Un formato de mensaje (<code class="inline">feat:</code>, <code class="inline">fix:</code>,
+    <code class="inline">chore:</code>, <code class="inline">feat!:</code> para cambios rompientes) que
+    una máquina puede leer. Permite generar el changelog y decidir el salto de versión (semver)
+    automáticamente. El valor no es la estética: es que el historial se vuelve datos.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Hooks <span>· pre-commit, pre-push, server-side</span></p>
+    <p>Scripts que Git dispara en momentos del ciclo. <em>Pre-commit</em> local corre formateo,
+    linter y escaneo de secretos antes de que exista el commit; es feedback en un segundo, no en cinco
+    minutos de CI. Los hooks locales son opcionales por diseño, así que lo que de verdad protege la
+    rama son las mismas comprobaciones repetidas en el servidor.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Merge queue <span>· cola de fusión</span></p>
+    <p>Con muchos PR aprobados a la vez, cada uno pasó CI contra un <code class="inline">main</code>
+    que ya cambió: se puede romper el tronco al fusionar aunque cada PR estuviera verde. La cola toma
+    los PR de a uno (o en lotes), los prueba <em>rebasados sobre el estado real</em> de
+    <code class="inline">main</code> y solo entonces fusiona. Mantiene el tronco siempre verde sin
+    frenar al equipo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Monorepo <span>· vs polyrepo</span></p>
+    <p><strong>Monorepo</strong>: todo el código de la organización en un repositorio. Un commit
+    atómico puede cambiar un servicio y sus consumidores a la vez; una sola versión de cada
+    dependencia interna; refactor global en un PR. <strong>Polyrepo</strong>: un repositorio por
+    servicio o librería. Fronteras de ownership claras, permisos y CI simples por repo, cada equipo a
+    su ritmo. La elección real es sobre <em>tooling</em>: un monorepo sano exige build system
+    incremental (Bazel, Nx, Turborepo) y CI que solo prueba lo afectado, o los tiempos explotan.</p>
+  </div>
+
+  <div class="diagram">main ●───●───●───●───●───●───●───●───●───●───●──►  (siempre desplegable)
+          \         \       \             \
+           ● fix     \       ● feat/x      ● chore
+            \         \       \             \
+             ●─────────┘       ●─────────────┘
+          (horas)          (medio día, tras un flag si no está lista)
+
+   ANTIPATRÓN:
+main ●───●───────────────────────────────────●──►
+      \                                     /
+       ●───●───●───●───●───●───●───●───●───●   rama "feature-grande"
+       (3 semanas · 4000 líneas · conflictos · merge de terror)</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Dimensión</th><th>Monorepo</th><th>Polyrepo</th></tr></thead>
+    <tbody>
+      <tr><td>Cambio atómico entre servicios</td><td>Un solo PR, un solo commit</td><td>PR coordinados en varios repos, ventana de incompatibilidad</td></tr>
+      <tr><td>Versionado de dependencias internas</td><td>Una sola versión, siempre la del repo</td><td>Cada consumidor a su versión; "diamond dependency"</td></tr>
+      <tr><td>Radio de impacto de un error de build</td><td>Grande: puede frenar a todos si el CI no está aislado</td><td>Acotado al repo</td></tr>
+      <tr><td>Costo de CI</td><td>Alto sin build incremental; hay que probar solo lo afectado</td><td>Naturalmente acotado por repo</td></tr>
+      <tr><td>Ownership y permisos</td><td>Necesita CODEOWNERS y reglas por carpeta</td><td>Implícito: un repo, un equipo</td></tr>
+      <tr><td>Descubrir y reusar código</td><td>Trivial: está todo ahí</td><td>Requiere registro de paquetes y descubrimiento</td></tr>
+      <tr><td>Herramientas necesarias</td><td>Build graph, sparse checkout, CI selectivo</td><td>Estándar; el reto es la orquestación entre repos</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="ci">
+  <span class="sec-num">03</span>
+  <h2>Integración continua: el pipeline por dentro</h2>
+  <p class="lead">
+    Un pipeline de CI es un grafo de trabajos que transforma un commit en artefactos verificados.
+    Entender sus piezas —y su superficie de ataque— es lo que separa "tengo GitHub Actions" de
+    "tengo una fábrica confiable".
+  </p>
+
+  <div class="concept">
+    <p class="term">Runner <span>· agent, executor</span></p>
+    <p>La máquina (o contenedor, o pod) donde corre cada trabajo. Puede ser <em>hospedado</em> por el
+    proveedor (efímero, limpio, se destruye al terminar) o <em>propio</em> (self-hosted: más control,
+    acceso a red privada, hardware especial, pero tú lo parcheas y lo aíslas). Un runner propio mal
+    aislado que ejecuta código de un fork es una de las vías de compromiso más explotadas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Etapas <span>· stages</span></p>
+    <p>El pipeline se ordena en fases lógicas —típicamente <em>build → test → scan → publish →
+    deploy</em>— donde una no empieza hasta que la anterior pasa. Las etapas dan puntos de corte
+    naturales: si el test falla, nunca se publica una imagen. Dentro de una etapa, los trabajos
+    corren en paralelo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Fan-out / fan-in</p>
+    <p><strong>Fan-out</strong>: un trabajo dispara muchos en paralelo (probar en Node 18, 20 y 22;
+    lint, tipos y unit a la vez). <strong>Fan-in</strong>: un trabajo espera a que todos los
+    anteriores terminen para consolidar (publicar solo si las tres versiones pasaron). Es cómo se
+    exprime el tiempo de pared sin perder las compuertas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Matriz <span>· matrix build</span></p>
+    <p>Una forma declarativa de expandir un trabajo en su producto cartesiano:
+    <code class="inline">{os: [linux, mac], version: [18, 20, 22]}</code> genera seis trabajos. Sirve
+    para probar compatibilidad real sin copiar y pegar definiciones.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Caché de dependencias <span>· vs caché de capas</span></p>
+    <p>La <strong>caché de dependencias</strong> guarda <code class="inline">node_modules</code>,
+    <code class="inline">~/.m2</code>, <code class="inline">.venv</code> entre corridas, indexada por
+    el hash del archivo de lock. La <strong>caché de capas</strong> reutiliza capas de imagen Docker
+    ya construidas cuando su entrada no cambió. Ambas convierten builds de minutos en builds de
+    segundos; ambas son peligrosas si la clave de invalidación está mal.</p>
+    <p class="why"><b>por qué importa</b>Una caché con clave demasiado amplia sirve artefactos
+    viejos y produce "en mi CI pasa y en el tuyo no". Una demasiado estrecha nunca acierta y no
+    ahorra nada.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Artefactos entre trabajos</p>
+    <p>Los runners son efímeros y aislados: lo que un trabajo produce (el binario compilado, el
+    reporte de cobertura) se pierde salvo que se publique explícitamente como <em>artefacto</em> y el
+    siguiente lo descargue. Compilar una vez y pasar el resultado —en vez de recompilar en cada
+    trabajo— es a la vez más rápido y más correcto: todos prueban exactamente el mismo binario.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Quality gates <span>· compuertas</span></p>
+    <p>Condiciones que deben cumplirse para avanzar: cobertura mínima, cero vulnerabilidades críticas,
+    linter limpio, sin secretos detectados, presupuesto de tamaño de bundle. Se ponen en el pipeline,
+    no en la buena voluntad del revisor. La compuerta que no bloquea el merge es una sugerencia.</p>
+  </div>
+  <div class="concept">
+    <p class="term">OIDC en vez de secretos de larga vida</p>
+    <p>El patrón viejo: guardar una clave de acceso permanente de AWS/GCP como secreto del repo. Si se
+    filtra, sirve para siempre. El patrón correcto: el runner presenta un <strong>token OIDC</strong>
+    firmado por el proveedor de CI que describe "este repo, esta rama, este workflow"; el cloud lo
+    verifica y entrega credenciales <em>temporales</em> con permisos acotados. No hay secreto que
+    robar.</p>
+    <p class="why"><b>por qué importa</b>Elimina la clase entera de incidentes por "clave de CI
+    filtrada en un log". La confianza es criptográfica y efímera, no un string en una caja fuerte.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Acciones ancladas por hash</p>
+    <p>Usar <code class="inline">actions/checkout@v4</code> significa "confío en lo que sea que haya en
+    esa etiqueta mañana". Si la cuenta del autor se compromete y reescriben la etiqueta, tu pipeline
+    ejecuta su código con tus permisos. Anclar al SHA del commit
+    (<code class="inline">@a1b2c3d...</code>) fija exactamente el código auditado. Vale para
+    dependencias de terceros en general.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Mínimo privilegio del token</p>
+    <p>El token que el CI inyecta en cada trabajo suele venir con permisos amplios por defecto.
+    Redúcelo a lo que ese trabajo necesita (<code class="inline">contents: read</code> y nada más para
+    un job de test). Un paso comprometido con un token de solo lectura no puede empujar a
+    <code class="inline">main</code> ni publicar un release.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Poisoned pipeline execution</span>
+    <p>Si el pipeline se define en el mismo repo que el código y se ejecuta al recibir un PR, alguien
+    con un fork puede modificar el archivo de workflow —o un script que este invoca, o un
+    <code class="inline">Makefile</code>, o un hook de test— para robar secretos y credenciales
+    durante la corrida. Defensa: no correr workflows con secretos sobre PR de forks sin aprobación
+    manual, separar los pipelines privilegiados en su propio archivo protegido, y tratar todo lo que
+    viene en un PR como código hostil hasta que un humano lo revisa.</p>
+  </div>
+
+  <div class="diagram">                 commit / PR
+                      │
+        ┌─────────────┼─────────────┐         (fan-out)
+        ▼             ▼             ▼
+     [ lint ]     [ types ]     [ unit ]
+        └─────────────┼─────────────┘         (fan-in)
+                      ▼
+                  [ build ]  ──► artefacto: imagen + SBOM
+                      │
+        ┌─────────────┼─────────────┐
+        ▼             ▼             ▼
+    [ scan SCA ]  [ scan SAST ] [ scan secretos ]
+        └─────────────┼─────────────┘
+                      ▼
+              ┌── quality gate ──┐   ¿0 críticas? ¿cobertura ok?
+              │       falla → detiene aquí, nada se publica
+              ▼
+                 [ publish ]  ──► registry (tag inmutable = digest)
+                      │
+                      ▼
+                 [ deploy staging ] ──► pruebas e2e ──► deploy prod</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Qué cachear</th><th>Clave de invalidación correcta</th><th>Síntoma si la clave está mal</th></tr></thead>
+    <tbody>
+      <tr><td>Dependencias del lenguaje (node_modules, .m2, wheels)</td><td>Hash del archivo de lock (package-lock, poetry.lock, go.sum)</td><td>Instala versiones viejas; build no reproducible</td></tr>
+      <tr><td>Capas de imagen Docker</td><td>Contenido de cada instrucción y de los archivos que copia; orden de capas</td><td>Reusa una capa con código viejo; "arreglé el bug pero sigue"</td></tr>
+      <tr><td>Compilación incremental (target/, build/, .gradle)</td><td>Hash de fuentes + versión del toolchain + flags de compilación</td><td>Enlaza objetos obsoletos; fallos fantasma</td></tr>
+      <tr><td>Descargas de herramientas (SDK, CLIs)</td><td>Versión exacta pineada de la herramienta</td><td>Usa una versión distinta a la de producción</td></tr>
+      <tr><td>Índices de test / resultados</td><td>Hash del código + del set de datos de prueba</td><td>Marca como "sin cambios" un test que sí cambió</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">Seguridad de la cadena de suministro <span>· SLSA, procedencia, SBOM, atestaciones</span></p>
+    <p>El pipeline no solo produce un artefacto: produce evidencia verificable de <em>cómo</em> lo
+    produjo. <strong>SBOM</strong> (Software Bill of Materials): el inventario completo de componentes
+    y versiones que lleva dentro el artefacto, en un formato estándar —SPDX (ISO/IEC 5962) o CycloneDX
+    (OWASP)—; sirve para responder en minutos "¿me afecta esta CVE?". <strong>Procedencia</strong>
+    (<em>provenance</em>): un documento firmado que dice qué código fuente (commit), qué pipeline y qué
+    parámetros generaron este digest exacto. <strong>Atestaciones</strong> (in-toto): el sobre firmado
+    y estandarizado que envuelve SBOM, procedencia, resultados de escaneo o de tests y los liga al
+    artefacto. <strong>SLSA</strong> (Supply-chain Levels for Software Artifacts, v1.0): una escala
+    para el <em>build track</em> —L0 sin procedencia; L1 hay procedencia (falsificable); L2 la
+    procedencia la firma una plataforma de build hospedada; L3 la plataforma está endurecida, los
+    builds aislados entre sí y las claves de firma fuera del alcance de los pasos del usuario—.</p>
+    <p class="why"><b>por qué importa</b>Los ataques a la cadena de suministro (SolarWinds, paquetes
+    npm secuestrados, imágenes base envenenadas) no atacan tu código: atacan lo que tu build consume.
+    Firmar el artefacto (Cosign / Sigstore, con firma <em>keyless</em> vía OIDC en vez de una clave
+    larga) y verificar esa firma y su procedencia en el clúster antes de ejecutar cierra el hueco
+    entre "el pipeline lo construyó" y "esto es lo que está corriendo".</p>
+  </div>
+  <div class="concept">
+    <p class="term">Builds reproducibles <span>· el mismo input, el mismo digest</span></p>
+    <p>Un build es reproducible si dos ejecuciones desde el mismo commit, en máquinas distintas,
+    producen artefactos bit a bit idénticos. Los enemigos: marcas de tiempo embebidas, orden no
+    determinista de archivos, rutas absolutas del build, dependencias sin fijar que resuelven a una
+    versión distinta hoy. Se acota fijando todas las versiones (lockfiles, imágenes base por digest,
+    acciones por SHA — sección anterior), normalizando timestamps (<code class="inline">SOURCE_DATE_EPOCH</code>)
+    y ordenando entradas.</p>
+    <p class="why"><b>por qué importa</b>Sin reproducibilidad no puedes verificar de forma
+    independiente que un artefacto corresponde a su código: cualquier verificación se reduce a
+    "confía en el servidor que lo construyó". Con ella, un tercero puede reconstruir y comparar el
+    digest.</p>
+  </div>
+</section>
+
+<section class="block" id="cd">
+  <span class="sec-num">04</span>
+  <h2>Entrega y despliegue continuos</h2>
+  <p class="lead">
+    El pipeline dejó un artefacto verificado listo. Lo que sigue es la parte donde el riesgo se
+    vuelve real: cómo ese artefacto reemplaza al que sirve tráfico ahora mismo, y cómo se vuelve
+    atrás si sale mal.
+  </p>
+
+  <div class="concept">
+    <p class="term">Continuous delivery <span>· vs continuous deployment</span></p>
+    <p><strong>Delivery</strong>: cada cambio que pasa el pipeline queda <em>listo</em> para
+    producción con un solo clic; el clic lo da una persona. <strong>Deployment</strong>: no hay clic,
+    el pipeline verde llega solo a producción. La diferencia es una decisión de negocio y de madurez,
+    no de herramientas: deployment continuo exige confianza total en los tests, en el monitoreo y en
+    el rollback automático.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Release ≠ deploy</p>
+    <p><strong>Desplegar</strong> es poner el código nuevo en los servidores. <strong>Lanzar</strong>
+    es exponer una funcionalidad a los usuarios. Con feature flags son dos eventos separados: el
+    código lleva días en producción, apagado, y el lanzamiento es encender un flag —reversible en
+    segundos, sin pipeline, y se puede encender solo para el 1 % o solo para empleados.</p>
+    <p class="why"><b>por qué importa</b>Separa el riesgo técnico (¿compila, arranca, no rompe?) del
+    riesgo de producto (¿le gusta a la gente?). Cada uno se maneja con su propio ritmo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Recreate <span>· la más simple</span></p>
+    <p>Apagar todas las instancias viejas, luego levantar las nuevas. Hay una ventana de caída total.
+    Aceptable para trabajos internos, entornos de desarrollo o apps sin requisito de disponibilidad.
+    Su virtud es que nunca hay dos versiones conviviendo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Rolling <span>· actualización progresiva</span></p>
+    <p>Se reemplazan las instancias de a lotes: baja dos viejas, sube dos nuevas, espera que estén
+    sanas, sigue. Sin caída y sin duplicar la infraestructura. La contra: durante varios minutos
+    conviven ambas versiones sirviendo tráfico, así que las dos tienen que ser compatibles con la
+    misma base de datos y entre sí. Es el default de Kubernetes.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Blue-green</p>
+    <p>Dos entornos idénticos. <em>Blue</em> sirve el tráfico; <em>green</em> recibe la versión nueva
+    y se prueba en aislamiento. Cuando green está listo, el balanceador conmuta todo el tráfico de
+    golpe. El rollback es volver a apuntar a blue: segundos. El costo es tener el doble de capacidad
+    durante la transición.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Canary</p>
+    <p>La versión nueva recibe una fracción pequeña del tráfico real (1 %, luego 5 %, 25 %, 50 %,
+    100 %), y en cada escalón se comparan métricas de error y latencia contra la versión estable. Si
+    se degradan, se corta automáticamente. Detecta problemas que solo aparecen con tráfico de
+    producción real, exponiendo a poca gente.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Progressive delivery</p>
+    <p>El canary automatizado y gobernado por política: un controlador (Argo Rollouts, Flagger) avanza
+    los porcentajes solo si un análisis de métricas lo aprueba, y revierte solo si no. Junta canary +
+    feature flags + observabilidad en un lazo cerrado. El humano define el criterio, la máquina
+    ejecuta la promoción.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Migraciones de base de datos en el deploy <span>· expand / contract</span></p>
+    <p>El esquema no puede cambiar de golpe si dos versiones del código conviven (rolling, canary,
+    blue-green). El patrón es en dos fases separadas por despliegues:
+    <strong>expand</strong> —agregar la columna/tabla nueva, dejar la vieja, escribir en ambas—;
+    liberar el código que ya usa lo nuevo; <strong>contract</strong> —una vez que nada lee lo viejo,
+    borrarlo—. Renombrar una columna en una sola migración rompe la versión que aún corre.</p>
+    <p class="why"><b>por qué importa</b>Es la causa más común de caída durante un deploy que "solo
+    tocaba el esquema". El código se revierte en un minuto; una migración destructiva, no.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Rollback <span>· vs roll-forward</span></p>
+    <p><strong>Rollback</strong>: volver al artefacto anterior, conocido y bueno. Rápido y predecible,
+    siempre que no haya cambios de esquema irreversibles de por medio. <strong>Roll-forward</strong>:
+    dejar la versión mala y desplegar un fix encima. Necesario cuando revertir es imposible (datos ya
+    migrados) o cuando el fix es trivial y el pipeline es rápido. Un equipo maduro tiene ambos
+    caminos ensayados.</p>
+  </div>
+
+  <div class="diagram">BLUE-GREEN
+  t0   blue [100%] ███████████   green  ·········  (desplegando, sin tráfico)
+  t1   blue [100%] ███████████   green  ✓ sano, smoke tests ok
+  t2   blue   ·····              green [100%] ███████████   ← switch instantáneo
+  t3   blue en reserva 10 min por si hay rollback, luego se recicla
+
+CANARY
+  t0   estable [100%] ████████████████████
+  t1   estable [ 95%] ███████████████████   canary [5%]  ▓   ← comparar métricas
+  t2   estable [ 75%] ███████████████       canary [25%] ▓▓▓
+  t3   estable [ 50%] ██████████             canary [50%] ▓▓▓▓▓
+  t4   canary  [100%] ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓
+       en cualquier escalón: error rate o p99 ↑  →  abortar, 100% a estable</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Estrategia</th><th>Downtime</th><th>Costo de infra</th><th>Riesgo de exposición</th><th>Velocidad de rollback</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Recreate</strong></td><td>Sí, total</td><td>Mínimo (1×)</td><td>Alto: todos ven la versión nueva de golpe</td><td>Lento: redeploy de la vieja</td></tr>
+      <tr><td><strong>Rolling</strong></td><td>No</td><td>Bajo (~1×)</td><td>Medio: exposición creciente, sin control fino</td><td>Medio: rolling inverso, varios minutos</td></tr>
+      <tr><td><strong>Blue-green</strong></td><td>No</td><td>Alto (2× durante la transición)</td><td>Alto tras el switch: 100 % de golpe, pero probado antes</td><td>Muy rápido: reapuntar el balanceador</td></tr>
+      <tr><td><strong>Canary</strong></td><td>No</td><td>Medio (1× + fracción)</td><td>Bajo: empieza en 1 % de usuarios</td><td>Muy rápido: 100 % de vuelta a estable</td></tr>
+      <tr><td><strong>Feature flag</strong></td><td>No</td><td>Nulo adicional</td><td>El que definas: %, cohorte, usuario</td><td>Instantáneo: apagar el flag, sin deploy</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">La compatibilidad hacia atrás es el precio de no tener downtime</span>
+    <p>Toda estrategia sin caída (rolling, canary, blue-green) implica que la versión N y la N+1
+    conviven. Eso obliga a que cada cambio sea compatible en ambos sentidos con el contrato que lo
+    rodea: el esquema de la base, los mensajes en la cola, la forma del payload de la API, el formato
+    de la sesión. Diseñar cambios "expand/contract" no es opcional, es la condición para desplegar
+    seguido.</p>
+  </div>
+</section>
+
+<section class="block" id="contenedores">
+  <span class="sec-num">05</span>
+  <h2>Contenedores por dentro</h2>
+  <p class="lead">
+    Un contenedor no es una máquina virtual liviana. Es un proceso normal de Linux al que el kernel
+    le miente sobre lo que puede ver y consumir. Entender de qué está hecha esa mentira explica sus
+    ventajas y sus límites de seguridad.
+  </p>
+
+  <div class="concept">
+    <p class="term">Namespaces <span>· qué puede ver el proceso</span></p>
+    <p>Mecanismo del kernel que le da a un grupo de procesos una vista propia y aislada de un recurso
+    global. <strong>PID</strong>: sus propios números de proceso (dentro es el PID 1).
+    <strong>NET</strong>: su propia pila de red, interfaces e IP. <strong>MNT</strong>: su propio
+    árbol de sistema de archivos. <strong>UTS</strong>: su propio hostname. <strong>IPC</strong>: su
+    propia memoria compartida. <strong>USER</strong>: un mapeo de usuarios, de modo que root dentro
+    puede ser un usuario sin privilegios fuera.</p>
+    <p class="why"><b>por qué importa</b>El aislamiento es <em>selectivo</em>: lo que no se puso en
+    un namespace, el contenedor lo comparte con el host. Ahí viven la mayoría de los escapes.</p>
+  </div>
+  <div class="concept">
+    <p class="term">cgroups v2 <span>· cuánto puede consumir</span></p>
+    <p>Los namespaces aíslan la vista; los <strong>control groups</strong> limitan el consumo: CPU,
+    memoria, ancho de banda de disco y de red, número de PIDs. La versión 2 unifica todos los
+    controladores en una sola jerarquía. Sin un límite de memoria, un contenedor con una fuga se come
+    la RAM del host y arrastra a todos los vecinos (el <em>noisy neighbor</em>).</p>
+  </div>
+  <div class="concept">
+    <p class="term">Union filesystem <span>· capas</span></p>
+    <p>La imagen es una pila de capas de solo lectura apiladas por un sistema de archivos de unión
+    (overlayfs). Cada instrucción del Dockerfile que toca archivos crea una capa. Al correr, se monta
+    encima una capa fina de escritura (<em>copy-on-write</em>): modificar un archivo lo copia a esa
+    capa. Por eso las imágenes se comparten en disco y en la red entre contenedores que parten de la
+    misma base.</p>
+  </div>
+  <div class="concept">
+    <p class="term">OCI image spec <span>· el estándar</span></p>
+    <p>La <em>Open Container Initiative</em> define el formato de imagen (un manifiesto + capas + una
+    config, todo direccionado por digest SHA-256) y el runtime. Por eso una imagen construida con
+    Docker corre en containerd, CRI-O o Podman: "imagen Docker" es en realidad "imagen OCI". El
+    <strong>digest</strong> (<code class="inline">sha256:...</code>) identifica el contenido exacto y
+    es inmutable; la etiqueta es solo un puntero móvil.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Multi-stage build</p>
+    <p>Un Dockerfile con varias fases <code class="inline">FROM</code>: una con el compilador, el SDK
+    y las dependencias de build produce el binario; la fase final parte de una imagen mínima y solo
+    copia ese binario. La imagen que se despliega no lleva el toolchain, ni el código fuente, ni las
+    credenciales usadas para construir. Menos tamaño y menos superficie de ataque.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Orden de capas <span>· y por qué importa el caché</span></p>
+    <p>Docker cachea capas mientras su entrada no cambie, pero al invalidar una, invalida todas las
+    siguientes. Por eso se copia primero el archivo de dependencias y se instala, y solo después se
+    copia el código: así un cambio en el código no reinstala todo. El <code class="inline">.dockerignore</code>
+    evita mandar <code class="inline">node_modules</code>, <code class="inline">.git</code> y secretos
+    al contexto de build.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Distroless / scratch <span>· imágenes mínimas</span></p>
+    <p><code class="inline">scratch</code> es la imagen vacía: solo tu binario estático, cero sistema
+    operativo. <em>Distroless</em> lleva lo justo para correr un runtime (glibc, certificados CA,
+    zoneinfo) pero sin shell ni gestor de paquetes. Sin shell, muchas técnicas post-explotación no
+    funcionan; y no hay <code class="inline">openssl</code> viejo que un escáner marque como CVE.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Usuario no-root <span>· HEALTHCHECK</span></p>
+    <p>Por defecto el proceso del contenedor corre como root. Si alguien escapa del contenedor,
+    escapa como root. Declara un <code class="inline">USER</code> sin privilegios en el Dockerfile.
+    El <code class="inline">HEALTHCHECK</code> (o las probes de Kubernetes) le dice al orquestador si
+    el proceso está realmente listo, no solo "arrancado".</p>
+  </div>
+  <div class="concept">
+    <p class="term">Tags inmutables <span>· vs <code class="inline">latest</code></span></p>
+    <p>Desplegar por etiqueta móvil (<code class="inline">app:latest</code>,
+    <code class="inline">app:prod</code>) significa que dos despliegues "de la misma versión" pueden
+    correr código distinto, y que un rollback no sabe a qué volver. Etiqueta por algo inmutable: el
+    SHA del commit, o directamente el digest de la imagen. La etiqueta es para humanos; el digest es
+    para el sistema.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Firmar imágenes <span>· procedencia</span></p>
+    <p>Cualquiera que empuje al registry puede publicar una imagen con el nombre de la tuya. Firmarla
+    (Cosign / Sigstore) y verificar la firma en el clúster antes de correrla garantiza que la imagen
+    salió de tu pipeline y no fue sustituida. Junto con un SBOM (inventario de lo que contiene) es la
+    base de la seguridad de la cadena de suministro.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label"><code class="inline">latest</code> en producción</span>
+    <p>Es la trampa más repetida. <code class="inline">latest</code> no significa "la última": es una
+    etiqueta como cualquier otra que alguien tiene que mover, y que un nodo puede tener cacheada en
+    una versión distinta a otro. Un incidente a las 3 a. m. con <code class="inline">latest</code>
+    desplegado es imposible de diagnosticar porque no sabes qué código está corriendo. Fija siempre
+    digest o SHA de commit, y configura el pull para que no reutilice caché ambigua.</p>
+  </div>
+
+  <div class="diagram">CONTENEDOR                              MÁQUINA VIRTUAL
+┌───────────────────────────┐          ┌───────────────────────────┐
+│ app A │ app B │ app C      │          │  app A    │   app B        │
+├───────┼───────┼────────────┤          ├───────────┼────────────────┤
+│ libs  │ libs  │ libs       │          │ libs      │ libs           │
+├───────┴───────┴────────────┤          ├───────────┼────────────────┤
+│ namespaces + cgroups       │          │  SO huésped│  SO huésped    │  ← kernel
+│ (aíslan procesos)          │          │  (kernel)  │  (kernel)      │    completo
+├────────────────────────────┤          ├───────────┴────────────────┤    por VM
+│      KERNEL DEL HOST        │  ◄── uno │       hypervisor           │
+│      (compartido)          │  solo    ├────────────────────────────┤
+├────────────────────────────┤          │      KERNEL DEL HOST        │
+│      hardware              │          │      hardware              │
+└────────────────────────────┘          └────────────────────────────┘
+ arranque: milisegundos                  arranque: decenas de segundos
+ aislamiento: del kernel (más débil)     aislamiento: del hardware (más fuerte)</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Dimensión</th><th>Contenedor</th><th>Máquina virtual</th></tr></thead>
+    <tbody>
+      <tr><td>Qué aísla</td><td>Procesos, vía kernel del host (namespaces/cgroups)</td><td>Un sistema operativo completo, vía hypervisor</td></tr>
+      <tr><td>Kernel</td><td>Compartido con el host y con los demás contenedores</td><td>Propio por VM</td></tr>
+      <tr><td>Arranque</td><td>Milisegundos</td><td>Segundos a minutos</td></tr>
+      <tr><td>Overhead</td><td>Casi nulo (es un proceso)</td><td>RAM y CPU para cada SO huésped</td></tr>
+      <tr><td>Densidad por host</td><td>Cientos</td><td>Decenas</td></tr>
+      <tr><td>Frontera de seguridad</td><td>Más delgada: un bug de kernel puede ser un escape</td><td>Más gruesa: superficie del hypervisor, mucho menor</td></tr>
+      <tr><td>Multi-tenant hostil</td><td>Requiere refuerzo (gVisor, Kata, microVM)</td><td>Aceptable de base</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="orquestacion">
+  <span class="sec-num">06</span>
+  <h2>Orquestación: Kubernetes y cuándo no</h2>
+  <p class="lead">
+    Con más de un contenedor y más de un servidor aparecen problemas que Docker solo no resuelve:
+    dónde poner cada contenedor, qué hacer cuando uno muere, cómo se encuentran entre sí. Eso es
+    orquestación. Kubernetes la resuelve; a veces con más máquina de la que hace falta.
+  </p>
+
+  <div class="concept">
+    <p class="term">Por qué existe Kubernetes</p>
+    <p>Tres funciones centrales. <strong>Scheduling</strong>: dado un conjunto de contenedores con
+    requisitos de CPU/memoria y un conjunto de nodos, decidir dónde va cada uno.
+    <strong>Self-healing</strong>: si un contenedor o un nodo muere, recrear lo que falta en otro
+    lado, sin intervención. <strong>Service discovery</strong>: dar a cada grupo de contenedores un
+    nombre y una IP estables aunque las instancias detrás cambien constantemente.</p>
+  </div>
+  <div class="concept">
+    <p class="term">El control loop <span>· reconciliación</span></p>
+    <p>El corazón de Kubernetes. Tú declaras el <strong>estado deseado</strong> ("quiero 3 réplicas
+    de esta imagen"). Un controlador observa el <strong>estado actual</strong> en un bucle infinito y
+    actúa para acercarlos: si hay 2, crea 1; si hay 4, mata 1. No hay "ejecutar despliegue", hay "el
+    mundo debería verse así" y un proceso que empuja hacia allá para siempre.</p>
+    <p class="why"><b>por qué importa</b>Cambia el modelo mental de imperativo ("haz estos pasos") a
+    declarativo ("este es el objetivo"). El sistema se autorrepara porque nunca deja de comparar.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Pod</p>
+    <p>La unidad mínima que Kubernetes programa: uno o varios contenedores que comparten red (misma
+    IP, mismo <code class="inline">localhost</code>) y pueden compartir volúmenes. Casi siempre es un
+    contenedor de aplicación, a veces con <em>sidecars</em> (un proxy, un recolector de logs). Los
+    pods son desechables: mueren y se recrean con otro nombre y otra IP todo el tiempo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">ReplicaSet <span>· Deployment</span></p>
+    <p>Un <strong>ReplicaSet</strong> mantiene N copias idénticas de un pod. No lo manejas
+    directamente: usas un <strong>Deployment</strong>, que gestiona ReplicaSets para darte
+    actualizaciones rolling e historial de rollback. Cambias la imagen en el Deployment y él crea un
+    ReplicaSet nuevo, lo escala mientras baja el viejo, y guarda el anterior por si hay que volver.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Service <span>· Ingress</span></p>
+    <p>Un <strong>Service</strong> da una IP y un nombre DNS internos y estables a un grupo de pods
+    (seleccionados por etiqueta) y balancea entre ellos. Un <strong>Ingress</strong> (con su
+    controlador: NGINX, Traefik, un ALB) expone servicios HTTP hacia afuera, con enrutamiento por
+    host y path y terminación TLS. Service resuelve el "dentro"; Ingress, el "borde".</p>
+  </div>
+  <div class="concept">
+    <p class="term">ConfigMap <span>· Secret</span></p>
+    <p>Configuración desacoplada de la imagen: un <strong>ConfigMap</strong> guarda pares clave-valor
+    o archivos de config y se monta en el pod como variables de entorno o como archivos. Un
+    <strong>Secret</strong> es igual pero para datos sensibles —y hay que saber que por defecto solo
+    van codificados en base64, no cifrados: hace falta cifrado en reposo del etcd y control de acceso
+    (RBAC) para que sea un secreto de verdad.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Namespace</p>
+    <p>Una partición lógica del clúster para agrupar recursos: por equipo, por entorno, por
+    aplicación. Sobre ella se aplican cuotas de recursos, políticas de red y reglas de RBAC. No es
+    una frontera de seguridad fuerte por sí sola, pero es la unidad natural de aislamiento
+    administrativo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Probes <span>· liveness, readiness, startup</span></p>
+    <p><strong>Liveness</strong>: ¿el proceso está vivo o colgado? Si falla, Kubernetes reinicia el
+    contenedor. <strong>Readiness</strong>: ¿está listo para recibir tráfico? Si falla, lo saca del
+    balanceo pero no lo mata (útil mientras calienta cachés o espera una dependencia).
+    <strong>Startup</strong>: da un margen grande al arranque inicial y solo entonces activa las
+    otras dos, para apps que tardan en levantar sin que liveness las mate en bucle.</p>
+    <p class="why"><b>por qué importa</b>Una liveness mal configurada (chequea una dependencia
+    externa) crea bucles de reinicio en cascada durante un incidente. Liveness prueba <em>tu</em>
+    proceso; readiness prueba si <em>debería</em> recibir tráfico.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Autoescalado <span>· HPA, VPA, cluster-autoscaler</span></p>
+    <p><strong>HPA</strong> (Horizontal Pod Autoscaler): cambia el número de pods según CPU, memoria o
+    métricas propias. <strong>VPA</strong> (Vertical): ajusta los requests/limits de cada pod.
+    <strong>Cluster-autoscaler</strong>: agrega o quita nodos cuando hay pods que no caben o nodos
+    ociosos. Los tres operan en capas distintas y se combinan.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Operators <span>· CRDs</span></p>
+    <p>Un <strong>CRD</strong> (Custom Resource Definition) enseña a Kubernetes un tipo nuevo de
+    objeto (<code class="inline">PostgresCluster</code>, <code class="inline">Certificate</code>). Un
+    <strong>operator</strong> es un controlador que reconcilia ese objeto: sabe cómo desplegar,
+    respaldar, actualizar y recuperar ese software concreto. Es empaquetar el conocimiento de un
+    operador humano como código que corre el mismo control loop.</p>
+  </div>
+
+  <div class="note">
+    <span class="label">Cuándo NO usar Kubernetes</span>
+    <p>Kubernetes tiene un costo fijo enorme: hay que aprenderlo, operarlo, parchearlo y pagar el
+    plano de control. Si corres uno o pocos servicios, con un equipo chico, sin picos extremos ni
+    requisito multi-región, ese costo no se amortiza. Alternativas que resuelven el 90 % con una
+    fracción de la complejidad: un PaaS (Fly.io, Render, App Runner), ECS Fargate, Nomad, o incluso
+    máquinas con systemd y un balanceador. Sube a Kubernetes cuando el dolor de no tenerlo sea real y
+    medible, no por defecto.</p>
+  </div>
+
+  <div class="diagram">CONTROL LOOP (se repite para siempre)
+
+   estado deseado           estado actual
+   (Deployment: 3)          (pods vivos: 2)
+        │                        │
+        └────────►  controlador  ◄┘
+                        │  "faltan 1" → crea pod
+                        ▼
+                  API server → etcd → scheduler → kubelet en un nodo
+
+
+TRÁFICO DE ENTRADA
+
+  internet ─► Ingress ─► Service (IP estable, balancea) ─┬─► Pod
+              (host/path,                                 ├─► Pod
+               TLS)                                       └─► Pod
+                                            (pods cambian de IP; el Service no)</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Kubernetes</th><th>ECS (Fargate)</th><th>Nomad</th><th>PaaS</th></tr></thead>
+    <tbody>
+      <tr><td>Curva de aprendizaje</td><td>Muy alta</td><td>Media</td><td>Baja–media</td><td>Mínima</td></tr>
+      <tr><td>Quién opera el plano de control</td><td>Tú (o el proveedor gestionado)</td><td>AWS</td><td>Tú, pero es un binario</td><td>El proveedor</td></tr>
+      <tr><td>Portabilidad entre nubes</td><td>Alta</td><td>Nula (AWS)</td><td>Alta</td><td>Baja</td></tr>
+      <tr><td>Ecosistema / extensibilidad</td><td>Enorme (CRDs, operators, Helm)</td><td>Limitado al de AWS</td><td>Modesto; orquesta también no-contenedores</td><td>Cerrado</td></tr>
+      <tr><td>Encaja bien cuando</td><td>Muchos servicios, varios equipos, escala y política complejas</td><td>Ya vives en AWS y quieres contenedores sin K8s</td><td>Quieres orquestación simple, o cargas mixtas (VMs, binarios)</td><td>Pocos servicios, equipo chico, time-to-market</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="iac">
+  <span class="sec-num">07</span>
+  <h2>Infraestructura como código</h2>
+  <p class="lead">
+    Ya usas Terraform, así que sabes el <em>qué</em>. Esta sección es sobre los conceptos que
+    muerden en producción: dónde vive el estado, qué es el drift, por qué un cambio inocente recrea
+    un recurso, y cómo GitOps lleva la misma idea al despliegue de aplicaciones.
+  </p>
+
+  <div class="concept">
+    <p class="term">Declarativo <span>· vs imperativo</span></p>
+    <p><strong>Imperativo</strong>: una lista de pasos ("crea la VPC, luego la subred, luego..."). Si
+    se corta a la mitad, el estado queda ambiguo y no sabes cómo seguir. <strong>Declarativo</strong>:
+    describes el resultado final y la herramienta calcula el conjunto de cambios para llegar desde
+    donde estás. Es idempotente: aplicar dos veces lo mismo no hace nada la segunda.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Providers</p>
+    <p>El plugin que traduce los recursos declarados a llamadas a la API de un servicio concreto (AWS,
+    Cloudflare, GitHub, Datadog). Terraform en sí no sabe nada de ninguna nube: todo el conocimiento
+    está en los providers, versionados aparte. Fijar su versión es tan importante como fijar la de
+    cualquier dependencia.</p>
+  </div>
+  <div class="concept">
+    <p class="term">El estado <span>· dónde vive, locking, drift</span></p>
+    <p>Terraform guarda un archivo de <strong>estado</strong> que mapea cada recurso del código con su
+    identidad real en la nube. Es la fuente de verdad de "qué gestiono yo". <strong>Dónde vive</strong>:
+    nunca en local ni en Git —contiene secretos y es un punto único de fallo—; va en un backend remoto
+    (S3 + DynamoDB, Terraform Cloud, GCS). <strong>Locking</strong>: un candado que impide que dos
+    <code class="inline">apply</code> simultáneos corrompan el estado. <strong>Drift</strong>: cuando
+    alguien cambia algo a mano en la consola y el mundo real deja de coincidir con el estado;
+    <code class="inline">plan</code> lo detecta y propone "corregirlo".</p>
+    <p class="why"><b>por qué importa</b>Perder o corromper el estado es el peor día: Terraform ya no
+    sabe qué recursos son suyos y puede intentar recrear —o destruir— infraestructura viva. El
+    backend remoto con versionado y locking no es opcional en equipo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">plan <span>· apply</span></p>
+    <p><code class="inline">plan</code> compara código, estado y realidad, y produce el
+    <em>diff</em>: qué se crea (<code class="inline">+</code>), qué se modifica
+    (<code class="inline">~</code>), qué se destruye (<code class="inline">-</code>), qué se reemplaza
+    (<code class="inline">-/+</code>). <code class="inline">apply</code> ejecuta ese diff. El plan es
+    la revisión de código de tu infraestructura: se lee entero, siempre, antes de aplicar.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Módulos</p>
+    <p>Un grupo de recursos parametrizado y reutilizable: "una aplicación web" = balanceador +
+    autoscaling group + security groups + registros DNS, con variables para el nombre y el tamaño.
+    Evita copiar y pegar bloques entre entornos y encapsula las decisiones por defecto. El riesgo es
+    la sobreabstracción: un módulo con treinta variables condicionales es más difícil de entender que
+    los recursos crudos.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Workspaces <span>· y sus límites</span></p>
+    <p>Permiten tener varios estados con el mismo código (típicamente dev/staging/prod). Útiles para
+    entornos casi idénticos. Su trampa: es fácil aplicar a prod creyendo que estás en dev. Muchos
+    equipos prefieren carpetas separadas con backends distintos, que hacen el entorno explícito y
+    permiten permisos diferentes.</p>
+  </div>
+  <div class="concept">
+    <p class="term">GitOps <span>· ArgoCD, Flux</span></p>
+    <p>El repositorio Git es la única fuente de verdad del estado deseado del clúster. Un agente
+    dentro del clúster (ArgoCD, Flux) observa el repo y reconcilia: si el repo dice "versión 5" y el
+    clúster tiene la 4, despliega la 5; si alguien parchea algo a mano, lo revierte al estado del
+    repo. Desplegar = hacer merge. Revertir = <code class="inline">git revert</code>.</p>
+    <p class="why"><b>por qué importa</b>El repo es un registro auditable y completo de todo lo que
+    corre. No hay credenciales de despliegue afuera del clúster, porque nadie empuja hacia adentro: el
+    clúster tira desde el repo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Reconciliación <span>· el hilo común</span></p>
+    <p>Terraform, Kubernetes y ArgoCD son la misma idea a distintas capas: declarar el objetivo, un
+    bucle que compara con la realidad, y acción para cerrar la brecha. Aprendida una vez, se
+    reconoce en todas: el drift de Terraform, el pod que se recrea, la app que ArgoCD marca
+    <em>OutOfSync</em>.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Ansible <span>· para config mutable</span></p>
+    <p>Terraform aprovisiona recursos (crea la VM). Ansible configura lo de <em>dentro</em> de un
+    servidor que ya existe y que persiste: instalar paquetes, editar archivos, reiniciar servicios.
+    Es procedimental y actúa por SSH sin agente. Hoy compite con el enfoque de <em>imágenes
+    inmutables</em> (construir una AMI con Packer y reemplazar la instancia entera en vez de
+    modificarla), que evita el drift de configuración por completo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Pulumi <span>· mención</span></p>
+    <p>La misma idea que Terraform (estado, plan, apply, providers) pero describiendo la
+    infraestructura en un lenguaje de programación real (TypeScript, Python, Go) en vez de HCL. Ganas
+    bucles, tipos y tests de verdad; pagas con la posibilidad de escribir infraestructura demasiado
+    "lista". CloudFormation es el equivalente nativo y solo-AWS, con el estado gestionado por AWS.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Leer el plan buscando <code class="inline"># forces replacement</code></span>
+    <p>Antes de cada <code class="inline">terraform apply</code>, lee el plan completo y busca
+    <code class="inline"># forces replacement</code> y las líneas <code class="inline">-/+</code>.
+    Muchos atributos no se pueden cambiar en caliente: el provider destruye el recurso y lo crea de
+    nuevo. Cambiar <code class="inline">name</code>, <code class="inline">description</code> o
+    <code class="inline">vpc_id</code> de un <em>security group</em> que tiene instancias enganchadas
+    lo recrea, y el apply se puede quedar colgado esperando que se liberen las dependencias, dejando
+    la infraestructura a medio aplicar. Lo mismo con el nombre de un bucket, el motor de una base de
+    datos, la zona de una subred. Si el plan dice "replace" sobre algo con tráfico encima: detente,
+    planifica una migración, no apliques.</p>
+  </div>
+
+  <div class="diagram">   código .tf                  estado remoto              realidad (la nube)
+  "quiero SG con              "SG sg-abc tiene            SG sg-abc: puerto 22
+   puertos 80,443"             puertos 80,443,22"          80, 443 abiertos
+        │                           │                           │
+        └──────────► terraform plan ◄┴───────────────────────────┘
+                          │
+                          ▼
+              diff:  ~ security_group.web
+                       - ingress { from_port = 22 }   (alguien lo abrió a mano)
+                     Plan: 0 to add, 1 to change, 0 to destroy
+                          │
+                    ¿lo revisaste?  ── sí ──►  terraform apply
+                          │                        │
+                          │                        ▼
+                          │            llama a la API, cierra el 22,
+                          │            escribe el nuevo estado (con lock)
+                          ▼
+                    NO hay "# forces replacement" → seguro continuar</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Terraform</th><th>Pulumi</th><th>CloudFormation</th><th>Ansible</th></tr></thead>
+    <tbody>
+      <tr><td>Modelo</td><td>Declarativo (HCL)</td><td>Declarativo en lenguaje real</td><td>Declarativo (YAML/JSON)</td><td>Procedimental (YAML)</td></tr>
+      <tr><td>Para qué</td><td>Aprovisionar recursos cloud</td><td>Aprovisionar recursos cloud</td><td>Aprovisionar recursos AWS</td><td>Configurar servidores existentes</td></tr>
+      <tr><td>Estado</td><td>Archivo propio en backend remoto</td><td>Archivo propio (o Pulumi Cloud)</td><td>Gestionado por AWS (stacks)</td><td>Sin estado: cada corrida evalúa el objetivo</td></tr>
+      <tr><td>Multi-nube</td><td>Sí (miles de providers)</td><td>Sí</td><td>Solo AWS</td><td>Sí (por SSH/API)</td></tr>
+      <tr><td>Punto débil</td><td>HCL limitado; gestión del estado</td><td>Se presta a sobre-ingeniería</td><td>Verboso; atado a AWS</td><td>Drift si se corre parcialmente; lento a escala</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">Políticas como código <span>· OPA, Gatekeeper, Kyverno</span></p>
+    <p>Las reglas de "qué se puede desplegar" dejan de vivir en una wiki y en la cabeza del revisor y
+    pasan a ser código que una máquina evalúa y hace cumplir. <strong>OPA</strong> (Open Policy Agent,
+    proyecto graduado de la CNCF) es un motor de políticas de propósito general: escribes las reglas
+    en el lenguaje Rego y las consultas desde un pipeline, un servidor de API o un clúster.
+    <strong>Gatekeeper</strong> lleva OPA a Kubernetes como <em>admission controller</em>: intercepta
+    cada objeto antes de que se cree y lo rechaza si viola una política. <strong>Kyverno</strong>
+    (también graduado de la CNCF, marzo de 2026) hace lo mismo pero con políticas escritas como
+    manifiestos YAML de Kubernetes, sin lenguaje nuevo, y además puede <em>mutar</em> objetos
+    (añadir etiquetas, límites por defecto) y <em>generar</em> recursos.</p>
+    <p>Ejemplos de política: prohibir imágenes con etiqueta <code class="inline">latest</code> o de
+    registries no confiables; exigir <code class="inline">requests</code>/<code class="inline">limits</code>
+    y usuario no-root; bloquear <code class="inline">Service</code> de tipo LoadBalancer público;
+    rechazar una imagen sin firma verificada; obligar a las etiquetas de coste (sección
+    <a href="#finops">11</a>).</p>
+    <p class="why"><b>por qué importa</b>Es el guardarraíl que hace seguro el autoservicio: el
+    desarrollador no espera aprobación humana para lo normal, y lo peligroso lo frena el sistema en el
+    mismo sitio siempre —el pipeline o el clúster—, no la suerte de que el revisor esté atento.
+    La misma política se corre <em>shift-left</em> en CI (fallar el PR) y como red de seguridad en
+    <em>admission</em>.</p>
+  </div>
+  <div class="concept">
+    <p class="term">IaC en el pipeline <span>· plan en el PR, detección continua de drift</span></p>
+    <p>La infraestructura se gobierna con el mismo flujo que el código: nadie corre
+    <code class="inline">terraform apply</code> desde su portátil. El patrón: un PR que toca
+    <code class="inline">.tf</code> dispara un <code class="inline">plan</code> automático cuyo diff se
+    publica como comentario para revisar; al fusionar, un runner con credenciales efímenas (OIDC,
+    sección <a href="#ci">03</a>) aplica; el estado vive en un backend remoto con locking. Herramientas
+    como Atlantis o los productos de las plataformas de CI y de Terraform orquestan esto. Encima se
+    monta un <strong>detector de drift</strong>: un job programado que corre <code class="inline">plan</code>
+    contra la realidad cada noche y alerta si algo se cambió a mano —porque el drift silencioso hace
+    que el siguiente <code class="inline">apply</code> de otra persona revierta o rompa algo sin querer—.</p>
+    <p class="why"><b>por qué importa</b>El <code class="inline">apply</code> desde un portátil no deja
+    rastro, corre con credenciales personales de permisos amplios, y compite por el estado con
+    cualquier otro. Llevarlo al pipeline le da revisión, auditoría, permisos mínimos y un solo camino
+    ordenado a producción, igual que para la aplicación.</p>
+  </div>
+</section>
+
+<section class="block" id="redes-cloud">
+  <span class="sec-num">08</span>
+  <h2>Redes en la nube</h2>
+  <p class="lead">
+    La red es donde la seguridad y la disponibilidad se deciden antes de que el primer paquete llegue
+    a tu código. Los conceptos son los de siempre —subredes, rutas, DNS, balanceo— con nombres de
+    AWS/GCP encima.
+  </p>
+
+  <div class="concept">
+    <p class="term">VPC <span>· red virtual privada</span></p>
+    <p>Tu porción aislada de la red del proveedor, con un rango de IP privadas
+    (<code class="inline">10.0.0.0/16</code>) que tú defines. Nada entra ni sale salvo por las puertas
+    que abras explícitamente. Es el contenedor de todo lo demás: subredes, tablas de ruta, gateways.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Subredes <span>· públicas, privadas, aisladas</span></p>
+    <p>Divisiones de la VPC, cada una atada a una zona de disponibilidad. <strong>Pública</strong>: su
+    tabla de ruta tiene un camino al internet gateway; ahí van los balanceadores y los bastiones.
+    <strong>Privada</strong>: sin ruta directa a internet entrante; sale a internet vía NAT. Ahí van
+    los servidores de aplicación. <strong>Aislada</strong>: sin ninguna ruta a internet; ahí van las
+    bases de datos. Lo que hace "pública" a una subred es su tabla de rutas, nada más.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Route tables <span>· internet gateway, NAT gateway</span></p>
+    <p>Una <strong>tabla de rutas</strong> dice, para cada rango de destino, por dónde sale el
+    tráfico. El <strong>internet gateway</strong> (IGW) conecta una subred pública con internet en
+    ambos sentidos. El <strong>NAT gateway</strong> deja que instancias en subred privada
+    <em>inicien</em> conexiones salientes (descargar paquetes, llamar APIs) sin ser alcanzables desde
+    afuera. El NAT gateway se paga por hora y por GB procesado: es una fuente clásica de factura
+    sorpresa.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Security groups <span>· stateful</span></p>
+    <p>Un firewall a nivel de instancia (o de ENI). Es <strong>con estado</strong>: si permites una
+    conexión entrante, la respuesta sale automáticamente aunque no haya regla de salida para ella.
+    Solo tiene reglas de <em>permitir</em>; lo que no está permitido, se niega. Puede referenciar
+    otros security groups ("permitir desde el SG de la app"), lo que evita fijar IPs.</p>
+  </div>
+  <div class="concept">
+    <p class="term">NACL <span>· stateless</span></p>
+    <p>Un firewall a nivel de subred. Es <strong>sin estado</strong>: hay que permitir explícitamente
+    tanto la ida como la vuelta (incluidos los puertos efímeros de retorno). Tiene reglas de permitir
+    y de negar, numeradas y evaluadas en orden. Se usa como segunda capa gruesa —bloquear un rango de
+    IP para toda la subred—, no para reglas finas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">DNS <span>· zonas, registros, TTL, split-horizon</span></p>
+    <p>Una <strong>zona</strong> es el conjunto de registros de un dominio. Registros comunes:
+    <code class="inline">A</code>/<code class="inline">AAAA</code> (nombre → IP),
+    <code class="inline">CNAME</code> (alias), <code class="inline">MX</code> (correo),
+    <code class="inline">TXT</code> (verificación, SPF). El <strong>TTL</strong> es cuánto pueden
+    cachear los resolvers una respuesta: TTL alto = menos consultas pero cambios lentos de propagar;
+    bajar el TTL <em>antes</em> de una migración es el truco. <strong>Split-horizon</strong>: la misma
+    consulta responde distinto según venga de dentro de la VPC (IP privada) o de fuera (IP pública).</p>
+  </div>
+  <div class="concept">
+    <p class="term">Balanceo L4 <span>· vs L7</span></p>
+    <p><strong>L4</strong> (capa de transporte, NLB): reparte conexiones TCP/UDP sin mirar el
+    contenido. Rapidísimo, preserva la IP de origen, ideal para tráfico no-HTTP o muy alto volumen.
+    <strong>L7</strong> (capa de aplicación, ALB): entiende HTTP, así que enruta por host, path,
+    header o cookie, termina TLS, reescribe, y hace health checks a nivel de aplicación. La mayoría de
+    las apps web quieren L7.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Health checks <span>· connection draining</span></p>
+    <p>El balanceador sondea cada backend y solo le manda tráfico si responde sano. El
+    <strong>connection draining</strong> (deregistration delay): cuando una instancia se va a retirar
+    —deploy, escalado— el balanceador deja de mandarle conexiones nuevas pero espera a que terminen
+    las en curso antes de cortarla. Sin esto, cada despliegue corta peticiones a medias.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Service mesh <span>· sidecar, mTLS, traffic splitting</span></p>
+    <p>Un <em>sidecar</em> proxy (Envoy) junto a cada servicio intercepta todo su tráfico de red. El
+    conjunto da, sin tocar el código de las apps: <strong>mTLS</strong> automático entre servicios
+    (cada uno prueba su identidad), <strong>reintentos y timeouts</strong> uniformes,
+    <strong>traffic splitting</strong> fino para canary, y telemetría de cada llamada. Istio y Linkerd
+    son las implementaciones conocidas.</p>
+    <p class="why"><b>cuándo NO</b>Un mesh agrega un proxy por pod, un plano de control que operar y
+    latencia por salto. Con pocos servicios, mTLS a nivel de librería o de red y reintentos en el
+    cliente cubren lo mismo sin el peso. El mesh se justifica con decenas de servicios y requisitos
+    de política y cumplimiento entre ellos.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Egress control <span>· private endpoints</span></p>
+    <p>Controlar el tráfico <em>saliente</em> importa tanto como el entrante: un servidor comprometido
+    que puede llamar a cualquier IP exfiltra datos sin problema. Se restringe con listas de destinos
+    permitidos y proxies de salida. Los <strong>private endpoints</strong> (VPC endpoints,
+    PrivateLink) permiten llegar a servicios del proveedor (S3, la API de secretos) por la red
+    interna, sin pasar por internet ni por el NAT gateway.</p>
+  </div>
+
+  <div class="diagram">                        internet
+                           │
+                    ┌──────┴──────┐
+                    │  Internet   │
+                    │  Gateway    │
+                    └──────┬──────┘
+        VPC 10.0.0.0/16    │
+  ┌───────────────────────┼────────────────────────┐
+  │   AZ-a                 │            AZ-b        │
+  │  ┌──────────────┐   ┌──┴───────────┐            │
+  │  │ subred pública│   │ subred pública│  ← ALB (L7), NAT gateway
+  │  │  10.0.0.0/24 │   │  10.0.1.0/24 │            │
+  │  └──────┬───────┘   └──────┬───────┘            │
+  │         │  (SG: solo 443 desde internet)       │
+  │  ┌──────┴───────┐   ┌──────┴───────┐            │
+  │  │ subred privada│   │ subred privada│  ← app (SG: 8080 solo desde el SG del ALB)
+  │  │  10.0.10.0/24│   │  10.0.11.0/24│            │
+  │  └──────┬───────┘   └──────┬───────┘            │
+  │  ┌──────┴───────┐   ┌──────┴───────┐            │
+  │  │ subred aislada│   │ subred aislada│  ← RDS (SG: 5432 solo desde el SG de la app,
+  │  │  10.0.20.0/24│   │  10.0.21.0/24│     sin ruta a internet, réplica en la otra AZ)
+  │  └──────────────┘   └──────────────┘            │
+  └────────────────────────────────────────────────┘</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Security group</th><th>NACL</th></tr></thead>
+    <tbody>
+      <tr><td>Alcance</td><td>Instancia / interfaz de red</td><td>Subred completa</td></tr>
+      <tr><td>Estado</td><td>Con estado (la respuesta se permite sola)</td><td>Sin estado (hay que permitir ida y vuelta)</td></tr>
+      <tr><td>Reglas</td><td>Solo permitir</td><td>Permitir y negar, numeradas y en orden</td></tr>
+      <tr><td>Puede referenciar</td><td>Otros security groups</td><td>Solo rangos de IP</td></tr>
+      <tr><td>Uso típico</td><td>Regla fina, la línea de defensa principal</td><td>Bloqueo grueso por subred, segunda capa</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>ALB (L7)</th><th>NLB (L4)</th><th>API Gateway</th></tr></thead>
+    <tbody>
+      <tr><td>Opera en</td><td>HTTP/HTTPS</td><td>TCP/UDP/TLS</td><td>HTTP/REST/WebSocket</td></tr>
+      <tr><td>Enrutamiento</td><td>Por host, path, header, cookie</td><td>Por puerto; no mira contenido</td><td>Por ruta + método, con integraciones</td></tr>
+      <tr><td>Extras</td><td>Terminación TLS, WAF, redirects</td><td>IP estática, preserva IP origen, latencia mínima</td><td>Auth, rate limiting, transformación, caché, claves de API</td></tr>
+      <tr><td>Precio</td><td>Por hora + LCU</td><td>Por hora + NLCU</td><td>Por millón de peticiones (más caro por request)</td></tr>
+      <tr><td>Elige cuando</td><td>App web con varias rutas/servicios</td><td>Alto volumen, no-HTTP, o necesitas IP fija</td><td>API pública que necesita gobernanza sin construirla tú</td></tr>
+    </tbody>
+  </table></div>
+</section>
+
+<section class="block" id="observabilidad-ops">
+  <span class="sec-num">09</span>
+  <h2>Observabilidad y operación</h2>
+  <p class="lead">
+    Monitoreo es vigilar lo que sabías que podía fallar. Observabilidad es poder responder preguntas
+    nuevas sobre el sistema sin desplegar código para investigar. Se apoya en tres tipos de señal con
+    costos y usos muy distintos.
+  </p>
+
+  <div class="concept">
+    <p class="term">Métricas <span>· agregables, baratas</span></p>
+    <p>Números medidos en el tiempo: peticiones por segundo, latencia p99, uso de memoria, largo de
+    la cola. Se agregan y se almacenan de forma muy compacta (una serie temporal ocupa casi nada),
+    así que se retienen mucho tiempo y son la base de los dashboards y las alertas. Su límite: te
+    dicen <em>que</em> algo pasa, rara vez <em>por qué</em>.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Logs <span>· contexto, caros</span></p>
+    <p>Eventos discretos con detalle: "usuario 42 recibió 500 al pagar, stack trace X". Dan el
+    contexto que las métricas no tienen. El costo es el volumen: la ingesta y el almacenamiento de
+    logs es de los mayores gastos ocultos de infraestructura. Logs <strong>estructurados</strong>
+    (JSON con campos, no texto libre) son consultables; el texto plano no.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Trazas <span>· causalidad entre servicios</span></p>
+    <p>Una <strong>traza</strong> sigue una petición a través de todos los servicios que toca, como un
+    árbol de <strong>spans</strong> (cada span = una operación con inicio, fin y metadatos). Muestra
+    dónde se fue el tiempo y qué llamada falló en una cadena de diez servicios. Es la señal que
+    responde "¿por qué esta petición tardó 3 segundos?".</p>
+  </div>
+  <div class="concept">
+    <p class="term">RED <span>· para servicios</span></p>
+    <p>Para cada servicio, tres métricas: <strong>R</strong>ate (peticiones por segundo),
+    <strong>E</strong>rrors (cuántas fallan), <strong>D</strong>uration (distribución de latencia).
+    Con esas tres por endpoint se detecta la enorme mayoría de los problemas de cara al usuario.</p>
+  </div>
+  <div class="concept">
+    <p class="term">USE <span>· para recursos</span></p>
+    <p>Para cada recurso (CPU, disco, red, pool de conexiones): <strong>U</strong>tilization (qué
+    fracción está en uso), <strong>S</strong>aturation (cuánta cola/espera hay),
+    <strong>E</strong>rrors. RED mira el servicio desde afuera; USE mira lo que lo sostiene desde
+    adentro. Se complementan.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Cardinalidad <span>· y su costo</span></p>
+    <p>El número de combinaciones únicas de etiquetas de una métrica. Añadir una etiqueta
+    <code class="inline">user_id</code> a una métrica con un millón de usuarios crea un millón de
+    series temporales: el sistema de métricas explota en costo y se vuelve lento. Regla: las etiquetas
+    son para dimensiones acotadas (endpoint, código de estado, región), nunca para identificadores
+    libres. Eso va en logs o trazas.</p>
+    <p class="why"><b>por qué importa</b>La "explosión de cardinalidad" es la causa número uno de
+    facturas descontroladas de observabilidad y de dashboards que no cargan.</p>
+  </div>
+  <div class="concept">
+    <p class="term">SLI · SLO · error budget</p>
+    <p>Un <strong>SLI</strong> es una medida concreta de salud desde la perspectiva del usuario (% de
+    peticiones bajo 300 ms). Un <strong>SLO</strong> es el objetivo para ese SLI (99,9 % en 30 días).
+    El <strong>error budget</strong> es lo que queda: 0,1 % de peticiones pueden fallar este mes. Si
+    hay presupuesto, se lanza rápido; si se agotó, se congelan features y el equipo trabaja en
+    fiabilidad. Convierte "¿desplegamos hoy?" en una pregunta con respuesta numérica.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Alertas sobre síntomas, no causas</p>
+    <p>Alerta cuando el usuario sufre —error rate alto, latencia fuera del SLO, presupuesto quemándose
+    rápido—, no cuando "la CPU está al 80 %" (puede ser normal). Las alertas de causa generan ruido
+    porque muchas causas no producen impacto. Toda alerta debe ser accionable: si no hay nada que
+    hacer al recibirla, no debería existir.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Fatiga de alertas <span>· on-call sano</span></p>
+    <p>Un buscapersonas que suena por cosas que no importan entrena al equipo a ignorarlo, y el día
+    que importa nadie reacciona. Un on-call sostenible: pocas alertas por turno, todas reales, con
+    runbook, rotación amplia, compensación, y una revisión periódica que borra o ajusta las que
+    dispararon sin necesidad.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Postmortem sin culpa</p>
+    <p>Tras un incidente se documenta qué pasó, la línea de tiempo, el impacto y —sobre todo— qué del
+    <em>sistema</em> permitió el error (falta de una validación, una alerta ausente, un runbook
+    equivocado), no qué persona se equivocó. La gente esconde información cuando teme el castigo;
+    sin esa información no se aprende. El resultado son acciones concretas con dueño y fecha.</p>
+  </div>
+  <div class="concept">
+    <p class="term">OpenTelemetry <span>· el estándar</span></p>
+    <p>Un conjunto de APIs, SDKs y un protocolo (OTLP) para generar y exportar métricas, logs y
+    trazas de forma neutral respecto al proveedor. Instrumentas una vez con OTel y luego eliges o
+    cambias el backend (Prometheus, Grafana, Datadog, Honeycomb) sin tocar el código. Es el proyecto
+    que terminó con el <em>lock-in</em> del agente de cada vendor.</p>
+  </div>
+
+  <div class="diagram">UNA TRAZA a través de 3 servicios
+
+  gateway    ├──────────────────────────────────────────────┤  318 ms
+  auth          ├────┤ 22 ms
+  pedidos            ├───────────────────────────────┤ 210 ms
+  db (query)              ├─────────────────────┤ 160 ms   ◄── aquí se fue el tiempo
+  cache                                     ├──┤ 8 ms
+                    span padre / spans hijos · cada barra = una operación
+
+
+ERROR BUDGET · SLO 99,9% mensual  (presupuesto: 43 min de caída)
+
+  100% ┤●●●●●●●●●●●●●●
+       │              ●●●●●●●●●            ← consumo normal, ritmo sano
+   50% ┤                       ●●●●●
+       │                            ●●●●●●●●●●●●●●
+       │                                          ●●●●●╲
+    0% ┤──────────────────────────────────────────────●╲──  incidente: quema
+       └┬─────────┬─────────┬─────────┬─────────┬─────┴──   el 60% en 20 min
+        1         8         15        22        29   → congelar releases</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>Métricas</th><th>Logs</th><th>Trazas</th></tr></thead>
+    <tbody>
+      <tr><td>Qué es</td><td>Números agregados en el tiempo</td><td>Eventos discretos con detalle</td><td>El camino de una petición entre servicios</td></tr>
+      <tr><td>Pregunta que responde</td><td>¿Está pasando algo? ¿desde cuándo?</td><td>¿Qué exactamente le pasó a esta operación?</td><td>¿Dónde y por qué se fue el tiempo / falló?</td></tr>
+      <tr><td>Cardinalidad</td><td>Debe ser baja (dimensiones acotadas)</td><td>Alta: cualquier campo</td><td>Alta: cada traza es única</td></tr>
+      <tr><td>Costo por volumen</td><td>Bajo</td><td>Alto</td><td>Medio-alto (se suele muestrear)</td></tr>
+      <tr><td>Retención típica</td><td>Meses o años</td><td>Días o semanas</td><td>Días</td></tr>
+      <tr><td>Base de</td><td>Dashboards y alertas</td><td>Depuración e investigación forense</td><td>Análisis de latencia y dependencias</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">Los tres pilares se están fundiendo</span>
+    <p>La tendencia (wide events, OpenTelemetry) es dejar de tratar métricas, logs y trazas como tres
+    silos con tres herramientas y emitir <em>eventos anchos</em> muy estructurados de los que se
+    derivan las tres vistas. Práctico: instrumenta con OTel, estructura todo, y evita comprarte tres
+    productos que no se hablan entre sí.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">eBPF <span>· observabilidad desde el kernel, sin tocar la app</span></p>
+    <p>eBPF (<em>extended Berkeley Packet Filter</em>) permite cargar programas pequeños y verificados
+    en un entorno aislado <em>dentro del kernel de Linux</em> y engancharlos a eventos —una llamada al
+    sistema, un paquete de red, una función del kernel o de un binario en espacio de usuario— sin
+    escribir un módulo de kernel ni reiniciar. Un verificador rechaza el programa si puede colgar el
+    kernel o acceder a memoria que no debe.</p>
+    <p>Para observabilidad, esto habilita <strong>auto-instrumentación</strong>: se ve latencia de
+    red servicio a servicio, conexiones, DNS, llamadas HTTP, syscalls, uso de CPU por función y
+    perfiles de rendimiento <em>sin añadir una sola línea ni un SDK a la aplicación</em>, porque la
+    medición ocurre en la capa que todas las apps comparten. Herramientas:
+    <strong>Cilium</strong> y su componente <strong>Hubble</strong> (red y flujos en Kubernetes;
+    proyecto graduado de la CNCF), <strong>Pixie</strong> (telemetría automática de apps en
+    Kubernetes), <strong>Parca</strong> (perfilado continuo), <strong>bpftrace</strong> (lenguaje de
+    trazado ad hoc estilo DTrace/awk para depurar en caliente), y <strong>Falco</strong> y
+    <strong>Tetragon</strong> para seguridad en runtime (detección de comportamiento anómalo a nivel
+    de kernel).</p>
+    <p class="why"><b>por qué importa</b>Cierra el hueco entre "la app no está instrumentada" y "no
+    tengo visibilidad": pones un agente y ves la red, los procesos y la latencia de todo el nodo. No
+    reemplaza la instrumentación con OpenTelemetry —eBPF no conoce el <em>contexto de negocio</em>
+    (qué usuario, qué pedido, qué span padre) ni ve dentro de TLS sin trucos—; la complementa por
+    debajo.</p>
+    <p class="why"><b>coste y límites</b>Exige un kernel razonablemente reciente (y funciones que
+    varían según versión), añade algo de overhead de CPU proporcional a cuántos eventos enganchas, la
+    curva de aprendizaje es real, y en entornos gestionados o serverless puede que no tengas acceso al
+    nodo para cargar los programas.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Perfilado continuo <span>· continuous profiling</span></p>
+    <p>Muestrear de forma permanente y a bajo coste dónde gasta CPU y memoria cada proceso en
+    producción, y guardarlo como una serie temporal de <em>flame graphs</em> que se puede consultar
+    hacia atrás. Antes se perfilaba solo cuando ya había un problema y en un entorno de pruebas que no
+    se parecía a producción. Con perfilado continuo (Parca, Pixie, o los perfiles de la mayoría de
+    plataformas de observabilidad, hoy a menudo vía eBPF) puedes preguntar "¿qué función se comió la
+    CPU durante el incidente de anoche a las 3:10?" y "¿qué cambió entre la versión que desplegamos el
+    martes y la de hoy?".</p>
+    <p class="why"><b>por qué importa</b>Es la señal que ataca directamente el coste de compute y la
+    latencia por trabajo de CPU, dos cosas que métricas y trazas señalan pero no explican a nivel de
+    línea de código. A menudo se le llama el "cuarto pilar" de la observabilidad.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Gestión de incidentes <span>· roles, severidad, comandante</span></p>
+    <p>Cuando algo se rompe de verdad, la improvisación cuesta minutos de RTO. Un proceso de
+    incidentes define: <strong>niveles de severidad</strong> (SEV1 = caída total o pérdida de datos;
+    SEV2 = degradación grave; SEV3 = acotado) que fijan a quién se despierta y con qué urgencia;
+    <strong>roles</strong> —<em>incident commander</em> (coordina y decide, no teclea),
+    <em>operaciones</em> (aplica los cambios), <em>comunicaciones</em> (actualiza a stakeholders y a
+    la página de estado), <em>scribe</em> (registra la línea de tiempo)—; un <strong>canal
+    único</strong> por incidente; y un criterio explícito de cuándo escalar y cuándo declarar el
+    incidente resuelto. El postmortem sin culpa (ver arriba) viene después y se alimenta de la línea
+    de tiempo que llevó el scribe.</p>
+    <p class="why"><b>por qué importa</b>El error caro en un incidente grande no suele ser técnico:
+    es que cinco personas tocan producción a la vez sin coordinarse, o que nadie avisó a soporte, o
+    que se perdió media hora reconstruyendo qué se probó ya. Los roles existen para que la mitigación
+    y la coordinación no compitan por la misma cabeza.</p>
+  </div>
+</section>
+
+<section class="block" id="config-secretos">
+  <span class="sec-num">10</span>
+  <h2>Configuración y secretos</h2>
+  <p class="lead">
+    La configuración es todo lo que cambia entre entornos sin cambiar el código. Los secretos son la
+    parte de la configuración que, filtrada, es un incidente. Se manejan distinto y el error más
+    caro es tratarlos igual.
+  </p>
+
+  <div class="concept">
+    <p class="term">Config en el entorno, no en la imagen <span>· 12-factor</span></p>
+    <p>El mismo artefacto (imagen, binario) debe correr en dev, staging y prod sin recompilar: lo que
+    cambia se inyecta desde afuera como variables de entorno o archivos montados. Meter la URL de la
+    base en la imagen obliga a una imagen por entorno y garantiza que tarde o temprano se despliega
+    la de staging en prod.</p>
+    <p class="why"><b>por qué importa</b>"Construir una vez, promover el mismo artefacto" solo
+    funciona si la config vive fuera del artefacto.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Jerarquía <span>· default → entorno → override</span></p>
+    <p>La config se resuelve por capas: valores por defecto en el código (o un archivo base) →
+    valores del entorno (prod, staging) → overrides puntuales (una variable para un experimento, un
+    flag para un incidente). Cada capa pisa a la anterior. El default debe ser el más seguro y
+    conservador, para que un valor olvidado no abra nada.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Config estática <span>· vs dinámica</span></p>
+    <p><strong>Estática</strong>: se lee al arrancar el proceso; cambiarla requiere reiniciar. Simple
+    y predecible. <strong>Dinámica</strong>: se puede cambiar en caliente (feature flags, límites de
+    rate, niveles de log) sin redeploy. Necesita un mecanismo de distribución y cuidado con la
+    consistencia entre instancias, pero es lo que permite reaccionar en un incidente en segundos.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Gestor de secretos <span>· Vault, cloud KMS, sealed-secrets</span></p>
+    <p>Un servicio dedicado a guardar, entregar y auditar secretos, con control de acceso propio y
+    registro de cada lectura. <strong>Vault</strong> (HashiCorp) es el de propósito general; los
+    <strong>KMS</strong> de nube (AWS Secrets Manager / KMS, GCP Secret Manager) integran con IAM;
+    <strong>sealed-secrets</strong> resuelve el caso de GitOps cifrando el secreto de forma que solo
+    el controlador del clúster puede abrirlo, y así el cifrado sí puede vivir en Git.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Rotación automática</p>
+    <p>Un secreto de vida infinita es un secreto que, si se filtró alguna vez sin que lo sepas, sigue
+    sirviendo. La rotación programada (el gestor genera una credencial nueva, actualiza el servicio y
+    revoca la vieja) acota la ventana. Solo es viable si la app relee el secreto sin reiniciar o
+    tolera un breve solapamiento entre la vieja y la nueva.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Dynamic secrets <span>· lease, TTL</span></p>
+    <p>En vez de una credencial de base de datos compartida y permanente, la app le pide a Vault una
+    <em>al momento</em>: Vault crea un usuario real en la base con permisos mínimos, se lo entrega con
+    un <strong>lease</strong> (contrato con un <strong>TTL</strong> de, digamos, una hora) y al vencer
+    lo borra de la base. Cada instancia, cada proceso, tiene su propia credencial efímera.</p>
+    <p class="why"><b>por qué importa</b>Un secreto que solo vive una hora y solo lo tuvo un proceso
+    reduce el radio de daño de una filtración casi a cero, y hace trivial saber quién usó qué.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Nunca en el repo <span>· git-secrets, pre-commit, scanning</span></p>
+    <p>Un secreto commiteado sigue en el historial aunque lo borres en el commit siguiente: hay que
+    reescribir la historia <em>y</em> rotar el secreto, porque ya se asume comprometido. Defensa en
+    capas: un hook de pre-commit que escanea antes de crear el commit, un escaneo en el CI que bloquea
+    el merge, y escaneo del proveedor (push protection) que rechaza el push.</p>
+  </div>
+  <div class="concept">
+    <p class="term">SOPS <span>· para GitOps</span></p>
+    <p><em>Secrets OPerationS</em> (Mozilla) cifra solo los <em>valores</em> de un archivo YAML/JSON,
+    dejando las claves legibles, usando un KMS, PGP o age. El archivo cifrado se versiona en Git —el
+    diff sigue teniendo sentido— y se descifra en el momento del despliegue. Es cómo se tienen
+    secretos en un repo GitOps sin un gestor de secretos en línea.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Blast radius de un secreto filtrado</p>
+    <p>La pregunta a hacerse por cada secreto: si esto se publica en un gist ahora mismo, ¿qué puede
+    hacer el atacante, por cuánto tiempo, y me entero? Un secreto con permisos amplios, sin
+    expiración y sin auditoría es una crisis; uno acotado, con TTL corto y cada uso registrado es un
+    aviso y una rotación. El diseño de secretos es, sobre todo, reducir ese radio de antemano.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">El <code class="inline">.env</code> que llega a producción o al repo</span>
+    <p>El archivo <code class="inline">.env</code> es cómodo en local y una trampa fuera de ahí: se
+    cuela en la imagen Docker por un <code class="inline">COPY . .</code> sin
+    <code class="inline">.dockerignore</code>, se sube al repo por un
+    <code class="inline">git add -A</code>, aparece entero en un log de arranque, o queda en un
+    backup. En cuanto un secreto sale de un gestor con control de acceso y pasa a un archivo plano en
+    disco, perdiste la auditoría y probablemente el control. En producción, los secretos se inyectan
+    desde el gestor al proceso, nunca vía un archivo versionable.</p>
+  </div>
+
+  <div class="diagram">CREDENCIAL DINÁMICA CON TTL
+
+  app (arranca)
+    │  1. se autentica ante Vault con su identidad de plataforma
+    │     (rol de K8s / instancia de AWS — no un secreto pre-provisto)
+    ▼
+  agent / sidecar Vault
+    │  2. "necesito acceso a la base de datos de pedidos"
+    ▼
+  Vault
+    │  3. CREATE USER 'v-app-x7f2' ... GRANT SELECT,INSERT ON pedidos.*
+    │  4. entrega  user=v-app-x7f2  pass=…  lease_id=…  ttl=1h
+    ▼
+  base de datos  ◄── la app se conecta con esa credencial efímera
+    │
+    │  (55 min después) el agente renueva el lease, o
+    │  (a los 60 min sin renovar) Vault ejecuta DROP USER 'v-app-x7f2'
+    ▼
+  la credencial deja de existir — nada que rotar, nada que revocar a mano</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Tipo de valor</th><th>Cuándo se necesita</th><th>Dónde vive</th><th>Ejemplos</th></tr></thead>
+    <tbody>
+      <tr><td>Constante de build</td><td>Al compilar</td><td>En el código o argumentos de build; queda en el artefacto</td><td>Versión, feature set del edificio, nivel de optimización</td></tr>
+      <tr><td>Config de entorno (no sensible)</td><td>Al arrancar el proceso</td><td>Variables de entorno, ConfigMap, archivo montado</td><td>URL de la API, nombre del bucket, nivel de log, región</td></tr>
+      <tr><td>Secreto</td><td>En runtime, al conectar</td><td>Gestor de secretos → inyectado al proceso (nunca en imagen ni repo)</td><td>Contraseña de base, clave de API de terceros, clave de firma</td></tr>
+      <tr><td>Config dinámica</td><td>Puede cambiar sin reiniciar</td><td>Servicio de flags / KV distribuido, con caché local</td><td>Feature flags, límites de rate, kill switch de un endpoint</td></tr>
+      <tr><td>Secreto efímero</td><td>Por proceso, por sesión</td><td>Generado al vuelo por el gestor, con lease/TTL</td><td>Credencial de base dinámica, token STS temporal</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="concept">
+    <p class="term">External Secrets Operator <span>· sincronizar, no copiar</span></p>
+    <p>El problema con los <code class="inline">Secret</code> de Kubernetes es que hay que meterlos en
+    el clúster de algún modo, y el gestor de verdad (Vault, AWS Secrets Manager, GCP Secret Manager)
+    vive fuera. El <strong>External Secrets Operator</strong> resuelve el puente: defines un
+    <code class="inline">ExternalSecret</code> que dice "el valor de esta clave vive en tal ruta de tal
+    gestor", y el operador lo lee de forma continua y materializa —y refresca— el
+    <code class="inline">Secret</code> nativo que consumen los pods. El secreto sigue teniendo su
+    fuente de verdad, su control de acceso y su auditoría en el gestor; el clúster solo tiene una copia
+    que se puede regenerar. Alternativa para el caso GitOps: <em>sealed-secrets</em> o SOPS (arriba),
+    que cifran el secreto para poder versionarlo.</p>
+    <p class="why"><b>por qué importa</b>Sin esto, la gente termina pegando secretos en manifiestos,
+    en el pipeline o en variables de CI, y se pierde el punto de tener un gestor. Con esto, rotar un
+    secreto en el gestor se propaga solo a los clústeres.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Identidad de carga de trabajo <span>· workload identity, en vez de una llave</span></p>
+    <p>La misma idea que OIDC en CI (sección <a href="#ci">03</a>), llevada al runtime. En vez de
+    darle a un pod o a una función una clave de acceso de larga vida para hablar con la nube o con
+    Vault, la plataforma le asigna una <strong>identidad</strong> (una service account de Kubernetes
+    federada con un rol de IAM, o la identidad de la instancia) y cada servicio verifica esa identidad
+    y entrega credenciales <em>temporales</em> acotadas al vuelo. No hay secreto inicial que
+    provisionar, filtrar ni rotar: la confianza es la identidad de la plataforma, y las credenciales
+    caducan solas.</p>
+    <p class="why"><b>por qué importa</b>Elimina el "secreto cero" —esa primera credencial que
+    siempre acababa hardcodeada en algún sitio para poder pedir las demás—. Es el estado del arte para
+    autenticación servicio-a-nube y servicio-a-servicio.</p>
+  </div>
+</section>
+
+<section class="block" id="finops">
+  <span class="sec-num">11</span>
+  <h2>FinOps: el costo como métrica de ingeniería</h2>
+  <p class="lead">
+    En la nube, cada decisión de arquitectura es una decisión de gasto, y la factura llega un mes
+    después de tomarla. FinOps es hacer del costo una métrica de primera —visible, atribuible y
+    optimizable— igual que la latencia o la disponibilidad.
+  </p>
+
+  <div class="concept">
+    <p class="term">El costo es una métrica no funcional</p>
+    <p>Un servicio que cumple su SLO pero cuesta diez veces lo que debería está roto, igual que si
+    fuera lento. El costo por petición, por tenant o por transacción es un número que el equipo que
+    construye el servicio debe ver en su dashboard, no algo que descubre finanzas a fin de mes.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Etiquetado obligatorio <span>· tagging</span></p>
+    <p>Cada recurso lleva etiquetas: equipo, servicio, entorno, centro de costo. Sin eso, la factura
+    es un número enorme e indivisible y nadie puede actuar sobre "su" parte. Se hace obligatorio con
+    política: un recurso sin etiquetas no se crea (o se marca y se apaga). Es el trabajo aburrido que
+    habilita todo lo demás.</p>
+    <p class="why"><b>por qué importa</b>No puedes optimizar lo que no puedes atribuir. El 80 % del
+    valor de FinOps es simplemente saber quién gasta qué.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Showback <span>· vs chargeback</span></p>
+    <p><strong>Showback</strong>: se le muestra a cada equipo lo que gastó, sin moverle dinero.
+    Genera conciencia con poca fricción. <strong>Chargeback</strong>: el gasto se carga de verdad al
+    presupuesto del equipo. Más incentivo, más discusiones sobre cómo se reparten los costos
+    compartidos. La mayoría empieza con showback.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Right-sizing</p>
+    <p>Ajustar el tamaño de instancias, contenedores y bases a lo que de verdad usan, medido, no a lo
+    que alguien pidió "por si acaso". Lo típico: instancias al 10 % de CPU sostenido, discos con
+    provisión de IOPS que nadie consume, pools sobredimensionados. Es la optimización de mayor
+    retorno y menor riesgo.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Autoscaling como ahorro</p>
+    <p>Escalar con la demanda significa no pagar la capacidad del pico las 24 horas. Requiere
+    procesos sin estado y arranque rápido. El complemento es el <strong>scale-to-zero</strong> para
+    cargas intermitentes (trabajos batch, entornos de preview): si no hay tráfico, no hay instancias
+    ni factura.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Spot / preemptible <span>· y cómo tolerar la interrupción</span></p>
+    <p>Capacidad sobrante del proveedor con 60–90 % de descuento, que te la pueden quitar con un aviso
+    de pocos minutos. Perfecta para lo que es interrumpible y reintentable: procesamiento batch, CI,
+    entrenamiento, workers de cola, réplicas de un servicio con estado sano. Para tolerarla: manejar
+    la señal de terminación (drenar, guardar checkpoint), diversificar tipos de instancia, y mantener
+    una base en on-demand o reserved para el mínimo que no puede caer.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Savings plans <span>· reserved instances</span></p>
+    <p>Un compromiso de gasto o de uso por 1 o 3 años a cambio de un descuento fijo (30–60 %). Se
+    aplican al consumo base y predecible —lo que sabes que vas a correr sí o sí—. El resto se cubre
+    con on-demand y spot. El error es sobrecomprometerse: un reserved sin usar es dinero quemado.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Apagar entornos no productivos</p>
+    <p>Dev, staging, QA y entornos de demo no necesitan correr de noche ni el fin de semana. Un
+    apagado programado (parar instancias 12 h al día, todo el finde) recorta ~65–70 % del costo de
+    esos entornos con cero impacto. Sorprende cuánta gente no lo hace.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Costos ocultos <span>· egress, NAT, logs</span></p>
+    <p>Las tres sorpresas clásicas de la factura. <strong>Data egress</strong>: sacar datos de la
+    nube —a internet, a otra región, a veces a otra AZ— se cobra por GB y suma rápido con tráfico de
+    medios o backups. <strong>NAT gateway</strong>: por hora y por GB procesado; enrutar todo el
+    tráfico saliente por ahí es caro (los VPC endpoints lo evitan para servicios del proveedor).
+    <strong>Ingesta de logs</strong>: pagar por indexar terabytes de logs con nivel DEBUG que nadie
+    consulta.</p>
+    <p class="why"><b>por qué importa</b>Estos costos no aparecen en el precio de la instancia que
+    miraste al diseñar; aparecen en la factura del mes siguiente, y para entonces el patrón de
+    tráfico ya está en producción.</p>
+  </div>
+  <div class="concept">
+    <p class="term">Presupuestos y alertas</p>
+    <p>Un presupuesto por equipo/servicio con alertas a 50 %, 80 % y 100 % del gasto proyectado, y
+    detección de anomalías que avisa cuando el gasto diario se sale de su patrón. Convierte una
+    factura sorpresa de fin de mes en un aviso el día 3, cuando todavía se puede actuar.</p>
+  </div>
+
+  <div class="diagram">CICLO FINOPS  (informar → optimizar → operar, en bucle)
+
+   ┌─► ETIQUETAR ──► ATRIBUIR ──► INFORMAR ──► OPTIMIZAR ──► PRESUPUESTAR ─┐
+   │   equipo=x       agrupar      dashboard    right-size    alertas 50/80  │
+   │   servicio=y     por tag      por equipo   spot/RI       anomalías      │
+   │   entorno=prod   y por        costo/req    apagar dev    forecast       │
+   │                  servicio                  autoscale                    │
+   └───────────────────────────────────────────────────────────────◄────────┘
+                        cada iteración es mensual o continua
+
+   sin la primera caja (etiquetar) todo lo demás es adivinar</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th></th><th>On-demand</th><th>Reserved / Savings Plan</th><th>Spot / Preemptible</th></tr></thead>
+    <tbody>
+      <tr><td>Descuento</td><td>0 % (precio de lista)</td><td>~30–60 %</td><td>~60–90 %</td></tr>
+      <tr><td>Compromiso</td><td>Ninguno</td><td>1 o 3 años (gasto o uso)</td><td>Ninguno</td></tr>
+      <tr><td>El proveedor puede quitártela</td><td>No</td><td>No</td><td>Sí, con aviso de minutos</td></tr>
+      <tr><td>Para qué carga</td><td>Variable, impredecible, corta</td><td>Base constante y conocida</td><td>Interrumpible y reintentable</td></tr>
+      <tr><td>Riesgo</td><td>Pagar de más por no optimizar</td><td>Sobrecomprometerse: reserva ociosa</td><td>Interrupción en mal momento si no hay fallback</td></tr>
+      <tr><td>Mezcla típica</td><td>El colchón sobre la base</td><td>Cubre el mínimo que siempre corre</td><td>Todo lo batch y los workers tolerantes</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">FinOps es un deporte de equipo</span>
+    <p>Finanzas no puede optimizar arquitectura y los ingenieros no ven el impacto de sus decisiones
+    sin datos de costo. El modelo que funciona: ingeniería es dueña de su gasto y lo ve en sus
+    dashboards; finanzas aporta forecast, compra de reservas y contexto de negocio; y hay un momento
+    recurrente donde se revisan juntos los mayores gastos y las oportunidades. La herramienta importa
+    menos que el bucle.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El coste dentro de Kubernetes <span>· la factura que el proveedor no desglosa</span></p>
+    <p>La nube te factura por nodo (la instancia EC2, la VM), no por pod. Dentro de un clúster
+    compartido, "¿cuánto cuesta el equipo de pagos?" no tiene respuesta directa: hay que repartir el
+    coste de cada nodo entre los pods que corrieron en él, ponderado por lo que cada uno
+    <em>reservó</em> (<code class="inline">requests</code>) o consumió. Herramientas como OpenCost
+    (proyecto de la CNCF, base de Kubecost) hacen ese reparto y lo atribuyen por namespace, label,
+    deployment o equipo, y lo cruzan con los precios reales del proveedor.</p>
+    <p>Las palancas propias de Kubernetes: <strong>requests infladas</strong> —un pod que reserva 2
+    CPU y usa 0,2 mantiene ocupado (y facturado) ese hueco en el nodo para nadie—; <strong>capacidad
+    ociosa del nodo</strong> —el trozo de cada nodo que no cabe en ningún pod—; y el
+    <strong>bin-packing</strong> pobre —pods mal distribuidos que obligan a tener más nodos de los
+    necesarios—. El right-sizing aquí es ajustar requests/limits a lo medido (VPA ayuda), y el
+    cluster-autoscaler o herramientas como Karpenter consolidan cargas en menos nodos y prefieren
+    tipos más baratos o spot.</p>
+    <p class="why"><b>por qué importa</b>En clústeres grandes, entre el 30 % y la mitad del gasto
+    suele ser capacidad reservada y nunca usada. Es invisible en la consola del proveedor —ahí solo
+    ves "nodos"— y solo aparece cuando alguien hace el reparto por pod.</p>
+  </div>
+</section>
+
+<section class="block" id="platform-engineering">
+  <span class="sec-num">12</span>
+  <h2>Platform engineering: la plataforma como producto</h2>
+  <p class="lead">
+    "El que construye, opera" (sección <a href="#que-es">01</a>) reparte bien la responsabilidad, pero
+    carga a cada equipo de producto con Kubernetes, Terraform, pipelines, observabilidad y secretos
+    encima de su propio dominio. Platform engineering es la respuesta: un equipo dedicado construye una
+    plataforma interna —con las mismas prácticas de producto que un SaaS— para que los demás equipos
+    entreguen rápido sin volverse expertos en infraestructura.
+  </p>
+
+  <div class="concept">
+    <p class="term">La evolución <span>· sysadmin → DevOps → SRE → platform engineering</span></p>
+    <p>El <strong>sysadmin</strong> operaba servidores por ticket, con un muro entre él y desarrollo.
+    <strong>DevOps</strong> borró el muro: el mismo equipo construye y opera, con automatización y
+    lotes pequeños. <strong>SRE</strong> (Google) puso ingeniería y números —SLO, error budget,
+    trabajo manual acotado— sobre esa operación. <strong>Platform engineering</strong> es el paso
+    siguiente: reconoce que pedirle a cada equipo de producto que domine todo el stack operativo no
+    escala, y extrae ese trabajo común a una plataforma que se consume como servicio. No sustituye a
+    las anteriores; las empaqueta.</p>
+    <p class="why"><b>por qué importa</b>Cada capa nació al chocar con el límite de la anterior.
+    Saltarse platform engineering en una organización grande devuelve el síntoma que DevOps quería
+    evitar: cada equipo reinventa el despliegue, y ninguno lo hace bien.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Carga cognitiva del desarrollador <span>· el problema que resuelve</span></p>
+    <p>Un equipo de producto tiene un presupuesto finito de atención. Si lo gasta decidiendo el tipo de
+    instancia, escribiendo HCL, depurando un <code class="inline">Ingress</code>, afinando probes y
+    persiguiendo una fuga de secretos, le queda menos para el problema de negocio que justifica su
+    existencia. Team Topologies llama a esto <em>carga cognitiva extraña</em>: complejidad accidental
+    que no aporta valor. La plataforma existe para absorberla —el equipo declara "quiero un servicio
+    HTTP con base de datos" y no piensa en cómo—.</p>
+    <p class="why"><b>por qué importa</b>La métrica que mueve la aguja no es "cuántas herramientas
+    tenemos" sino "cuánto tiene que saber un desarrollador nuevo para llegar a producción". Si la
+    respuesta es "un trimestre", la plataforma —o su ausencia— es el cuello de botella.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Internal Developer Platform <span>· IDP, y sus capas</span></p>
+    <p>Un IDP es el producto que construye el equipo de plataforma: la suma de herramientas, servicios
+    y flujos que un equipo de producto usa para llevar código a producción sin tickets. Se suele
+    describir en tres capas. <strong>Interfaz</strong>: por dónde entra el desarrollador —un portal, una
+    CLI, un archivo YAML en el repo, un plugin del IDE—. <strong>Orquestación</strong>: la lógica que
+    traduce esa petición declarativa en acciones —crear el repo desde una plantilla, provisionar la
+    base, configurar el pipeline, registrar el servicio, abrir los accesos—. <strong>Plataforma
+    (plano de recursos)</strong>: lo que de verdad corre debajo —Kubernetes o ECS, la nube, la malla,
+    el registry, los secretos—. El desarrollador vive en la primera capa; el equipo de plataforma es
+    dueño de las tres.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Backstage <span>· el portal de referencia</span></p>
+    <p>Backstage es un framework de código abierto para construir portales de desarrollador, creado por
+    Spotify y donado a la CNCF en 2020 (proyecto en incubación). No es una plataforma llave en mano:
+    es el esqueleto sobre el que montas la tuya. Sus piezas centrales: el <strong>Software
+    Catalog</strong>, un inventario vivo de servicios, APIs, recursos y sus dueños (cada componente se
+    describe en un <code class="inline">catalog-info.yaml</code> en su repo); los <strong>Software
+    Templates</strong> (el <em>scaffolder</em>), que generan un servicio nuevo ya cableado —repo,
+    pipeline, manifiestos, alta en el catálogo— desde un formulario; <strong>TechDocs</strong>,
+    documentación en Markdown versionada junto al código y renderizada en el portal; y un sistema de
+    <strong>plugins</strong> para incrustar CI, Kubernetes, incidentes, costes o escaneos de seguridad
+    en la misma vista.</p>
+    <p class="why"><b>por qué importa</b>El valor no es la UI bonita: es tener <em>una</em> respuesta a
+    "¿qué servicios existen, quién los mantiene, qué versión corre, dónde está su runbook?". Sin
+    catálogo, ese conocimiento vive en la cabeza de tres personas.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Golden paths <span>· paved roads, caminos recomendados</span></p>
+    <p>Un <em>golden path</em> (término de Spotify; Netflix lo llama <em>paved road</em>) es la forma
+    opinada y soportada de hacer algo común: crear un servicio backend, publicar una API, montar un
+    pipeline de datos. Es un tutorial más una plantilla más las decisiones por defecto ya tomadas
+    (lenguaje, estructura, observabilidad, despliegue). La regla de calidad de Spotify: un
+    desarrollador recién llegado debe poder seguir el golden path y tener un servicio en producción
+    <em>sin pedirle ayuda a nadie</em>; si no llega, el camino no se publica.</p>
+    <p class="why"><b>por qué importa</b>El golden path no es obligatorio. Puedes salirte cuando tu
+    caso lo exige —y entonces asumes el mantenimiento de esa desviación—. La plataforma gana por
+    hacerlo tan bueno que casi nadie quiera salirse, no por prohibir la salida.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Platform as a product <span>· los devs son los clientes</span></p>
+    <p>La diferencia entre una plataforma que se usa y una que se ignora es tratarla como producto:
+    tiene un product manager, un roadmap público, usuarios a los que se entrevista, un canal de
+    soporte, versionado y notas de versión, y métricas de adopción. Los desarrolladores son clientes
+    internos que pueden "comprar" en otro lado (montarse su propio despliegue, irse a un PaaS
+    externo). Si la plataforma les hace la vida más difícil que el atajo, eligen el atajo.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Métricas de experiencia de desarrollo <span>· DORA + SPACE + DevEx</span></p>
+    <p>Cómo se mide si la plataforma funciona. <strong>DORA</strong> (sección <a href="#que-es">01</a>):
+    lead time, frecuencia de despliegue, tasa de fallo, tiempo de recuperación —resultados de entrega—.
+    <strong>SPACE</strong> (Forsgren et al., 2021): cinco dimensiones —Satisfaction, Performance,
+    Activity, Communication, Efficiency— con la tesis de que ninguna métrica sola basta y hay que
+    cubrir al menos tres. <strong>DevEx</strong> (Noda, Storey, Forsgren, 2023): tres motores de la
+    experiencia —bucles de retroalimentación, carga cognitiva y estado de flujo—, con la reducción de
+    carga cognitiva como la palanca de mayor retorno. En la práctica se combinan pocas señales duras
+    (tiempo al primer despliegue de un dev nuevo, tiempo de onboarding, lead time) con una encuesta
+    trimestral de percepción.</p>
+    <p class="why"><b>por qué importa</b>Medir solo actividad (commits, PRs, tickets cerrados) premia
+    el teatro y castiga el trabajo profundo. Medir solo percepción no dice dónde está el problema.
+    Hacen falta las dos caras.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Team Topologies <span>· cuatro tipos de equipo, tres modos de interacción</span></p>
+    <p>El modelo de Skelton y Pais para organizar equipos hacia el flujo rápido.
+    <strong>Stream-aligned</strong>: alineado a un flujo de valor (un producto, un segmento); es la
+    mayoría de los equipos y todos los demás existen para reducir su carga.
+    <strong>Platform</strong>: ofrece servicios internos que los stream-aligned consumen con poca
+    fricción. <strong>Enabling</strong>: ayuda temporalmente a otros equipos a adquirir una capacidad
+    que les falta (testing, seguridad, una tecnología nueva) y luego se retira.
+    <strong>Complicated-subsystem</strong>: posee una parte que necesita conocimiento especialista
+    profundo (un motor de cálculo, un códec). Interactúan de tres formas:
+    <strong>colaboración</strong> (juntos, intensa, para problemas nuevos), <strong>X-as-a-Service</strong>
+    (uno consume lo del otro con mínima coordinación, el modo objetivo entre plataforma y producto) y
+    <strong>facilitación</strong> (uno ayuda al otro a mejorar).</p>
+    <p class="why"><b>por qué importa</b>Una plataforma que exige colaboración constante con cada
+    equipo de producto no escala: cada cliente nuevo consume tiempo del equipo de plataforma. La meta
+    es llegar a X-as-a-Service —autoservicio real— y reservar la colaboración para incubar
+    capacidades nuevas.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Cuándo NO montar una plataforma</p>
+    <p>Una plataforma interna es, ella misma, un producto con coste fijo: gente que la construye,
+    documenta, versiona y soporta. Con un puñado de servicios y un equipo pequeño, ese coste no se
+    amortiza —el "camino" cabe en un README y un par de scripts, y un PaaS externo (Render, Fly.io,
+    App Runner) cubre el resto—. Montar Backstage, un scaffolder y un plano de orquestación para diez
+    personas es construir andamios para una caseta. La plataforma se justifica cuando la duplicación
+    de esfuerzo entre equipos es visible y medible: varios equipos resolviendo el mismo problema de
+    despliegue, cada uno a medias.</p>
+  </div>
+
+  <div class="diagram">LAS TRES CAPAS DE UN IDP  (el desarrollador solo toca la de arriba)
+
+  INTERFAZ        portal (Backstage) . CLI . YAML en el repo . plugin del IDE
+     |            "quiero un servicio HTTP 'pagos' con Postgres"
+     v
+  ORQUESTACION    scaffolder + control loops (Crossplane, operators, pipelines)
+     |            - crea repo desde plantilla (golden path)
+     |            - provisiona la base y sus credenciales dinamicas
+     |            - genera pipeline + manifiestos + alertas base
+     |            - registra el servicio y su dueno en el catalogo
+     v
+  PLATAFORMA      Kubernetes / ECS . nube . malla . registry . secretos . observabilidad
+  (plano de       el equipo de plataforma es DUENO de esta capa;
+   recursos)      el de producto NO la ve
+
+  regla: cada cosa que un equipo de producto tuvo que aprender dos veces
+         es candidata a subir una capa
+
+  ------------------------------------------------------------------
+
+  ADOPCION, NO MANDATO
+
+   plataforma mala          plataforma buena
+   equipos evitan el        equipos eligen el
+   golden path, montan      golden path solos
+   su propio despliegue     porque es el atajo
+        |                        |
+   metrica: % de servicios nuevos que nacen por el golden path
+            tiempo al primer deploy de un dev nuevo</div>
+
+  <div class="note">
+    <span class="label">Autoservicio con guardarraíles, no barra libre</span>
+    <p>Self-service no significa que cualquiera pueda hacer cualquier cosa. Significa que las
+    operaciones seguras son inmediatas y sin ticket, y las peligrosas están acotadas por defecto. Se
+    consigue con dos piezas: <strong>golden paths</strong> que ya traen las decisiones correctas
+    (cifrado, backups, límites de recursos, red mínima) y <strong>políticas como código</strong>
+    (sección <a href="#iac">07</a>) que rechazan en el pipeline o en el clúster lo que se sale de la
+    norma —una imagen sin firmar, un bucket público, un contenedor como root—. El desarrollador no
+    espera aprobación; el sistema le impide el error.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">La plataforma que nadie pidió</span>
+    <p>El fallo más común de platform engineering es construir la plataforma que el equipo de
+    plataforma quería construir, no la que los desarrolladores necesitaban. Síntomas: adopción por
+    decreto ("a partir del lunes todos usan la plataforma"), roadmap decidido sin entrevistar a un
+    solo equipo de producto, y una plataforma que resuelve elegantemente un problema que nadie tenía
+    mientras el dolor real —arrancar un entorno de pruebas, entender por qué falló un deploy— sigue
+    igual. Antídoto: trátala como producto desde el día uno. Pocos golden paths, elegidos por
+    demanda observada, y una métrica de adopción voluntaria que tenga que subir sola.</p>
+  </div>
+</section>
+
+<section class="block" id="multirregion-dr">
+  <span class="sec-num">13</span>
+  <h2>Multirregión y recuperación ante desastres</h2>
+  <p class="lead">
+    Recuperación ante desastres (DR) no es "tener backups". Es haber decidido, antes del incidente,
+    cuántos datos puedes perder y cuánto puedes tardar en volver —y haber pagado la arquitectura que
+    cumple esos dos números—. Todo lo demás, incluido si necesitas otra región, se deriva de ahí.
+  </p>
+
+  <div class="concept">
+    <p class="term">RPO y RTO <span>· los dos números que deciden la arquitectura</span></p>
+    <p>El <strong>RPO</strong> (Recovery Point Objective) es cuántos datos puedes permitirte perder,
+    medido en tiempo: un RPO de 5 minutos significa que tras el desastre aceptas haber perdido como
+    mucho los últimos 5 minutos de escrituras. Lo fija la frecuencia de tu replicación o tus backups.
+    El <strong>RTO</strong> (Recovery Time Objective) es cuánto puedes tardar en volver a dar
+    servicio: un RTO de 1 hora significa que en 60 minutos el sistema tiene que estar operativo en
+    otro sitio. Lo fija cuánta infraestructura tienes ya lista frente a cuánta hay que crear y
+    poblar.</p>
+    <p class="why"><b>por qué importa</b>Estos dos números son una decisión de negocio con precio.
+    Un RPO cercano a cero y un RTO de minutos cuestan varias veces más que "perder una hora y volver
+    en cuatro". Fijarlos por servicio —no todos valen lo mismo— es el primer paso; sin ellos, cada
+    conversación de DR es una opinión.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">El gradiente de estrategias <span>· backup&nbsp;→ pilot light&nbsp;→ warm standby&nbsp;→ active/active</span></p>
+    <p>Las cuatro estrategias del whitepaper de DR de AWS, de menor a mayor coste y de mayor a menor
+    RTO. <strong>Backup &amp; restore</strong>: copias en otra región, nada corriendo; ante el
+    desastre se aprovisiona todo y se restaura (RTO de horas, RPO según la frecuencia de copia).
+    <strong>Pilot light</strong>: los datos se replican de continuo a una región donde solo está
+    encendido el núcleo mínimo (la base); el resto está definido pero apagado y se enciende en el
+    failover (RTO de decenas de minutos). <strong>Warm standby</strong>: una copia completa del
+    sistema corre en la otra región, a escala reducida; el failover es escalarla y redirigir el
+    tráfico (RTO de minutos). <strong>Multi-site active/active</strong>: las dos regiones sirven
+    tráfico real a la vez; un fallo de una es dejar de enviarle tráfico (RTO cercano a cero).</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Failover regional <span>· DNS y redirección de tráfico</span></p>
+    <p>Mover el tráfico de una región a otra casi siempre pasa por DNS. Las piezas: <strong>health
+    checks</strong> que sondean cada región y retiran de las respuestas la que está caída;
+    <strong>TTL</strong> bajo en los registros críticos (30–60 s) para que el cambio se propague
+    rápido —a costa de más consultas—; <strong>routing policies</strong> como failover (primaria y
+    secundaria), latencia (cada cliente a la región más cercana) o geolocalización. La alternativa sin
+    esperar TTL es una <strong>IP anycast</strong> delante (la misma IP anunciada desde varias
+    regiones; la red enruta a la más cercana viva), típica de un CDN o un balanceador global.</p>
+    <p class="why"><b>por qué importa</b>Un TTL de 3600 s en el registro de tu API significa que, tras
+    activar el failover, hay resolvers y clientes que seguirán yendo a la región muerta durante una
+    hora. El TTL hay que bajarlo <em>antes</em>, no durante el incidente.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Los datos son el problema difícil <span>· la ventana de pérdida</span></p>
+    <p>El compute es fácil de replicar: es sin estado, se define en código y arranca en minutos. Los
+    datos no. La <strong>replicación asíncrona</strong> —la primaria confirma la escritura al cliente
+    y <em>luego</em> la envía a la otra región— es lo normal entre regiones, porque esperar la
+    confirmación remota añadiría decenas o cientos de milisegundos a cada write. El precio es el
+    <strong>lag de replicación</strong>: si la primaria muere, lo que aún no había viajado se pierde.
+    Ese lag <em>es</em> tu RPO real. La <strong>replicación síncrona</strong> (la escritura no se
+    confirma hasta que un cuórum de réplicas la tiene) da RPO cero pero paga la latencia
+    entre-regiones en cada operación, y si el cuórum no se alcanza —partición de red— la escritura se
+    bloquea.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Bases de datos multi-región <span>· lo que resuelven y lo que cuestan</span></p>
+    <p><strong>Aurora Global Database</strong> (AWS): réplica de lectura entre regiones con RPO típico
+    de ~1 segundo y RTO de menos de un minuto en el failover gestionado; una sola región escribe.
+    <strong>DynamoDB global tables</strong>: multi-región activo-activo, replicación asíncrona
+    (típicamente &lt;1 s), resolución de conflictos por <em>last writer wins</em> según marca de
+    tiempo; existe además un modo de consistencia fuerte multi-región que devuelve error de conflicto
+    en vez de resolver. <strong>Spanner</strong> (Google) y <strong>CockroachDB</strong>: consistencia
+    fuerte global mediante consenso (Paxos / Raft) y replicación síncrona; Spanner usa TrueTime para
+    ordenar transacciones. La regla: la consistencia global fuerte se paga en latencia de escritura;
+    el activo-activo barato se paga en tener que razonar sobre conflictos.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Active/active <span>· conflictos y latencia del write</span></p>
+    <p>Si las dos regiones aceptan escrituras, dos usuarios pueden modificar el mismo registro a la
+    vez en regiones distintas y ninguna de las dos lo sabe hasta que la replicación las cruza.
+    Estrategias: <strong>last writer wins</strong> (simple, pero se pierde silenciosamente una de las
+    dos escrituras); <strong>particionar por región</strong> (cada registro tiene una región "dueña"
+    que es la única que lo escribe —evita el conflicto pero obliga a enrutar el write); <strong>CRDTs
+    o merge a nivel de aplicación</strong> (estructuras que fusionan sin perder datos, para contadores,
+    conjuntos, texto colaborativo). Y aunque no haya conflicto, un write que necesita coordinar con la
+    otra región carga la latencia entre-regiones (60–150 ms típicos entre continentes) en el camino
+    crítico de esa operación.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Consistencia vs disponibilidad en la práctica <span>· PACELC</span></p>
+    <p>El teorema CAP dice que durante una partición de red hay que elegir entre consistencia y
+    disponibilidad. <strong>PACELC</strong> (Abadi) lo completa: <em>si hay partición (P)</em>, eliges
+    entre disponibilidad (A) y consistencia (C); <em>y si no la hay (E, "else")</em>, aún eliges entre
+    latencia (L) y consistencia (C). DynamoDB y Cassandra son PA/EL: disponibles bajo partición,
+    rápidas el resto del tiempo, a cambio de consistencia eventual. Spanner y CockroachDB son PC/EC:
+    consistentes siempre, aceptando más latencia y bloquearse antes que servir un dato viejo. No hay
+    respuesta correcta; hay que elegir por servicio y saber cuál elegiste.</p>
+    <p class="why"><b>por qué importa</b>Mucha gente diseña multi-región asumiendo, sin decirlo, un
+    modelo de consistencia que su base no da. El resultado son bugs sutiles —un saldo que se ve
+    distinto según la región, una idempotencia que falla— que solo aparecen bajo carga o durante el
+    failover.</p>
+  </div>
+
+  <div class="concept">
+    <p class="term">Game days <span>· probar el DR de verdad</span></p>
+    <p>Un plan de DR que no se ha ejecutado es una hipótesis. Un <strong>game day</strong> (AWS los
+    llama <em>GameDay</em>) es un ejercicio programado donde se provoca el fallo —apagar la región
+    primaria, cortar la replicación, matar la base— y el equipo ejecuta el runbook de recuperación
+    con cronómetro, en un entorno lo más parecido a producción posible. Es la aplicación de
+    <strong>chaos engineering</strong> (experimentar sobre el sistema para ganar confianza en su
+    resiliencia) al escenario más grande. Lo que sale a la luz: runbooks desactualizados, permisos que
+    faltan en la región secundaria, cuotas de servicio sin subir, dependencias ocultas en la región
+    primaria, y un RTO real que triplica al que estaba en el papel.</p>
+  </div>
+
+  <div class="diagram">EL GRADIENTE  (coste sube, RTO baja)
+
+  BACKUP & RESTORE     [ region B: copias en S3, nada corriendo ]
+    RTO horas            desastre -> aprovisionar todo + restaurar
+    RPO = frec. copia
+
+  PILOT LIGHT          [ region B: solo la BD replicando, resto APAGADO ]
+    RTO 10-45 min        desastre -> encender app, escalar, redirigir DNS
+    RPO segundos
+
+  WARM STANDBY         [ region B: sistema completo a escala reducida ]
+    RTO minutos          desastre -> escalar B + redirigir DNS
+    RPO segundos
+
+  ACTIVE / ACTIVE      [ region A y B sirven trafico a la vez ]
+    RTO ~0               desastre -> dejar de enrutar a la region muerta
+    RPO ~0 a segundos    (segun el modelo de la BD)
+
+
+  FAILOVER (pilot light / warm standby)
+
+   clientes --> DNS (health check) --+--> region A  [PRIMARIA]  X caida
+                  TTL 30-60s         |
+                                     +--> region B  [promover replica a primaria,
+                                                      escalar app, calentar caches]
+        el reloj del RTO corre desde "A cae" hasta "B sirve la primera peticion buena"</div>
+
+  <div class="table-scroll"><table>
+    <thead><tr><th>Estrategia</th><th>RTO típico</th><th>RPO típico</th><th>Coste (infra ociosa)</th><th>Para qué servicio</th></tr></thead>
+    <tbody>
+      <tr><td><strong>Backup &amp; restore</strong></td><td>Horas a un día</td><td>Minutos a horas (frecuencia de copia)</td><td>Mínimo: solo almacenamiento</td><td>Interno, no crítico, o datos que se regeneran</td></tr>
+      <tr><td><strong>Pilot light</strong></td><td>10–45 min</td><td>Segundos (replicación continua de datos)</td><td>Bajo: solo la base encendida en B</td><td>Importante pero tolera una ventana corta de caída</td></tr>
+      <tr><td><strong>Warm standby</strong></td><td>Minutos</td><td>Segundos</td><td>Medio: sistema completo a escala reducida</td><td>Crítico, con RTO exigente y presupuesto</td></tr>
+      <tr><td><strong>Active/active</strong></td><td>Casi cero</td><td>Casi cero a segundos</td><td>Alto: doble capacidad + complejidad de datos</td><td>El que no puede caer y cuyo negocio lo paga</td></tr>
+    </tbody>
+  </table></div>
+
+  <div class="note">
+    <span class="label">Soberanía y residencia de datos</span>
+    <p>Antes de elegir regiones, hay una restricción legal: ciertos datos (personales de la UE,
+    sanitarios, financieros, del sector público) pueden estar obligados a no salir de una jurisdicción.
+    Eso limita a qué región puedes replicar, descarta algunos servicios globales gestionados
+    (una tabla global que replica a todas las regiones puede violar el requisito), y a veces fuerza
+    arquitecturas de <em>datos particionados por región</em> donde cada país es su propio silo con su
+    propio DR local. La residencia de datos se decide antes que el RPO, porque puede hacer imposible
+    la estrategia que ibas a elegir.</p>
+  </div>
+
+  <div class="note rust">
+    <span class="label">Multi-región en el compute, punto único de fallo en los datos o el registry</span>
+    <p>La trampa clásica: se despliega la aplicación en tres regiones, se pone un balanceador global,
+    se dibuja la arquitectura resiliente… y todas las réplicas leen y escriben en <em>una</em> base de
+    datos en una sola región. O tiran la imagen de <em>un</em> registry de contenedores en una sola
+    región —que si cae, ninguna región puede arrancar un pod nuevo durante el incidente—. O dependen
+    de un almacén de secretos, una cola, un servicio de identidad o un bucket de configuración que
+    vive en un único sitio. La disponibilidad de un sistema es la de su componente menos disponible en
+    el camino crítico. Multi-región de verdad exige inventariar <em>cada</em> dependencia del arranque
+    y del runtime y preguntar por cada una: "si su región cae, ¿qué pasa?".</p>
+  </div>
+</section>
+
+
+
+      <section class="block" id="curriculo">
+        <span class="sec-num">14</span>
+        <h2>Currículo: libros y cursos</h2>
+        <p class="lead">
+          Un camino ordenado. No los leas todos ni en orden estricto: elige uno por etapa según
+          lo que te toque montar. <span class="rl-tag free">gratis</span> es libre o legalmente
+          gratuito online; <span class="rl-tag paid">pago</span> cuesta;
+          <span class="rl-tag lvl">nivel</span> indica dificultad.
+        </p>
+
+        <div class="stage">
+          <h4>Etapa 0 · Cultura y flujo</h4>
+          <p>DevOps es primero una forma de trabajar. Estos tres explican el porqué.</p>
+          <div class="book"><span class="t">The Phoenix Project</span> — <span class="a">Kim, Behr &amp; Spafford</span> <span class="rl-tag lvl">principiante</span><span class="d">Novela sobre un equipo de IT en crisis. Se lee en un fin de semana y te deja el modelo mental completo. En <a href="https://itrevolution.com/product/the-phoenix-project/" target="_blank" rel="noopener">itrevolution.com</a>.</span></div>
+          <div class="book"><span class="t">The DevOps Handbook, 2ª ed.</span> — <span class="a">Kim, Humble, Debois &amp; Willis</span> <span class="rl-tag lvl">intermedio</span><span class="d">La versión práctica del Phoenix Project: las tres vías, con casos reales. La referencia de fondo. En <a href="https://itrevolution.com/product/the-devops-handbook/" target="_blank" rel="noopener">itrevolution.com</a>.</span></div>
+          <div class="book"><span class="t">Accelerate</span> — <span class="a">Forsgren, Humble &amp; Kim</span> <span class="rl-tag lvl">intermedio</span><span class="d">La investigación detrás de las métricas DORA: qué prácticas predicen rendimiento, con datos. En <a href="https://itrevolution.com/product/accelerate/" target="_blank" rel="noopener">itrevolution.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 1 · Linux y la línea de comandos</h4>
+          <p>Todo lo demás corre encima de esto. Si vienes de atrás, empieza aquí.</p>
+          <div class="book"><span class="t">The Linux Command Line</span> — <span class="a">William Shotts</span> <span class="rl-tag free">gratis</span><span class="d">De cero a shell scripting. PDF libre en linuxcommand.org. El estándar. Buena base para el LFCS. En <a href="https://linuxcommand.org/tlcl.php" target="_blank" rel="noopener">linuxcommand.org</a>.</span></div>
+          <div class="book"><span class="t">How Linux Works, 3ª ed.</span> — <span class="a">Brian Ward</span> <span class="rl-tag lvl">intermedio</span><span class="d">Qué pasa entre encender la máquina y el prompt: init, procesos, red, discos. El nivel justo para ops. En <a href="https://nostarch.com/how-linux-works-3rd-edition/" target="_blank" rel="noopener">nostarch.com</a>.</span></div>
+          <div class="book"><span class="t">wizardzines.com</span> — <span class="a">Julia Evans</span> <span class="rl-tag paid">parte pago</span><span class="d">Zines cortas e ilustradas: contenedores, DNS, tcpdump, bash. Varias gratis. En <a href="https://wizardzines.com" target="_blank" rel="noopener">wizardzines.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 2 · CI/CD</h4>
+          <div class="book"><span class="t">Continuous Delivery</span> — <span class="a">Jez Humble &amp; David Farley</span> <span class="rl-tag lvl">intermedio</span><span class="d">El libro fundacional (2010). Algunas herramientas envejecieron; los principios no. En <a href="https://www.oreilly.com/library/view/continuous-delivery-reliable/9780321670250/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Grokking Continuous Delivery</span> — <span class="a">Christie Wilson</span> <span class="rl-tag lvl">principiante</span><span class="d">Versión moderna e ilustrada. Buen primer libro sobre pipelines. En <a href="https://www.manning.com/books/grokking-continuous-delivery" target="_blank" rel="noopener">manning.com</a>.</span></div>
+          <div class="book"><span class="t">Docs de GitHub Actions / GitLab CI</span> — <span class="a">oficiales</span> <span class="rl-tag free">gratis</span><span class="d">Léelas enteras una vez; la sección de seguridad del pipeline y la de caché valen oro. En <a href="https://docs.github.com/actions" target="_blank" rel="noopener">docs.github.com/actions</a> y <a href="https://docs.gitlab.com/ee/ci/" target="_blank" rel="noopener">docs.gitlab.com/ee/ci</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 3 · Contenedores</h4>
+          <div class="book"><span class="t">Docker Deep Dive</span> — <span class="a">Nigel Poulton</span> <span class="rl-tag lvl">principiante</span><span class="d">De la imagen al runtime, bien explicado y actualizado cada año. En <a href="https://leanpub.com/dockerdeepdive" target="_blank" rel="noopener">leanpub.com</a>.</span></div>
+          <div class="book"><span class="t">Container Security</span> — <span class="a">Liz Rice</span> <span class="rl-tag lvl">intermedio</span><span class="d">Qué aísla y qué no aísla un contenedor: namespaces, cgroups, capabilities, seccomp. Corto y claro. En <a href="https://www.oreilly.com/library/view/container-security/9781492056690/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Especificaciones OCI</span> — <span class="a">opencontainers.org</span> <span class="rl-tag free">gratis</span><span class="d">Image spec y runtime spec. Cortas; leerlas desmitifica del todo qué es un contenedor. En <a href="https://opencontainers.org/" target="_blank" rel="noopener">opencontainers.org</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 4 · Kubernetes</h4>
+          <p>Solo cuando de verdad lo necesites. Antes, ECS o un PaaS.</p>
+          <div class="book"><span class="t">The Kubernetes Book</span> — <span class="a">Nigel Poulton</span> <span class="rl-tag lvl">principiante</span><span class="d">La mejor entrada. Se reedita cada año. Buen punto de partida antes del CKA o el CKAD. En <a href="https://leanpub.com/thekubernetesbook" target="_blank" rel="noopener">leanpub.com</a>.</span></div>
+          <div class="book"><span class="t">Kubernetes Up &amp; Running, 3ª ed.</span> — <span class="a">Burns, Beda, Hightower &amp; Evenson</span> <span class="rl-tag lvl">intermedio</span><span class="d">Escrito por gente que construyó Kubernetes y Borg. El segundo libro. En <a href="https://www.oreilly.com/library/view/kubernetes-up-and/9781098110192/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Kubernetes Patterns</span> — <span class="a">Ibryam &amp; Huß</span> <span class="rl-tag free">gratis</span> <span class="rl-tag lvl">intermedio</span><span class="d">Patrones de diseño para apps en k8s. PDF libre (Red Hat). En <a href="https://www.oreilly.com/library/view/-/9781492050278" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Kubernetes the Hard Way</span> — <span class="a">Kelsey Hightower</span> <span class="rl-tag free">gratis</span><span class="d">Montas un clúster a mano, componente por componente. La forma de entenderlo de verdad. Práctica muy recomendada antes del CKA. En <a href="https://github.com/kelseyhightower/kubernetes-the-hard-way" target="_blank" rel="noopener">github.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 5 · Infraestructura como código</h4>
+          <div class="book"><span class="t">Terraform Up &amp; Running, 3ª ed.</span> — <span class="a">Yevgeniy Brikman</span> <span class="rl-tag lvl">intermedio</span><span class="d">El libro de Terraform. Estado, módulos, tests, patrones de equipo. Práctico de principio a fin. Buena preparación para el HashiCorp Terraform Associate. En <a href="https://www.terraformupandrunning.com/" target="_blank" rel="noopener">terraformupandrunning.com</a>.</span></div>
+          <div class="book"><span class="t">Infrastructure as Code, 2ª ed.</span> — <span class="a">Kief Morris</span> <span class="rl-tag lvl">intermedio</span><span class="d">Agnóstico de herramienta: principios, antipatrones, cómo probar infraestructura. En <a href="https://www.oreilly.com/library/view/infrastructure-as-code/9781098114664/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">HashiCorp Developer — tutoriales de Terraform</span> — <span class="a">developer.hashicorp.com</span> <span class="rl-tag free">gratis</span><span class="d">Rutas guiadas oficiales, de lo básico a CI/CD de infraestructura. Incluye la ruta oficial de estudio para el Terraform Associate. En <a href="https://developer.hashicorp.com/terraform/tutorials" target="_blank" rel="noopener">developer.hashicorp.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 6 · Observabilidad y SRE</h4>
+          <div class="book"><span class="t">Site Reliability Engineering</span> + <span class="t">The SRE Workbook</span> — <span class="a">Google</span> <span class="rl-tag free">gratis</span><span class="d">Los dos libros completos en sre.google/books. El primero es el marco; el segundo, el cómo. En <a href="https://sre.google/books/" target="_blank" rel="noopener">sre.google/books</a>.</span></div>
+          <div class="book"><span class="t">Observability Engineering</span> — <span class="a">Majors, Fong-Jones &amp; Miranda</span> <span class="rl-tag lvl">intermedio</span><span class="d">Por qué las tres señales clásicas no bastan y qué es la observabilidad basada en eventos con alta cardinalidad. En <a href="https://www.oreilly.com/library/view/observability-engineering/9781492076438/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Implementing Service Level Objectives</span> — <span class="a">Alex Hidalgo</span> <span class="rl-tag lvl">intermedio</span><span class="d">Todo sobre SLI/SLO/error budget, con la matemática y la política de equipo. En <a href="https://www.oreilly.com/library/view/implementing-service-level/9781492076803/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 7 · Cloud y FinOps</h4>
+          <div class="book"><span class="t">Cloud FinOps, 2ª ed.</span> — <span class="a">J.R. Storment &amp; Mike Fuller</span> <span class="rl-tag lvl">intermedio</span><span class="d">Cómo una organización gestiona el gasto en la nube sin frenar a ingeniería. En <a href="https://www.oreilly.com/library/view/cloud-finops-2nd/9781492098348/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">AWS / Google Cloud Well-Architected Framework</span> — <span class="a">oficiales</span> <span class="rl-tag free">gratis</span><span class="d">Los seis pilares (operación, seguridad, fiabilidad, rendimiento, coste, sostenibilidad) con preguntas concretas de revisión. En <a href="https://aws.amazon.com/architecture/well-architected/" target="_blank" rel="noopener">aws.amazon.com</a> y <a href="https://cloud.google.com/architecture/framework" target="_blank" rel="noopener">cloud.google.com</a>.</span></div>
+          <div class="book"><span class="t">roadmap.sh/devops</span> — <span class="a">mapa interactivo</span> <span class="rl-tag free">gratis</span><span class="d">Ruta visual con recursos por nodo. Úsalo como índice, no como lista de tareas. En <a href="https://roadmap.sh/devops" target="_blank" rel="noopener">roadmap.sh</a>.</span></div>
+        </div>
+
+        
+<div class="stage">
+          <h4>Etapa 8 · Platform engineering y organización</h4>
+          <p>Cuando el problema deja de ser técnico y pasa a ser "cómo estructuro esto para varios equipos".</p>
+          <div class="book"><span class="t">Team Topologies</span> — <span class="a">Matthew Skelton &amp; Manuel Pais</span> <span class="rl-tag lvl">intermedio</span><span class="d">Los cuatro tipos de equipo y los tres modos de interacción. Léelo antes de montar un equipo de plataforma: te dice para qué existe y cómo no convertirlo en un cuello de botella. En <a href="https://teamtopologies.com" target="_blank" rel="noopener">teamtopologies.com</a>.</span></div>
+          <div class="book"><span class="t">Platform Engineering: A Guide for Technical, Product, and People Leaders</span> — <span class="a">Camille Fournier &amp; Ian Nowland</span> <span class="rl-tag lvl">intermedio</span><span class="d">O'Reilly, 2024. Qué es y qué no es una plataforma interna, cómo tratarla como producto, cómo medir su adopción. La referencia actual para leads. En <a href="https://www.oreilly.com/library/view/platform-engineering/9781098153649/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Documentación de Backstage</span> — <span class="a">backstage.io</span> <span class="rl-tag free">gratis</span><span class="d">Software Catalog, Software Templates, TechDocs y plugins. Léela cuando estés evaluando si construir un portal propio; el modelo del catálogo vale aunque no uses Backstage. En <a href="https://backstage.io/docs" target="_blank" rel="noopener">backstage.io</a>.</span></div>
+          <div class="book"><span class="t">platformengineering.org · internaldeveloperplatform.org</span> — <span class="a">comunidad</span> <span class="rl-tag free">gratis</span><span class="d">Definiciones, patrones de referencia de IDP y casos. Buen mapa del espacio antes de comprar o construir nada. En <a href="https://platformengineering.org" target="_blank" rel="noopener">platformengineering.org</a> y <a href="https://internaldeveloperplatform.org" target="_blank" rel="noopener">internaldeveloperplatform.org</a>.</span></div>
+          <div class="book"><span class="t">Accelerate State of DevOps Report</span> — <span class="a">DORA / Google</span> <span class="rl-tag free">gratis</span><span class="d">El informe anual detrás de las métricas DORA; las ediciones recientes cubren platform engineering, IA y experiencia de desarrollo. Lee el del año en curso, no un resumen viejo. En <a href="https://dora.dev/research/" target="_blank" rel="noopener">dora.dev</a>.</span></div>
+        </div>
+
+        <div class="stage">
+          <h4>Etapa 9 · Fiabilidad avanzada: multirregión, DR y caos</h4>
+          <p>El escalón final: qué pasa cuando se cae una región entera y cómo se prueba antes de que ocurra.</p>
+          <div class="book"><span class="t">Building Secure and Reliable Systems</span> — <span class="a">Google (Adkins, Beyer, Blankinship, Lewandowski, Oprea, Stubblefield)</span> <span class="rl-tag free">gratis</span><span class="d">Libro completo en sre.google/books. Dónde se cruzan seguridad y fiabilidad: diseño resiliente, recuperación, defensa en profundidad. El tercer libro de SRE. En <a href="https://google.github.io/building-secure-and-reliable-systems/raw/toc.html" target="_blank" rel="noopener">google.github.io</a>.</span></div>
+          <div class="book"><span class="t">Chaos Engineering: System Resiliency in Practice</span> — <span class="a">Casey Rosenthal &amp; Nora Jones</span> <span class="rl-tag lvl">intermedio</span><span class="d">De los que inventaron la disciplina en Netflix. Cómo diseñar experimentos de fallo, game days y pruebas de DR reales sin romper producción de verdad. En <a href="https://www.oreilly.com/library/view/chaos-engineering/9781492043867/" target="_blank" rel="noopener">oreilly.com</a>.</span></div>
+          <div class="book"><span class="t">Disaster Recovery of Workloads on AWS + pilar de Fiabilidad del Well-Architected</span> — <span class="a">AWS</span> <span class="rl-tag free">gratis</span><span class="d">El whitepaper con las cuatro estrategias (backup, pilot light, warm standby, active/active) y cómo elegir por RPO/RTO. Los conceptos valen para cualquier nube. En <a href="https://docs.aws.amazon.com/whitepapers/latest/disaster-recovery-workloads-on-aws/disaster-recovery-workloads-on-aws.html" target="_blank" rel="noopener">docs.aws.amazon.com</a> y <a href="https://docs.aws.amazon.com/wellarchitected/latest/reliability-pillar/welcome.html" target="_blank" rel="noopener">pilar de Fiabilidad</a>.</span></div>
+          <div class="book"><span class="t">Designing Data-Intensive Applications</span> — <span class="a">Martin Kleppmann</span> <span class="rl-tag lvl">avanzado</span><span class="d">Los capítulos de replicación, particionado y consistencia son la base para entender por qué los datos son la parte difícil de la multirregión. Denso; léelo por capítulos según lo que necesites. En <a href="https://dataintensive.net" target="_blank" rel="noopener">dataintensive.net</a>.</span></div>
+        </div>
+
+<h3>Cursos y laboratorios guiados (gratis)</h3>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Recurso</th><th>Qué es</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://kodekloud.com" target="_blank" rel="noopener">KodeKloud</a></td><td>Cursos con laboratorios en el navegador; varios gratis (Docker, Kubernetes, Linux, Git). El más práctico para empezar</td></tr>
+            <tr><td><a href="https://killercoda.com" target="_blank" rel="noopener">Killercoda</a></td><td>Escenarios interactivos de Kubernetes, Linux y Docker sin registro; entornos efímeros reales</td></tr>
+            <tr><td><a href="https://training.linuxfoundation.org/full-catalog/" target="_blank" rel="noopener">Linux Foundation — cursos gratis</a></td><td>"Intro to Kubernetes", "Intro to DevOps", "Intro to Linux" en edX, del proyecto que mantiene el kernel y k8s</td></tr>
+            <tr><td><a href="https://developer.hashicorp.com/terraform/tutorials" target="_blank" rel="noopener">HashiCorp Learn</a></td><td>Tutoriales oficiales de Terraform, Vault, Consul y Nomad, de básico a producción</td></tr>
+            <tr><td><a href="https://sadservers.com" target="_blank" rel="noopener">SadServers</a></td><td>"LeetCode para SREs": un servidor roto, arréglalo. Escenarios de troubleshooting con sesión gratis</td></tr>
+            <tr><td><a href="https://12factor.net" target="_blank" rel="noopener">The Twelve-Factor App</a></td><td>Las doce reglas para apps que se despliegan y escalan bien. Corto; léelo entero</td></tr>
+          </tbody>
+        </table></div>
+
+        <h3>Certificaciones — panorama</h3>
+        <p>Ninguna es requisito para aprender; algunas ayudan en el mercado laboral. Ordénalas por
+        lo que quieras operar, no por prestigio.</p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Cert</th><th>Para qué</th><th>Nota</th></tr></thead>
+          <tbody>
+            <tr><td><strong>AWS Solutions Architect Associate</strong></td><td>Base amplia de una nube; la más pedida en ofertas</td><td>Teórica; buena primera</td></tr>
+            <tr><td><strong>HashiCorp Terraform Associate</strong></td><td>Valida fundamentos de IaC con Terraform</td><td>Asequible y acotada</td></tr>
+            <tr><td><strong>CKA / CKAD</strong> (CNCF)</td><td>Kubernetes: administración (CKA) o desarrollo sobre él (CKAD)</td><td>Exámenes 100% prácticos, muy valorados</td></tr>
+            <tr><td><strong>LFCS</strong> (Linux Foundation)</td><td>Administración de Linux, también práctica</td><td>Buena si el Linux flojea</td></tr>
+          </tbody>
+        </table></div>
+      </section>
+
+      <section class="block" id="laboratorio">
+        <span class="sec-num">15</span>
+        <h2>Laboratorio: tocar el concepto en el navegador</h2>
+        <p class="lead">
+          Herramientas que corren en la pestaña, sin cuenta ni instalación. La práctica de DevOps
+          necesita en algún momento una nube real (tienes créditos de AWS Activate), pero para
+          entender un concepto suelto esto basta.
+        </p>
+        <div class="table-scroll"><table>
+          <thead><tr><th>Herramienta</th><th>Qué concepto de la guía vuelve tangible</th></tr></thead>
+          <tbody>
+            <tr><td><a href="https://killercoda.com" target="_blank" rel="noopener">Killercoda</a></td><td>§5 · §6 — un clúster de Kubernetes y un host con Docker de verdad, efímeros, sin registro: crea pods, rompe cosas, mira los eventos</td></tr>
+            <tr><td><a href="https://sadservers.com" target="_blank" rel="noopener">SadServers</a></td><td>§9 — un servidor roto y una tarea: diagnosticar con <code class="inline">journalctl</code>, <code class="inline">ss</code>, <code class="inline">df</code>. El trabajo real de on-call</td></tr>
+            <tr><td><a href="https://stackblitz.com" target="_blank" rel="noopener">StackBlitz</a></td><td>§5 — WebContainers: un runtime de Node completo dentro del navegador, con su sistema de archivos y su red. Empaquetar y aislar, visto desde dentro</td></tr>
+            <tr><td><a href="https://crontab.guru" target="_blank" rel="noopener">crontab.guru</a></td><td>§3 — traducir la expresión de cron de un job programado a lenguaje humano y al revés</td></tr>
+            <tr><td><a href="https://explainshell.com" target="_blank" rel="noopener">explainshell.com</a></td><td>§3 — pega una línea de un script de pipeline y te explica cada flag; útil para entender pasos heredados</td></tr>
+            <tr><td><a href="https://jsoncrack.com/" target="_blank" rel="noopener">JSON Crack</a></td><td>§10 — pega un <code class="inline">values.yaml</code> de Helm o un manifiesto y velo como árbol; entender configuración anidada</td></tr>
+            <tr><td><a href="https://regex101.com" target="_blank" rel="noopener">regex101.com</a></td><td>§9 — construir el patrón que extrae campos de una línea de log, con explicación en vivo</td></tr>
+            <tr><td><a href="https://vscode.dev" target="_blank" rel="noopener">vscode.dev</a></td><td>§2 — editor completo como PWA: abre un repo de GitHub, revisa el <code class="inline">.github/workflows</code> sin clonar nada</td></tr>
+            <tr><td><a href="https://www.digitalocean.com/community/tools/nginx" target="_blank" rel="noopener">NGINXConfig (DigitalOcean)</a></td><td>§8 — generar una configuración de NGINX como reverse proxy / balanceador y ver cada directiva explicada</td></tr>
+          </tbody>
+        </table></div>
+        <div class="note">
+          <span class="label">Cómo usar el laboratorio</span>
+          <p>Cuando termines una sección, abre la herramienta que le toca y reprodúcela una vez.
+          Media hora rompiendo un pod en Killercoda enseña más sobre el control loop que releer
+          la §6 tres veces.</p>
+        </div>
+      </section>
+
+    </main>
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>DevOps de Punta a Punta</strong> — guía de estudio hermana de
+    <em>Backend de Punta a Punta</em> y <em>Seguridad de Punta a Punta</em>. Mismo formato:
+    para consultar por partes, no para leer de corrido.</p>
+    <p>Los nombres de productos, servicios gestionados, versiones y precios cambian rápido en
+    este dominio; los conceptos de las secciones 1 a 11 son estables. Verifica ediciones,
+    límites de capa gratuita y precios antes de comprar o decidir. Los libros y cursos son
+    recomendaciones de referencia amplia, no una lista cerrada.</p>
+  </div>
+</footer>
