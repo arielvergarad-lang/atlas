@@ -156,6 +156,37 @@
   }
   .lvl-lbl { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.08em; fill: var(--muted); text-transform: uppercase; }
 
+  /* Ambient trace: una pasada al cargar, con stagger topológico.
+     Copia el patrón de Archify: las flechas "corren" según --step en el orden de
+     estudio, los nodos pulsan al llegarles la señal, y todo se apaga al terminar
+     (data-ambient-motion = settled) restaurando la línea estable. */
+  svg.graph[data-animation="trace"] path.tr { display: none; }
+  html[data-motion-capable="true"][data-ambient-motion="running"] svg.graph[data-animation="trace"] path.tr { display: block; }
+  html[data-motion-capable="true"][data-document-hidden="true"] svg.graph[data-animation="trace"] path.tr,
+  html[data-motion-capable="true"][data-motion="still"] svg.graph[data-animation="trace"] path.tr { display: none !important; }
+
+  html[data-ambient-motion="running"] svg.graph[data-animation="trace"] path.tr {
+    animation: mapa-edge-flow 1.6s linear 1 both;
+    animation-delay: calc(var(--step, 0) * 140ms);
+  }
+  html[data-ambient-motion="running"] svg.graph[data-animation="trace"] [data-animate="node"] {
+    animation: mapa-node-pulse 1.9s ease-in-out 1;
+    animation-delay: calc(var(--step, 0) * 140ms);
+  }
+  @keyframes mapa-edge-flow {
+    0% { stroke-dasharray: 2 90; stroke-dashoffset: 120; opacity: 0.5; }
+    70% { stroke-dasharray: 4 12; stroke-dashoffset: -4; opacity: 0.95; }
+    100% { stroke-dasharray: 4 12; stroke-dashoffset: -4; opacity: 0; }
+  }
+  @keyframes mapa-node-pulse {
+    0%, 72%, 100% { filter: none; }
+    18%, 44% { filter: drop-shadow(0 0 7px var(--pulse-glow, var(--accent-soft))); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    svg.graph[data-animation="trace"] path.tr { display: none !important; }
+    svg.graph[data-animation="trace"] [data-animate] { animation: none !important; }
+  }
+
   .below { display: grid; grid-template-columns: 1fr; gap: 1.6rem; margin-top: 1.8rem; }
   @media (min-width: 980px) { .below { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; } }
 
@@ -278,7 +309,7 @@
         </span>
       </div>
       <div class="graph-scroll" id="graphScroll" tabindex="0" aria-label="Mapa de conceptos">
-        <svg class="graph" id="graph" role="img" aria-label="Grafo de dependencias de estudio"></svg>
+        <svg class="graph" id="graph" data-animation="trace" role="img" aria-label="Grafo de dependencias de estudio"></svg>
       </div>
     </div>
 
@@ -356,13 +387,13 @@
   var showRef = true;
   var q = "";
   var selId = null;
+  var cssV = document.documentElement;
   var curTheme = initTheme();
   var svg = document.getElementById("graph");
   var panel = document.getElementById("panel");
   var orderList = document.getElementById("orderList");
   var nextChips = document.getElementById("nextChips");
   var graphScroll = document.getElementById("graphScroll");
-  var cssV = document.documentElement;
   var byId = {};
   var levels = {};
   var down = {};
@@ -474,6 +505,8 @@
     var W = PAD * 2 + (Math.max.apply(null, Object.keys(levels).map(Number)) + 1) * COL_W - (COL_W - NODE_W);
     var lastL = Math.max.apply(null, Object.keys(levels).map(Number));
     var H = TOP + 40;
+    var stepOf = {};
+    order.forEach(function (n, i) { stepOf[n.id] = i; });
     NODES.forEach(function (n) {
       if (pos[n.id]) H = Math.max(H, pos[n.id].y + NODE_H + 28);
     });
@@ -489,16 +522,17 @@
         var dx = Math.max(40, (p2.x - (p1.x + NODE_W)) / 2);
         var col = getC(ROUTES[src.r].color === "rust" ? "--rust" : "--accent");
         var op = done(src) ? 0.85 : 0.45;
-        edges += '<path d="M ' + (p1.x + NODE_W) + ' ' + (p1.y + NODE_H / 2) +
+        var dash = isRef(n) || isRef(src) ? " 3 4" : "";
+        var d = 'M ' + (p1.x + NODE_W) + ' ' + (p1.y + NODE_H / 2) +
           ' C ' + (p1.x + NODE_W + dx) + ' ' + (p1.y + NODE_H / 2) +
           ', ' + (p2.x - dx) + ' ' + (p2.y + NODE_H / 2) +
-          ', ' + p2.x + ' ' + (p2.y + NODE_H / 2) + '" fill="none" stroke="' + col +
-          '" stroke-width="1.6" opacity="' + op + '" stroke-dasharray="' + (isRef(n) || isRef(src) ? "3 4" : "") + '"></path>';
+          ', ' + p2.x + ' ' + (p2.y + NODE_H / 2);
+        edges += '<path d="' + d + '" fill="none" stroke="' + col +
+          '" stroke-width="1.6" opacity="' + op + '" stroke-dasharray="' + dash.trim() + '"></path>';
+        edges += '<path class="tr" d="' + d +
+          '" fill="none" stroke="' + col + '" stroke-width="2.2" stroke-linecap="round" data-animate="edge" style="--step:' + (stepOf[n.id] || 0) + '"></path>';
       });
     });
-
-    var labels = "";
-    Object.keys(groupsL) /* will fill below */;
 
     svg.setAttribute("viewBox", "0 0 " + W + " " + H);
     svg.setAttribute("width", W);
@@ -533,8 +567,9 @@
       var refTxt = isRef(n) ? '<text class="rf" x="' + (NODE_W - 14) + '" y="NODE_W" dominant-baseline="text-after-edge" text-anchor="middle"></text>' : "";
       var chip = isRef(n) ? '<text class="rf" x="' + (NODE_W / 2) + '" y="' + (NODE_H - 10) + '" text-anchor="middle">referencia</text>' : '<text class="rf" x="' + (NODE_W / 2) + '" y="' + (NODE_H - 10) + '" text-anchor="middle">' + n.sec + '</text>';
       if (isRef(n)) chip = '<text class="rf" x="' + (NODE_W / 2) + '" y="' + (NODE_H - 10) + '" text-anchor="middle">' + n.sec + ' · referencia</text>';
+      var pulseGlow = (n.r === "linux" ? "var(--rust)" : "var(--accent)");
       html += '<g class="' + cls + '" data-id="' + n.id + '" transform="translate(' + p.x + ',' + p.y + ')">' +
-        '<rect class="nr" width="' + NODE_W + '" height="' + NODE_H + '" rx="11" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + ((done(n) || st === "st-live") ? 1.8 : 1.3) + '"' + dsh + '></rect>' +
+        '<rect class="nr" data-animate="node" style="--step:' + (stepOf[n.id] || 0) + ';--pulse-glow:' + pulseGlow + '" width="' + NODE_W + '" height="' + NODE_H + '" rx="11" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + ((done(n) || st === "st-live") ? 1.8 : 1.3) + '"' + dsh + '></rect>' +
         check +
         '<text class="nt" x="' + tX + '" y="36" font-size="' + fsz + '">' + esc(title) + '</text>' +
         chip +
@@ -568,6 +603,7 @@
   }
 
   function select(n) {
+    killAmbient();
     selId = n ? n.id : null;
     renderPanel(n);
     renderGraph();
@@ -576,6 +612,7 @@
   }
 
   function toggleDone(id) {
+    killAmbient();
     if (stateDone[id]) delete stateDone[id]; else stateDone[id] = 1;
     saveState();
     selId = id;
@@ -766,6 +803,7 @@
     return t;
   }
   function toggleTheme() {
+    killAmbient();
     var isDark = cssV.getAttribute("data-theme") === "dark";
     var nv = isDark ? "" : "dark";
     if (nv === "dark") cssV.setAttribute("data-theme", "dark"); else cssV.removeAttribute("data-theme");
@@ -782,6 +820,7 @@
   document.getElementById("themeBtn").addEventListener("click", toggleTheme);
   document.querySelectorAll(".seg button").forEach(function (b) {
     b.addEventListener("click", function () {
+      killAmbient();
       focus = b.getAttribute("data-focus");
       document.querySelectorAll(".seg button").forEach(function (x) {
         x.setAttribute("aria-pressed", String(x === b));
@@ -793,6 +832,7 @@
     });
   });
   document.getElementById("showRef").addEventListener("change", function (e) {
+    killAmbient();
     showRef = e.target.checked;
     renderGraph();
     renderOrder();
@@ -804,6 +844,7 @@
   document.getElementById("exportBtn").addEventListener("click", exportMd);
   document.getElementById("resetBtn").addEventListener("click", function () {
     if (window.confirm("¿Borrar todo el progreso guardado de este mapa?")) {
+      killAmbient();
       stateDone = {};
       saveState();
       selId = null;
@@ -813,7 +854,7 @@
   });
   panel.addEventListener("click", function (e) {
     var c = e.target.closest(".chip");
-    if (c && c.getAttribute("data-id")) select(byId[c.getAttribute("data-id")]);
+    if (c && c.getAttribute("data-id")) { killAmbient(); select(byId[c.getAttribute("data-id")]); }
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") { select(null); }
@@ -826,5 +867,84 @@
   renderGraph();
   renderOrder();
   renderProgress();
+
+  /* Ambient trace controller — one pass, then settled.
+     Mirrors Archify: data-motion-capable gates CSS; data-ambient-motion
+     goes running → settled once every animated element finishes a single
+     iteration, restoring the stable authored line language. */
+  var motionQuery = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  var ambientStarted = false;
+  var ambientPending = new Set();
+  var motionApplied = false;
+  var ambientGuard = null;
+
+  function applyMotionState() {
+    if (!motionApplied) return;
+    var htmlEl = document.documentElement;
+    if (document.hidden) htmlEl.setAttribute("data-document-hidden", "true");
+    else htmlEl.removeAttribute("data-document-hidden");
+    if (motionQuery && motionQuery.matches || document.hidden) {
+      htmlEl.setAttribute("data-motion", "still");
+      settleAmbient("suppressed");
+    } else {
+      htmlEl.removeAttribute("data-motion");
+    }
+    if (ambientStarted) return;
+    if (motionQuery && motionQuery.matches || document.hidden) return;
+    startAmbient();
+  }
+  function detachAmbient() {
+    if (!svg) return;
+    svg.removeEventListener("animationend", onAmbientBoundary, true);
+    svg.removeEventListener("animationcancel", onAmbientBoundary, true);
+  }
+  function settleAmbient(reason) {
+    if (!ambientStarted && reason === "suppressed") return;
+    ambientStarted = true;
+    ambientPending.clear();
+    detachAmbient();
+    if (ambientGuard) { clearTimeout(ambientGuard); ambientGuard = null; }
+    document.documentElement.setAttribute("data-ambient-motion", "settled");
+    document.documentElement.setAttribute("data-ambient-settle-reason", reason || "complete");
+  }
+  function onAmbientBoundary(event) {
+    if (!ambientPending.has(event.target)) return;
+    ambientPending.delete(event.target);
+    if (!ambientPending.size) settleAmbient("complete");
+  }
+  function startAmbient() {
+    if (ambientStarted) return false;
+    ambientStarted = true;
+    ambientPending = new Set(Array.prototype.slice.call(svg.querySelectorAll('[data-animate]')));
+    if (!ambientPending.size) { settleAmbient("empty"); return false; }
+    svg.addEventListener("animationend", onAmbientBoundary, true);
+    svg.addEventListener("animationcancel", onAmbientBoundary, true);
+    document.documentElement.setAttribute("data-ambient-motion", "running");
+    var maxStep = 0;
+    ambientPending.forEach(function (el) {
+      var raw = el.style && el.style.getPropertyValue ? el.style.getPropertyValue("--step") : "";
+      var st = parseInt(raw || "0", 10);
+      if (!isNaN(st) && st > maxStep) maxStep = st;
+    });
+    ambientGuard = setTimeout(function () { settleAmbient("timeout"); }, 7000 + maxStep * 140);
+    return true;
+  }
+  function killAmbient() {
+    if (ambientStarted && document.documentElement.getAttribute("data-ambient-motion") === "running") {
+      settleAmbient("interaction");
+    }
+  }
+
+  motionApplied = true;
+  var mo = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)");
+  motionQuery = mo;
+  document.documentElement.setAttribute("data-motion-capable", "true");
+  if (motionQuery && typeof motionQuery.addEventListener === "function") {
+    motionQuery.addEventListener("change", applyMotionState);
+  } else if (motionQuery && typeof motionQuery.addListener === "function") {
+    motionQuery.addListener(applyMotionState);
+  }
+  document.addEventListener("visibilitychange", applyMotionState);
+  applyMotionState();
 })();
 </script>
