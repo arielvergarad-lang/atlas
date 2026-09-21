@@ -1,0 +1,830 @@
+<title>Atlas — Mapa de estudio</title>
+<meta name="description" content="Mapa interactivo de rutas de Atlas: grafo de conceptos con dependencias, orden de estudio calculado automáticamente, progreso guardado en el navegador y export a Markdown. Rutas de Linux y Backend conectadas.">
+<style>
+  :root {
+    --ground: #f6f5f1;
+    --surface: #ffffff;
+    --surface-2: #efede7;
+    --ink: #20242a;
+    --ink-soft: #464c56;
+    --muted: #6b7280;
+    --line: #ddd9cf;
+    --line-soft: #e9e6dd;
+    --accent: #0f6f63;
+    --accent-soft: #d7ebe7;
+    --accent-ink: #0a4f47;
+    --rust: #b0552e;
+    --rust-soft: #f1e0d6;
+    --code-bg: #1d2127;
+    --code-ink: #d9e2ec;
+    --code-comment: #8b98a8;
+    --shadow: 0 1px 2px rgba(20, 22, 26, 0.05), 0 6px 20px rgba(20, 22, 26, 0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --ground: #14161a;
+      --surface: #1c1f25;
+      --surface-2: #23272e;
+      --ink: #e7e5df;
+      --ink-soft: #b9bdc6;
+      --muted: #8b919c;
+      --line: #333842;
+      --line-soft: #2a2f37;
+      --accent: #4bb7a8;
+      --accent-soft: #16302d;
+      --accent-ink: #7fd3c7;
+      --rust: #d98a5f;
+      --rust-soft: #35241b;
+      --code-bg: #10131a;
+      --code-ink: #d9e2ec;
+      --code-comment: #7b8798;
+      --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 26px rgba(0, 0, 0, 0.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; scroll-padding-top: 2rem; }
+  body {
+    margin: 0; background: var(--ground); color: var(--ink);
+    font-family: "IBM Plex Sans", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    font-size: 17px; line-height: 1.65; -webkit-font-smoothing: antialiased;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    * { transition: none !important; }
+  }
+
+  .wrap { max-width: 1180px; margin: 0 auto; padding: 0 clamp(1rem, 4vw, 3rem); }
+  header.masthead {
+    border-bottom: 1px solid var(--line);
+    background: radial-gradient(120% 140% at 88% -20%, var(--accent-soft) 0%, transparent 55%), var(--surface);
+  }
+  .masthead-top {
+    display: flex; align-items: center; justify-content: space-between; gap: 1rem;
+    padding-top: 1.4rem;
+  }
+  .mh-back { font-size: 0.84rem; color: var(--ink-soft); text-decoration: none; border: 1px solid var(--line); border-radius: 999px; padding: 0.22rem 0.8rem; background: var(--surface); }
+  .mh-back:hover { border-color: var(--accent); color: var(--ink); }
+  .masthead-inner { padding: clamp(2rem, 5vw, 3.2rem) 0 clamp(1.8rem, 4vw, 2.4rem); }
+  .kicker {
+    font-family: "IBM Plex Mono", ui-monospace, SFMono-Regular, Menlo, monospace;
+    font-size: 0.74rem; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--accent-ink); margin: 0 0 1rem;
+  }
+  h1 {
+    font-family: "IBM Plex Serif", Georgia, "Times New Roman", serif; font-weight: 600;
+    font-size: clamp(2.1rem, 6vw, 3rem); line-height: 1.08; letter-spacing: -0.015em;
+    text-wrap: balance; margin: 0 0 1rem;
+  }
+  .standfirst { font-size: clamp(1.02rem, 2.4vw, 1.2rem); color: var(--ink-soft); max-width: 64ch; margin: 0 0 1.2rem; }
+  .meta-row { display: flex; flex-wrap: wrap; gap: 0.5rem 0.6rem; }
+  .tag {
+    font-family: "IBM Plex Mono", ui-monospace, monospace; font-size: 0.72rem; letter-spacing: 0.04em;
+    padding: 0.28rem 0.6rem; border: 1px solid var(--line); border-radius: 999px;
+    color: var(--muted); background: var(--surface);
+  }
+
+  .layout { padding: clamp(1.6rem, 4vw, 2.6rem) 0 4.5rem; }
+  h2 {
+    font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: clamp(1.4rem, 3.4vw, 1.8rem);
+    line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 0.8rem;
+  }
+  p { margin: 0 0 1rem; max-width: 68ch; }
+  button { font-family: inherit; }
+
+  .controls {
+    display: flex; flex-wrap: wrap; align-items: center; gap: 0.6rem 1rem;
+    margin: 0 0 1.2rem;
+  }
+  .seg { display: inline-flex; border: 1px solid var(--line); border-radius: 999px; background: var(--surface); padding: 0.18rem; gap: 0.15rem; }
+  .seg button {
+    border: 0; background: transparent; color: var(--ink-soft); font-size: 0.88rem;
+    padding: 0.3rem 0.85rem; border-radius: 999px; cursor: pointer;
+  }
+  .seg button[aria-pressed="true"] { background: var(--accent-soft); color: var(--accent-ink); font-weight: 600; }
+  .seg button:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .ctl {
+    display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.84rem; color: var(--ink-soft);
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface); padding: 0.3rem 0.8rem; cursor: pointer;
+  }
+  .ctl:hover { border-color: var(--accent); }
+  .ctl input { accent-color: var(--accent); }
+  input#q {
+    border: 1px solid var(--line); border-radius: 999px; background: var(--surface);
+    padding: 0.34rem 0.95rem; font-size: 0.86rem; color: var(--ink); min-width: 200px;
+  }
+  input#q:focus { outline: 2px solid var(--accent); outline-offset: 1px; }
+
+  .progress-wrap { margin: 0 0 1.4rem; display: flex; flex-wrap: wrap; gap: 0.5rem 1.4rem; align-items: center; }
+  .prog { display: flex; align-items: center; gap: 0.6rem; font-size: 0.84rem; color: var(--ink-soft); }
+  .bar { width: 130px; height: 8px; border-radius: 999px; background: var(--surface-2); border: 1px solid var(--line); overflow: hidden; }
+  .bar i { display: block; height: 100%; width: 0%; border-radius: 999px; transition: width 0.25s; }
+  .bar.be i { background: var(--accent); }
+  .bar.lx i { background: var(--rust); }
+
+  .graph-card { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); overflow: hidden; }
+  .graph-card .gc-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 0.5rem; padding: 0.7rem 1.1rem; border-bottom: 1px solid var(--line-soft); }
+  .gc-head .t { font-size: 0.8rem; color: var(--muted); }
+  .legend { display: flex; flex-wrap: wrap; gap: 0.6rem 1.1rem; align-items: center; }
+  .lg { display: inline-flex; align-items: center; gap: 0.4rem; font-size: 0.74rem; color: var(--ink-soft); }
+  .dot { width: 10px; height: 10px; border-radius: 3px; }
+  .dot.be { background: var(--accent); }
+  .dot.lx { background: var(--rust); }
+  .dot.ref { background: transparent; border: 1.5px dashed var(--muted); }
+  .dot.done { background: var(--accent-soft); border: 1.5px solid var(--accent); }
+  .graph-scroll { overflow-x: auto; }
+  svg.graph { display: block; }
+
+  .node { cursor: pointer; }
+  .node .nr { fill: var(--surface); stroke: var(--line); stroke-width: 1.5; transition: fill 0.12s, stroke 0.12s; }
+  .node:hover .nr { stroke-width: 2.2; }
+  .node .nt {
+    font-family: "IBM Plex Sans", sans-serif; font-size: 12.5px; font-weight: 500; fill: var(--ink);
+    pointer-events: none;
+  }
+  .node.st-done { cursor: default; }
+  .node.st-done .nr { fill: var(--accent-soft); stroke: var(--accent); }
+  .node.st-done .nt { text-decoration: line-through; text-decoration-color: var(--muted); }
+  .node.st-lock .nr { fill: var(--surface-2); stroke: var(--line); stroke-dasharray: 5 4; }
+  .node.st-lock .nt { fill: var(--muted); }
+  .node.st-next .nr { stroke-width: 2.6; filter: drop-shadow(0 0 4px var(--accent-soft)); }
+  .node.st-sel .nr { stroke-width: 3; }
+  .node .rf { font-family: "IBM Plex Mono", monospace; font-size: 9.5px; letter-spacing: 0.08em; fill: var(--muted); }
+  .node .ck {
+    font-family: "IBM Plex Mono", monospace; font-weight: 700; font-size: 13px; fill: var(--accent);
+  }
+  .lvl-lbl { font-family: "IBM Plex Mono", monospace; font-size: 10px; letter-spacing: 0.08em; fill: var(--muted); text-transform: uppercase; }
+
+  .below { display: grid; grid-template-columns: 1fr; gap: 1.6rem; margin-top: 1.8rem; }
+  @media (min-width: 980px) { .below { grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr); align-items: start; } }
+
+  #panel {
+    border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow);
+    padding: 1.3rem 1.4rem;
+  }
+  #panel.empty { color: var(--muted); font-size: 0.94rem; }
+  #panel.empty .p-clue { font-size: 0.9rem; }
+  .p-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.6rem; margin-bottom: 0.5rem; }
+  .p-sec {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.08em;
+    color: var(--accent-ink); background: var(--accent-soft); border-radius: 5px; padding: 0.15rem 0.5rem;
+  }
+  .p-title { font-family: "IBM Plex Serif", Georgia, serif; font-weight: 600; font-size: 1.35rem; margin: 0; line-height: 1.2; }
+  .p-est { font-family: "IBM Plex Mono", monospace; font-size: 0.72rem; color: var(--muted); }
+  .p-badge { font-size: 0.72rem; font-family: "IBM Plex Mono", monospace; text-transform: uppercase; letter-spacing: 0.06em; }
+  .p-why { font-size: 0.98rem; color: var(--ink-soft); }
+  .p-label {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.1em; text-transform: uppercase;
+    color: var(--muted); display: block; margin: 1rem 0 0.35rem;
+  }
+  #panel ul { margin: 0 0 0.4rem; padding-left: 1.2rem; font-size: 0.94rem; max-width: 68ch; }
+  #panel li { margin: 0.3rem 0; }
+  .p-act {
+    background: var(--surface-2); border-radius: 9px; padding: 0.8rem 1rem; font-size: 0.92rem; margin: 0.6rem 0 1rem;
+  }
+  .p-chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin: 0.4rem 0 0.9rem; }
+  .chip {
+    font-family: "IBM Plex Mono", monospace; font-size: 0.7rem; letter-spacing: 0.03em;
+    border: 1px solid var(--line); border-radius: 999px; padding: 0.18rem 0.65rem; color: var(--ink-soft);
+    text-decoration: none; cursor: pointer; background: var(--surface);
+  }
+  .chip:hover { border-color: var(--accent); color: var(--ink); }
+  .p-actions { display: flex; flex-wrap: wrap; gap: 0.6rem; margin-top: 0.4rem; }
+  .btn {
+    border: 1px solid var(--accent); background: var(--accent-soft); color: var(--accent-ink);
+    border-radius: 9px; padding: 0.5rem 0.95rem; font-size: 0.9rem; font-weight: 600; cursor: pointer;
+  }
+  .btn:hover { filter: brightness(0.97); }
+  .btn.ghost { background: transparent; color: var(--ink-soft); border-color: var(--line); }
+  .btn.ghost:hover { border-color: var(--accent); color: var(--ink); }
+  .btn:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+
+  #order { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); box-shadow: var(--shadow); padding: 1.3rem 1.4rem; }
+  #order .next {
+    background: var(--accent-soft); color: var(--accent-ink); border-radius: 9px;
+    padding: 0.6rem 0.9rem; font-size: 0.86rem; margin-bottom: 1rem;
+  }
+  #order ol { list-style: none; margin: 0; padding: 0; counter-reset: ord; }
+  #order li { counter-increment: ord; display: grid; grid-template-columns: auto 1fr auto; gap: 0.6rem; align-items: baseline; padding: 0.45rem 0; border-bottom: 1px solid var(--line-soft); font-size: 0.92rem; }
+  #order li:last-child { border-bottom: none; }
+  #order li::before {
+    content: counter(ord, decimal-leading-zero); font-family: "IBM Plex Mono", monospace;
+    font-size: 0.72rem; color: var(--muted);
+  }
+  #order li .nm { cursor: pointer; max-width: 30ch; }
+  #order li .nm:hover { color: var(--accent-ink); text-decoration: underline; text-underline-offset: 2px; }
+  #order li .ro { font-family: "IBM Plex Mono", monospace; font-size: 0.66rem; letter-spacing: 0.05em; color: var(--muted); }
+  #order li.done .nm { text-decoration: line-through; color: var(--muted); }
+  #order li .cb { cursor: pointer; accent-color: var(--accent); margin-top: 0.2rem; }
+  .foot { border-top: 1px solid var(--line); background: var(--surface); padding: 2.2rem 0 3.2rem; font-size: 0.9rem; color: var(--muted); margin-top: 2.5rem; }
+  .foot p { max-width: 66ch; }
+  .search-hint { font-size: 0.78rem; color: var(--muted); margin: 0.4rem 0 0; }
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Serif:wght@500;600&display=swap">
+
+<header class="masthead">
+  <div class="wrap">
+    <div class="masthead-top">
+      <a class="mh-back" href="index.html">&larr; Índice de guías</a>
+      <button class="ctl" id="themeBtn" type="button" aria-pressed="false">Tema oscuro</button>
+    </div>
+  </div>
+  <div class="wrap masthead-inner">
+    <p class="kicker">Atlas · mapa de estudio · 2 rutas conectadas</p>
+    <h1>El mapa de las rutas</h1>
+    <p class="standfirst">
+      Un grafo de lo que hay que aprender para dominar backend, ordenado por dependencias:
+      cada nodo es una sección densificada de la guía, y el orden de estudio se calcula solo.
+      Marca tu progreso, se guarda en este navegador, y exporta tu plan a Markdown.
+    </p>
+    <div class="meta-row">
+      <span class="tag">Linux + Backend</span>
+      <span class="tag">27 conceptos</span>
+      <span class="tag">orden automático</span>
+      <span class="tag">progreso local</span>
+      <span class="tag"><a href="guia/backend-guia.html" style="color:inherit">guía &rarr;</a></span>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="layout">
+
+    <div class="controls">
+      <span class="seg" role="group" aria-label="Ruta enfocada">
+        <button type="button" data-focus="all" aria-pressed="true">Ambas</button>
+        <button type="button" data-focus="linux" aria-pressed="false">Linux</button>
+        <button type="button" data-focus="backend" aria-pressed="false">Backend</button>
+      </span>
+      <label class="ctl"><input type="checkbox" id="showRef" checked> nodos de referencia</label>
+      <input id="q" type="search" placeholder="Buscar en el mapa…" aria-label="Buscar concepto">
+      <button class="ctl" id="exportBtn" type="button">Exportar plan .md</button>
+      <button class="ctl" id="resetBtn" type="button">Reiniciar progreso</button>
+    </div>
+
+    <div class="progress-wrap" id="progressWrap"></div>
+
+    <div class="graph-card">
+      <div class="gc-head">
+        <span class="t">Dirección de lectura: izquierda → derecha. Las flechas son prerequisitos.</span>
+        <span class="legend">
+          <span class="lg"><i class="dot be"></i> Backend</span>
+          <span class="lg"><i class="dot lx"></i> Linux · terminal</span>
+          <span class="lg"><i class="dot ref"></i> referencia (no cuenta)</span>
+          <span class="lg"><i class="dot done"></i> hecho</span>
+        </span>
+      </div>
+      <div class="graph-scroll" id="graphScroll" tabindex="0" aria-label="Mapa de conceptos">
+        <svg class="graph" id="graph" role="img" aria-label="Grafo de dependencias de estudio"></svg>
+      </div>
+    </div>
+
+    <div class="below">
+      <section id="panel" class="empty" aria-live="polite">
+        <p class="p-clue">Selecciona un nodo del mapa para ver su detalle: por qué importa, los puntos clave,
+        la acción concreta, sus prerequisitos y lo que habilita.</p>
+      </section>
+
+      <section id="order" aria-label="Tu orden de estudio">
+        <h2 style="font-size:1.2rem">Tu orden de estudio</h2>
+        <div class="next" id="nextChips"></div>
+        <ol id="orderList"></ol>
+      </section>
+    </div>
+
+  </div>
+</div>
+
+<footer class="foot">
+  <div class="wrap">
+    <p><strong>Atlas — Mapa de estudio</strong> · grafo de conceptos de la guía <em>Backend de Punta a Punta</em>
+    con la ruta <em>Linux · terminal</em> como prerequisito densificado dentro del propio mapa. El orden se
+    recalcula cada vez que marcas un nodo; el progreso se guarda solo en tu navegador, no se sube a ningún
+    servidor. Nombres de productos y versiones cambian; los conceptos son estables.</p>
+  </div>
+</footer>
+
+<script>
+(function () {
+  "use strict";
+
+  var LS_KEY = "atlas-mapa-v1";
+  var LS_THEME = "atlas-mapa-theme";
+
+  var ROUTES = {
+    linux:   { name: "Linux · terminal", color: "rust",   order: 0 },
+    backend: { name: "Backend",          color: "accent", order: 1 }
+  };
+
+  var NODES = [
+    { id:"lx-terminal", r:"linux", t:"La terminal",              sec:"LX·01", est:"2–3 días", why:"Manejar la terminal es el 90% del trabajo de un backend: ahí se opera todo, se despliega y se depura.", pts:["pwd, ls, cd, . y .. y la ruta absoluta vs relativa","man &lt;comando&gt; y &lt;comando&gt; --help para aprender sin navegador","autocompletar con Tab, histórico con ↑, borrado de línea con Ctrl+U","no se memoriza: se busca. Se automatiza lo que se repite"], act:"Abre la terminal, crea ~/notas y navega hacia y desde ella sin mirar, hasta que pwd/ls/cd no te cuesten pensar.", deps:[], a:"" },
+    { id:"lx-archivos", r:"linux", t:"Archivos y permisos",     sec:"LX·02", est:"2 días", why:"Los permisos drwxr-xr-x explican la mayoría de los 'permission denied' que verás toda tu carrera.", pts:["ls -l muestra tipo, permisos rwx y propietario","chmod: 644 para archivos, 755 para ejecutables; los tres grupos ugo","redirección &gt;, &gt;&gt;, 2&gt;&amp;1, y pipes | entre comandos","find, grep, wc, head para inspeccionar un directorio real"], act:"Crea un script.sh con texto, hazlo ejecutable con chmod +x y lista el antes y el después con ls -l.", deps:["lx-terminal"], a:"" },
+    { id:"lx-procesos", r:"linux", t:"Procesos y señales",      sec:"LX·03", est:"2–3 días", why:"Un servidor es una colección de procesos; saber listarlos y comunicarte con ellos es operar de verdad.", pts:["ps, top/htop; PID y PPID; el árbol pstree","señales: SIGTERM (amable) vs SIGKILL (a la fuerza); kill, jobs, Ctrl+Z","background con &amp; y nohup; sesiones persistentes con tmux","por qué un proceso muere al cerrar la terminal y cómo se hace para que sobreviva"], act:"Lanza un comando largo en background, tráelo al frente, envíale SIGTERM y observa el estado con ps.", deps:["lx-terminal"], a:"" },
+    { id:"lx-pipes", r:"linux", t:"Pipelines y bash scripting", sec:"LX·04", est:"3–4 días", why:"Componer comandos pequeños con | es el poder de Unix; los scripts convierten tareas repetidas en automatizaciones.", pts:["encadenar grep, sort, uniq, wc, xargs con pipes","variables, $? y exit codes, parámetros $1 y $@, condicionales","scripts ejecutables con shebang #!/bin/bash; validar con bash -n","un backup real: tar + pipe a gzip + programar con cron"], act:"Escribe un script que liste los archivos de una carpeta modificados en la última semana, cuéntalos y prográmalo con cron.", deps:["lx-archivos","lx-procesos"], a:"" },
+    { id:"lx-git", r:"linux", t:"Git en la terminal",           sec:"LX·05", est:"2–3 días", why:"Git local es la base del capítulo de GitHub y PR de la guía Backend: primero se entiende local, después remoto.", pts:["init, add, commit, status, log y diff","restore y stash para deshacer sin drama","ramas y merge local; la idea de un commit por idea","aliasing y configuración global para ahorrar teclas"], act:"Inicia un repo en ~/notas y haz 5 commits pequeños con mensajes tipo 'feat: añade nota de índices'.", deps:["lx-archivos"], a:"" },
+    { id:"lx-ssh", r:"linux", t:"SSH y operación remota",       sec:"LX·06", est:"2–3 días", why:"Desplegar y mantener un servidor es entrar por SSH; las claves son ese login seguro que no viaja por la red.", pts:["ssh usuario@host, puerto, y túneles con -L","pares de claves ed25519 con ssh-keygen; ssh-copy-id; agente","scp y rsync para mover archivos","nada de contraseña por red: claves públicas + autenticación de dos factores","tmux para que la sesión sobreviva a una desconexión"], act:"Genera una clave ed25519 y configura acceso por clave a una VM o a tu propia máquina, dejando el login con contraseña deshabilitado.", deps:["lx-pipes"], a:"" },
+    { id:"lx-systemd", r:"linux", t:"systemd y servicios",      sec:"LX·07", est:"2–3 días", why:"Los procesos que aguantan producción se declaran como servicios para que el sistema los arranque y los reviva.", pts:["systemctl status/start/enable/restart","una unidad .service: ExecStart, Restart=on-failure, EnvironmentFile","journalctl -u para leer los logs del servicio","el puente: tu API de Backend se va a emitir como un servicio así"], act:"Escribe un .service para un script propio y comprueba que arranca al encender la máquina.", deps:["lx-ssh"], a:"" },
+
+    { id:"be-recursos",  r:"backend", t:"Recursos y enlaces",       sec:"BE·20", est:"consulta", ref:true, why:"El directorio maestro de dónde seguir: rutas (roadmap.sh, teachyourselfcs, OSSU), documentación oficial, cursos, práctica, system design, seguridad, comunidades y hosting gratis.", pts:["rutas y currículos: roadmap.sh, OSSU, The Odin Project, Full Stack Open","documentación oficial primero (MDN, PostgreSQL, go.dev, python.org)","práctica: Exercism, build-your-own-x, codingchallenges.fyi, PGExercises","laboratorio en el navegador: tocar cada concepto sin instalar nada"], act:"No lo recorras entero: cuando una sección te suene abstracta, toma UN recurso de su categoría y úsalo.", deps:[], a:"recursos" },
+    { id:"be-lenguajes", r:"backend", t:"Lenguajes de backend",   sec:"BE·01", est:"1 semana", why:"Elegir lenguaje es la decisión con más inercia; casi cualquiera sirve: pesan el equipo que lo domina, lo fácil de contratar y el ecosistema.", pts:["apuesta segura: JS/TS, Python, Java, C#, Go, PHP, Ruby","sólido y nicho: Rust (rendimiento+memoria), Elixir (tiempo real), Kotlin","tiempo real masivo → Elixir; latencia/coste al límite → Go o Rust; panel rápido → Django/Rails/Laravel","el 'óptimo' solo pesa en los extremos"], act:"Elige UNO ahora mismo. Si dudas: Go si te tira la infraestructura, Python si quieres APIs rápido.", deps:["lx-terminal","lx-archivos"], a:"lenguajes" },
+    { id:"be-frameworks", r:"backend", t:"Frameworks",             sec:"BE·02", est:"3–4 días", why:"Un framework resuelve por ti lo repetido de todo backend; la diferencia que importa es cuánto control te deja (micro vs full-stack) y si es síncrono o asíncrono.", pts:["micro (Express, Fastify, FastAPI, Gin) vs full-stack (NestJS, Django, Laravel, Rails)","síncrono de raíz (Django, Rails) vs async-first (Node, FastAPI, Go, Elixir)","menos magia no es peor: es menos control, pero más entendimiento cuando falla","más productivo con pilas incluidas para paneles de administración"], act:"Construye el mismo hello-world HTTP en un framework micro y uno full-stack y compara cuánto te dan ya hecho.", deps:["be-lenguajes"], a:"frameworks" },
+    { id:"be-corre",   r:"backend", t:"Cómo corre tu código",      sec:"BE·03", est:"1 semana", why:"Entre el archivo de texto y el programa atendiendo peticiones hay máquina, proceso, hilos y red: siete pasos y cada uno es un lugar donde falla producción.", pts:["compilado (binario) vs interpretado vs VM/JIT: por qué Go arranca en ms y Spring en segundos","proceso vs hilo; modelos de servidor: workers, hilos, event loop (Node), goroutines","concurrencia ≠ paralelismo; locks y deadlocks; la alternativa por canales/mensajes","el viaje de una URL: DNS → TCP → TLS → HTTP → handler → respuesta → keep-alive","HTTP a fondo: métodos, 2xx/3xx/4xx/5xx, sin estado; GET/PUT/DELETE idempotentes, POST no"], act:"Depura un sitio tuyo capa por capa: dig para DNS, nc -vz host 443 para el puerto, y mira el certificado TLS en el navegador.", deps:["lx-pipes"], a:"como-corre" },
+    { id:"be-capas",    r:"backend", t:"Las capas de un sistema",  sec:"BE·04", est:"1 semana", why:"La palabra 'capa' cubre cinco cosas distintas; saber cuál se rompe es el 90% de depurar.", pts:["pila de ejecución: transistor → kernel → runtime → tu código","pila de red (OSI/TCP-IP): el método es bajar capa por capa: DNS → puerto → ruta","capas de la app: presentación/aplicación/dominio/infra; las dependencias apuntan hacia adentro","capas de infraestructura: CDN → balanceador → servidores sin estado → caché → BD","capas de los datos: del byte al JSON (N+1, serialización, pool)"], act:"Toma un fallo real tuyo y nómbralo por capa (¿red, aplicación o dato?) antes de tocar nada.", deps:["be-corre"], a:"capas" },
+    { id:"be-git",      r:"backend", t:"Git, GitHub y CI",          sec:"BE·14", est:"1 semana", why:"Git vive en tu máquina; GitHub añade pull requests, issues, CI y despliegue. El CI es un archivo dentro de tu repo.", pts:["el entrelazado: init → remote → push → ramas → PR → review → merge → CD","y aplica aquí los convencionales commits: feat:, fix:, docs:","CI como archivo .github/workflows: tests en cada push; la ✗ roja bloquea el merge","GitFlow vs trunk-based: la industria moderna tiende a trunk-based","dónde sacar proyectos: build-your-own-x, app-ideas, roadmap.sh"], act:"Crea un workflow de CI en tu proyecto actual (tests en cada push) y pégale el badge en el README.", deps:["lx-git"], a:"git" },
+    { id:"be-tipos",     r:"backend", t:"Tipos de software",         sec:"BE·12", est:"consulta", ref:true, why:"Programar no es 'hacer webs': es una herramienta que aparece en casi todo. Ver el mapa de capas (firmware → OS → apps → scripts) y de dominios (web, móvil, datos, IA, DevOps, seguridad…) para ubicar las intersecciones con lo que ya te interesa.", pts:["desde el firmware y el kernel hasta los scripts de operación","dominios: fintech, salud, agro, música, legal — siempre hay una intersección","capas de infra: VM → contenedor → Kubernetes añaden aislamiento a cambio de sobrecarga"], act:"Conecta tu otra área con un problema que un proyecto propio de backend resuelva; esa va a ser tu demo más fuerte.", deps:["be-lenguajes"], a:"tipos" },
+    { id:"be-conceptos", r:"backend", t:"Conceptos del backend web", sec:"BE·05", est:"1–2 semanas", why:"Este es el vocabulario que hace que cualquier framework tenga sentido: cada concepto resuelve un problema concreto.", pts:["lenguaje vs librería vs framework (inversión de control)","routing, middleware, ORM y el costo N+1: saber leer el SQL que genera","auth: sesión (cookie) vs token (JWT); las trampas del JWT; OAuth2/OIDC con proveedor","hashing con sal: argon2/bcrypt/scrypt; nunca MD5 ni SHA a secas","migraciones versionadas; UTC y timestamptz; dinero en enteros/decimal","paginación por cursor (keyset) en vez de OFFSET; claves de idempotencia; los 12 factores"], act:"Añade a tu proyecto auth real (sesión o JWT con expiración corta) + validación de entrada y haz que falle de forma limpia.", deps:["be-lenguajes","be-frameworks"], a:"conceptos" },
+    { id:"be-datos",     r:"backend", t:"Bases de datos a profundidad", sec:"BE·06", est:"2 semanas", why:"La base de datos es casi siempre el cuello de botella y lo más caro de cambiar: entender relacional, índices y transacciones paga caro.", pts:["relacional: claves primarias/foráneas y normalización","índices y árbol B+: aprender a leer EXPLAIN","transacciones y ACID; niveles de aislamiento","pool de conexiones: dimensionarlo mal es causa clásica de caídas","familias NoSQL; la regla: empieza PostgreSQL (JSONB, búsqueda de texto, vectores)","replicación, particionado/sharding; claves: UUID v7 vs serial"], act:"Diseña el esquema de tu proyecto con normalización, crea el índice de la consulta caliente y mira el plan con EXPLAIN.", deps:["be-conceptos"], a:"datos" },
+    { id:"be-arquitectura", r:"backend", t:"Arquitectura de software", sec:"BE·07", est:"1–2 semanas", why:"Organizar el código para poder cambiarlo sin miedo es la diferencia entre crecer rápido y quedar atascado.", pts:["acoplamiento bajo y cohesión alta; capas por responsabilidad","hexagonal: puertos y adaptadores; pruebas el núcleo sin base de datos","S y D de SOLID: responsabilidad única e inversión de dependencias","patrones que de verdad usas: Repository, Factory, Strategy, Adapter, Pub-Sub","monolito primero; microservicios resuelven escala organizativa, no técnica","el patrón outbox para la doble escritura BD + cola"], act:"Separa en tu proyecto un módulo de dominio puro (sin HTTP ni SQL) y apunta la infraestructura hacia él con una interfaz.", deps:["be-conceptos","be-datos"], a:"arquitectura" },
+    { id:"be-distribuidos", r:"backend", t:"Sistemas distribuidos", sec:"BE·08", est:"2 semanas", why:"Con más de una máquina aparecen fallos que no existen en local: la red miente, los relojes no coinciden y la verdad se vuelve distribuida.", pts:["las 8 falacias; CAP y PACELC","consistencia fuerte vs eventual y el coste real de cada una","caché e invalidación: stampede, TTL con jitter","colas y Pub-Sub, backpressure y rate limiting (token bucket)","reintentos con backoff exponencial + jitter, solo idempotentes; circuit breaker","presupuesto de latencia: deadlines propagados, no timeouts fijos","balanceadores y CDN; servidores sin estado"], act:"Mueve una tarea lenta de tu proyecto a una cola (Redis/SQS) y haz que el consumidor sea idempotente frente a reintentos.", deps:["be-arquitectura","be-datos"], a:"distribuidos" },
+    { id:"be-seguridad", r:"backend", t:"Seguridad",                 sec:"BE·09", est:"1 semana", why:"No es una fase al final: es cómo escribes cada línea que toca entrada externa. Regla base: nunca confíes en el cliente.", pts:["inyección: consultas parametrizadas, nunca pegar strings","XSS y CSRF; CORS es la regla del navegador, no tu defensa","control de acceso roto / IDOR: cada consulta filtra por el usuario del token","OWASP Top 10: léela entera al menos una vez","TLS y certificados, secretos fuera del repo, mínimo privilegio"], act:"Audita tu proyecto contra el Top 10: prueba cambiar el id de un recurso en la URL (IDOR) e intenta una inyección; arregla lo que aparezca.", deps:["be-conceptos","be-git"], a:"seguridad" },
+    { id:"be-ciclo",    r:"backend", t:"Ciclo de vida y testing",  sec:"BE·10", est:"1–2 semanas", why:"El software nace, se construye, se despliega y evoluciona; las siete fases te dicen dónde estás y qué sigue, y el testing es donde se paga la calidad.", pts:["7 fases: idea → diseño (con ADR) → terreno → construcción (PR+CI) → calidad → deploy → operación → evolución","tipos de test: unitario (miles), integración, e2e (pocos), contract, property","TDD rojo-verde-refactor; stubs, mocks y fakes","la cobertura es una señal, no una meta","deploy: rolling, blue-green, canary; feature flags; infraestructura como código (Terraform)","deuda técnica se paga refactorizando; versionado semántico"], act:"Escribe tu primer test rojo (unitario de una función pura), hazlo verde y déjalo corriendo en CI.", deps:["be-conceptos","be-git"], a:"ciclo" },
+    { id:"be-observabilidad", r:"backend", t:"Observabilidad",      sec:"BE·11", est:"1 semana", why:"Publicar no es el final: un sistema en producción hay que poder verlo y tener un acuerdo explícito de cuán confiable debe ser.", pts:["los tres pilares: logs estructurados, métricas, trazas","percentiles, no promedios: p50/p95/p99","RED para servicios, USE para recursos","SLI, SLO, SLA y error budget","Sentry + alertas sobre síntomas del usuario, no cada métrica rara","IDs de correlación: un filtro te da la historia completa de una petición"], act:"Instrumenta tu proyecto: logs en JSON + una métrica de latencia (p95) + Sentry, y define un SLI simple.", deps:["be-distribuidos","be-ciclo"], a:"observabilidad" },
+    { id:"be-opensource", r:"backend", t:"Open source y licencias", sec:"BE·13", est:"2 días", why:"Casi toda la infraestructura de internet es open source; entenderlo — y saber licenciar tu propio código — es parte de la profesión.", pts:["MIT, Apache-2.0 y GPL en una línea cada una","por qué importa: infraestructura, no reinventar, transparencia, sin lock-in, carrera visible","el lado B: sostenibilidad, cadena de suministro (xz, event-stream), 'gratis' en dos sentidos"], act:"Pon licencia MIT a tu repositorio actual y un README mínimo que explique qué hace.", deps:["be-git"], a:"opensource" },
+    { id:"be-portafolio", r:"backend", t:"Cómo mostrar el portafolio", sec:"BE·15", est:"2–3 días", why:"El portafolio es la prueba de que sabes hacer el ciclo completo; el README es el 80% del impacto: nadie lee tu código, todos leen el README.", pts:["cada proyecto: README excelente, demo en vivo, screenshot/GIF, CI en verde, commits limpios, licencia","perfil: README propio, 6 fijados, constancia &gt; volumen","sitio de una página + un post por proyecto","trabajo de clientes: necesita permiso o anonimizar"], act:"Pulir el README de tu mejor repo: problema → stack y por qué → 3 comandos para correrlo → lo que aprendiste.", deps:["be-git","be-ciclo"], a:"portafolio" },
+    { id:"be-bd-prod",   r:"backend", t:"Bases de datos en producción", sec:"BE·16", est:"2 semanas", why:"Entre 'sé consultar' y 'opero la base con datos de gente real' hay un salto que casi ningún curso cubre: backups que restauran, PITR, réplicas, failover y migraciones sin cortar el servicio.", pts:["backup lógico vs físico, completo vs incremental; regla 3-2-1; un backup no probado no existe (restore drill)","RPO y RTO: los números los pone el negocio","PITR: backup base + WAL archivado; la trampa del archivado que falla sin que nadie lo note","réplicas física/lógica, replication lag y por qué no leer de una réplica lo que acabas de escribir","failover, split-brain y fencing: Patroni + quórum + STONITH","PgBouncer con modo transaction; dimensiona el pool","migraciones sin downtime: expand/contract, lock_timeout, CREATE INDEX CONCURRENTLY"], act:"Haz un restore drill real: borra una tabla, restaura tu backup y cronometra el RTO resultante.", deps:["be-datos","be-observabilidad"], a:"bd-produccion" },
+    { id:"be-proyectos", r:"backend", t:"3 proyectos de punta a punta", sec:"BE·18", est:"2–3 meses", why:"Un proyecto terminado — desplegado, con tests y README — enseña más que diez tutoriales a medias. Aquí aplicas las siete fases tres veces.", pts:["P1 · Go + Chi + PostgreSQL: acortador de URLs con analíticas (framework micro)","P2 · Python + FastAPI: API de gastos con usuarios y auth JWT (micro, API-first)","P3 · PHP + Laravel + MySQL: blog con panel de administración (full-stack MVC)","mismo ciclo 7 veces igual: lo que cambia es cuánto te da el framework","cada uno con demo en vivo, README, CI y un post"], act:"Empieza P1 HOY: idea → arquitectura (tabla links + endpoints) → repo → primera migración. Cierra el ciclo completo antes de pasar al siguiente.", deps:["be-seguridad","be-observabilidad","be-portafolio","be-bd-prod"], a:"proyectos" },
+    { id:"be-ruta",      r:"backend", t:"Plan de estudio de 12 meses", sec:"BE·19", est:"método", why:"La ruta que ordena todo lo anterior en el tiempo: fundamentos → primer backend → base de datos → calidad → arquitectura + full-stack → despliegue → seguridad → distribuidos y portafolio.", pts:["meses 1-2 fundamentos+lenguaje; 3-5 web+backend (P1); 5-6 bases de datos (P2); 7 testing; 8-9 arquitectura+full-stack (P3); 10 deploy; 11 seguridad; 12 distribuidos+portafolio","reglas: un proyecto terminado &gt; diez tutoriales a medias; lee menos y construye más","los conceptos importan más que la sintaxis; la arquitectura más que el framework","la tecnología correcta es la que puedes mantener"], act:"Marca tu posición actual en el mapa y define el entregable del próximo mes: algún proyecto terminado, no más tutoriales.", deps:["be-proyectos"], a:"ruta" },
+    { id:"be-curriculo", r:"backend", t:"Currículo: libros y cursos", sec:"BE·17", est:"consulta", ref:true, why:"Un camino ordenado de libros y cursos por etapa: no se leen todos ni en orden estricto, sino uno por etapa según lo que te toque construir.", pts:["etapa 0: The Pragmatic Programmer y A Philosophy of Software Design antes de la técnica","libro del lenguaje elegido (Fluent Python, El Go, Eloquent JavaScript, el libro de Rust)","bases de datos: Designing Data-Intensive Applications (si lees uno, este)","mapas: teachyourselfcs.com y OSSU; nets: CMU 15-445, MIT 6.5840"], act:"Guarda UN libro por etapa en tu libreta y consúltalo cuando esa etapa te toque construir.", deps:["be-lenguajes"], a:"curriculo" }
+  ];
+
+  var state = loadState();
+  var stateDone = state.done || {};
+  var focus = "all";
+  var showRef = true;
+  var q = "";
+  var selId = null;
+  var curTheme = initTheme();
+  var svg = document.getElementById("graph");
+  var panel = document.getElementById("panel");
+  var orderList = document.getElementById("orderList");
+  var nextChips = document.getElementById("nextChips");
+  var graphScroll = document.getElementById("graphScroll");
+  var cssV = document.documentElement;
+  var byId = {};
+  var levels = {};
+  var down = {};
+  var order = null;
+
+  NODES.forEach(function (n) { byId[n.id] = n; });
+
+  function isRef(n) { return !!n.ref; }
+  function done(n) { return !!stateDone[n.id]; }
+  function depsDone(n) { return n.deps.every(function (d) { return done(byId[d]); }); }
+
+  function computeLevels() {
+    function lvl(n) {
+      if (levels[n.id] !== undefined) return levels[n.id];
+      var m = -1;
+      n.deps.forEach(function (d) { var l = lvl(byId[d]); if (l > m) m = l; });
+      levels[n.id] = m + 1;
+      return levels[n.id];
+    }
+    NODES.forEach(function (n) { lvl(n); });
+  }
+
+  function countDown(n) {
+    if (down[n.id] !== undefined) return down[n.id];
+    var c = n.deps.length;
+    n.deps.forEach(function (d) { c += countDown(byId[d]); });
+    down[n.id] = c;
+    return c;
+  }
+
+  function topo() {
+    return NODES.slice().sort(function (a, b) {
+      if (levels[a.id] !== levels[b.id]) return levels[a.id] - levels[b.id];
+      var ra = isRef(a) ? 1 : 0, rb = isRef(b) ? 1 : 0;
+      if (ra !== rb) return ra - rb;
+      var da = countDown(b) - countDown(a);
+      if (da !== 0) return da;
+      return (ROUTES[a.r].order - ROUTES[b.r].order) || (a.id < b.id ? -1 : 1);
+    });
+  }
+
+  function isSelRoute(n) {
+    if (focus === "all") return true;
+    return n.r === focus;
+  }
+  function visible(n) { return showRef || !isRef(n); }
+
+  function nodeClass(n) {
+    var c = ["node"];
+    if (done(n)) c.push("st-done");
+    else if (!isSelRoute(n)) c.push("st-lock");
+    else if (!depsDone(n)) c.push("st-lock");
+    else c.push("st-live");
+    if (isRef(n)) c.push("st-ref");
+    if (n.id === selId) c.push("st-sel");
+    if (isNext(n)) c.push("st-next");
+    return c.join(" ");
+  }
+
+  function nextIds() {
+    var avail = topo().filter(function (n) {
+      return !isRef(n) && isSelRoute(n) && !done(n) && depsDone(n);
+    });
+    return avail.map(function (n) { return n.id; });
+  }
+  function isNext(n) { return !isRef(n) && isSelRoute(n) && !done(n) && depsDone(n); }
+
+  var routeColor = function (r, w) {
+    var c = (r === "linux") ? "--rust" : "--accent";
+    var s = (r === "linux") ? "--rust-soft" : "--accent-soft";
+    return { c: getC(c), s: getC(s), v: w ? c + "-w" : c };
+  };
+
+  function getC(name) {
+    var v = getComputedStyle(cssV).getPropertyValue(name).trim();
+    return v || "#8b919c";
+  }
+
+  var NODE_W = 196, NODE_H = 64, COL_W = 236, V_GAP = 30, TOP = 44, PAD = 26;
+  var pos = {};
+
+  function layout() {
+    pos = {};
+    var cols = {};
+    Object.keys(levels).forEach(function (id) {
+      var l = levels[id];
+      (cols[l] = cols[l] || []).length; /* noop */
+    });
+    var groups = {};
+    NODES.forEach(function (n) { (groups[levels[n.id]] = groups[levels[n.id]] || []).push(n); });
+    Object.keys(groups).forEach(function (l) {
+      var list = groups[l];
+      list.sort(function (a, b) {
+        var ra = isRef(a) ? 1 : 0, rb = isRef(b) ? 1 : 0;
+        if (ra !== rb) return ra - rb;
+        if (ROUTES[a.r].order !== ROUTES[b.r].order) return ROUTES[a.r].order - ROUTES[b.r].order;
+        return (countDown(b) - countDown(a)) || (a.id < b.id ? -1 : 1);
+      });
+      var y = TOP;
+      list.forEach(function (n) {
+        pos[n.id] = { x: PAD + (+l) * COL_W, y: y };
+        y += NODE_H + V_GAP;
+      });
+    });
+  }
+
+  function renderGraph() {
+    var colors = {};
+    var W = PAD * 2 + (Math.max.apply(null, Object.keys(levels).map(Number)) + 1) * COL_W - (COL_W - NODE_W);
+    var lastL = Math.max.apply(null, Object.keys(levels).map(Number));
+    var H = TOP + 40;
+    NODES.forEach(function (n) {
+      if (pos[n.id]) H = Math.max(H, pos[n.id].y + NODE_H + 28);
+    });
+    /* edges first */
+    var edges = "";
+    NODES.forEach(function (n) {
+      if (!visible(n)) return;
+      n.deps.forEach(function (d) {
+        var src = byId[d];
+        if (!visible(src)) return;
+        var p1 = pos[src.id], p2 = pos[n.id];
+        if (!p1 || !p2) return;
+        var dx = Math.max(40, (p2.x - (p1.x + NODE_W)) / 2);
+        var col = getC(ROUTES[src.r].color === "rust" ? "--rust" : "--accent");
+        var op = done(src) ? 0.85 : 0.45;
+        edges += '<path d="M ' + (p1.x + NODE_W) + ' ' + (p1.y + NODE_H / 2) +
+          ' C ' + (p1.x + NODE_W + dx) + ' ' + (p1.y + NODE_H / 2) +
+          ', ' + (p2.x - dx) + ' ' + (p2.y + NODE_H / 2) +
+          ', ' + p2.x + ' ' + (p2.y + NODE_H / 2) + '" fill="none" stroke="' + col +
+          '" stroke-width="1.6" opacity="' + op + '" stroke-dasharray="' + (isRef(n) || isRef(src) ? "3 4" : "") + '"></path>';
+      });
+    });
+
+    var labels = "";
+    Object.keys(groupsL) /* will fill below */;
+
+    svg.setAttribute("viewBox", "0 0 " + W + " " + H);
+    svg.setAttribute("width", W);
+    svg.setAttribute("height", H);
+
+    var html = edges;
+    var groups = {};
+    NODES.forEach(function (n) { (groups[levels[n.id]] = groups[levels[n.id]] || []).push(n); });
+    var firstGroups = groups[0] ? true : false;
+    if (groups[0]) {
+      html += '<text class="lvl-lbl" x="' + (PAD + 2) + '" y="30">Etapa 0 — comienza aquí</text>';
+    }
+    if (groups[lastL]) {
+      html += '<text class="lvl-lbl" x="' + (PAD + lastL * COL_W + 2) + '" y="30">Etapa ' + lastL + ' — meta</text>';
+    }
+
+    NODES.forEach(function (n) {
+      if (!visible(n)) return;
+      var p = pos[n.id];
+      var rc = routeColor(n.r);
+      var st = done(n) ? "st-done" : (!isSelRoute(n) || !depsDone(n) ? "st-lock" : "st-live");
+      var fill, stroke;
+      if (done(n)) { fill = rc.s; stroke = rc.c; }
+      else if (st === "st-lock") { fill = getC("--surface-2"); stroke = getC("--line"); }
+      else { fill = getC("--surface"); stroke = rc.c; }
+      var dsh = isRef(n) ? ' stroke-dasharray="5 4"' : "";
+      var cls = nodeClass(n);
+      var check = done(n) ? '<text class="ck" x="16" y="39">&#10003;</text>' : "";
+      var tX = done(n) ? 34 : 18;
+      var title = n.t;
+      var fsz = title.length > 30 ? 11.5 : 12.6;
+      var refTxt = isRef(n) ? '<text class="rf" x="' + (NODE_W - 14) + '" y="NODE_W" dominant-baseline="text-after-edge" text-anchor="middle"></text>' : "";
+      var chip = isRef(n) ? '<text class="rf" x="' + (NODE_W / 2) + '" y="' + (NODE_H - 10) + '" text-anchor="middle">referencia</text>' : '<text class="rf" x="' + (NODE_W / 2) + '" y="' + (NODE_H - 10) + '" text-anchor="middle">' + n.sec + '</text>';
+      if (isRef(n)) chip = '<text class="rf" x="' + (NODE_W / 2) + '" y="' + (NODE_H - 10) + '" text-anchor="middle">' + n.sec + ' · referencia</text>';
+      html += '<g class="' + cls + '" data-id="' + n.id + '" transform="translate(' + p.x + ',' + p.y + ')">' +
+        '<rect class="nr" width="' + NODE_W + '" height="' + NODE_H + '" rx="11" fill="' + fill + '" stroke="' + stroke + '" stroke-width="' + ((done(n) || st === "st-live") ? 1.8 : 1.3) + '"' + dsh + '></rect>' +
+        check +
+        '<text class="nt" x="' + tX + '" y="36" font-size="' + fsz + '">' + esc(title) + '</text>' +
+        chip +
+        '</g>';
+    });
+
+    svg.innerHTML = html;
+    svg.querySelectorAll(".node").forEach(function (g) {
+      g.addEventListener("click", function (ev) {
+        ev.stopPropagation();
+        select(byId[g.getAttribute("data-id")]);
+      });
+    });
+    applyFilter();
+  }
+
+  function applyFilter() {
+    svg.querySelectorAll(".node").forEach(function (g) {
+      var n = byId[g.getAttribute("data-id")];
+      var on = true;
+      if (q) {
+        var hay = (n.t + " " + n.why + " " + n.pts.join(" ")).toLowerCase();
+        on = hay.indexOf(q) !== -1;
+      }
+      g.style.opacity = on ? "" : "0.28";
+    });
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function select(n) {
+    selId = n ? n.id : null;
+    renderPanel(n);
+    renderGraph();
+    renderOrder();
+    renderProgress();
+  }
+
+  function toggleDone(id) {
+    if (stateDone[id]) delete stateDone[id]; else stateDone[id] = 1;
+    saveState();
+    selId = id;
+    renderGraph();
+    renderPanel(byId[id]);
+    renderOrder();
+    renderProgress();
+  }
+
+  function renderPanel(n) {
+    if (!n) {
+      panel.className = "empty";
+      panel.innerHTML = '<p class="p-clue">Selecciona un nodo del mapa para ver su detalle: por qué importa, los puntos clave, la acción concreta, sus prerequisitos y lo que habilita.</p>';
+      return;
+    }
+    panel.className = "";
+    var rc = routeColor(n.r);
+    var req = n.deps.map(function (d) { return chipFor(byId[d]); }).join("");
+    var en = NODES.filter(function (o) { return o.deps.indexOf(n.id) !== -1; })
+      .map(function (o) { return chipFor(o); }).join("");
+    var guideLink = n.a ? '<a class="btn ghost" href="guia/backend-guia.html#' + esc(n.a) + '">Abrir sección en la guía &rarr;</a>' : "";
+    var badge = isRef(n) ? '<span class="p-badge">referencia · no cuenta para el avance</span>' : "";
+    panel.innerHTML =
+      '<div class="p-head"><span class="p-sec">' + n.sec + '</span>' + badge + '</div>' +
+      '<h3 class="p-title">' + esc(n.t) + '</h3>' +
+      '<p class="p-est">Tiempo estimado: ' + esc(n.est) + ' · ruta: ' + ROUTES[n.r].name + '</p>' +
+      '<p class="p-why">' + esc(n.why) + '</p>' +
+      '<span class="p-label">Puntos clave</span>' +
+      '<ul>' + n.pts.map(function (p) { return '<li>' + p + '</li>'; }).join("") + '</ul>' +
+      '<span class="p-label">Acción concreta</span>' +
+      '<p class="p-act">' + esc(n.act) + '</p>' +
+      (req ? '<span class="p-label">Requiere</span><div class="p-chips">' + req + '</div>' : "") +
+      (en ? '<span class="p-label">Habilita</span><div class="p-chips">' + en + '</div>' : "") +
+      '<div class="p-actions">' +
+        '<button class="btn" type="button" id="doneBtn">' + (done(n) ? "Desmarcar" : "Marcar como hecho &#10003;") + '</button>' +
+        guideLink +
+      '</div>';
+    var db = document.getElementById("doneBtn");
+    if (db) db.addEventListener("click", function () { toggleDone(n.id); });
+  }
+
+  function chipFor(n) {
+    var col = getC(ROUTES[n.r].color === "rust" ? "--rust" : "--accent");
+    return '<span class="chip" data-id="' + n.id + '" style="border-color:' + col + '">' + esc(n.t) + '</span>';
+  }
+
+  function renderOrder() {
+    orderList.innerHTML = "";
+    var items = order.filter(function (n) { return !isRef(n) && isSelRoute(n); });
+    if (focus !== "all") {
+      var miss = order.filter(function (n) {
+        return n.r !== focus && items.indexOf(n) === -1 && n.deps.some(function (d) {
+          return byId[d].r === focus; /* any scoped edge: skip complexity */
+        });
+      });
+    }
+    items.forEach(function (n, i) {
+      var li = document.createElement("li");
+      if (done(n)) li.className = "done";
+      var cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.className = "cb";
+      cb.checked = done(n);
+      cb.setAttribute("aria-label", "marcar " + n.t);
+      cb.addEventListener("change", function () { toggleDone(n.id); });
+      var nm = document.createElement("span");
+      nm.className = "nm";
+      nm.textContent = n.t;
+      nm.addEventListener("click", function () {
+        select(n);
+        var gEl = svg.querySelector('[data-id="' + n.id + '"]');
+        if (gEl && pos[n.id]) {
+          var rect = gEl.getBoundingClientRect();
+          graphScroll.scrollTo({ left: pos[n.id].x - 40, behavior: "smooth" });
+        }
+      });
+      var ro = document.createElement("span");
+      ro.className = "ro";
+      ro.textContent = ROUTES[n.r] ? ROUTES[n.r].name.slice(0, 9) : "";
+      li.appendChild(cb);
+      li.appendChild(nm);
+      li.appendChild(ro);
+      orderList.appendChild(li);
+    });
+    var nxt = nextIds();
+    nextChips.innerHTML = "";
+    if (items.length && nextChips) {
+      if (nxt.length) {
+        nextChips.textContent = "Siguiente disponible: " + nxt.map(function (id) { return byId[id].t; }).join(" · ");
+      } else if (items.every(function (n) { return done(n); })) {
+        nextChips.textContent = "Ruta " + (focus === "all" ? "completa" : ROUTES[focus].name) + " completada.";
+      } else {
+        nextChips.textContent = "Completa primero los prerequisitos de la ruta.";
+      }
+    }
+  }
+
+  function renderProgress() {
+    var wrap = document.getElementById("progressWrap");
+    if (focus === "all") {
+      wrap.innerHTML = "";
+      ["linux", "backend"].forEach(function (r) {
+        wrap.appendChild(progEl(r));
+      });
+    } else {
+      wrap.innerHTML = "";
+      wrap.appendChild(progEl(focus));
+      var other = (focus === "linux" ? "backend" : "linux");
+      var o = document.createElement("span");
+      o.className = "prog";
+      o.textContent = "Prerrequisitos (" + ROUTES[other].name + "): " + countRoute(other);
+      wrap.appendChild(o);
+    }
+  }
+
+  function countRoute(r) {
+    var all = NODES.filter(function (n) { return n.r === r && !isRef(n); });
+    var d = all.filter(done).length;
+    var pct = all.length ? Math.round(d / all.length * 100) : 0;
+    return d + "/" + all.length + " (" + pct + "%)";
+  }
+
+  function progEl(r) {
+    var all = NODES.filter(function (n) { return n.r === r && !isRef(n); });
+    var d = all.filter(done).length;
+    var pct = all.length ? Math.round(d / all.length * 100) : 0;
+    var el = document.createElement("span");
+    el.className = "prog";
+    el.innerHTML = '<span>' + ROUTES[r].name + ' · ' + d + '/' + all.length + '</span><span class="bar ' + r + '"><i style="width:' + pct + '%"></i></span>';
+    return el;
+  }
+
+  function exportMd() {
+    var lines = [];
+    lines.push("# Mapa de estudio — Atlas");
+    lines.push("Generado: " + new Date().toISOString().slice(0, 10));
+    lines.push("");
+    lines.push("## Progreso");
+    lines.push("- Backend: " + countRoute("backend"));
+    lines.push("- Linux: " + countRoute("linux"));
+    lines.push("");
+    ["linux", "backend"].forEach(function (r) {
+      lines.push("## " + ROUTES[r].name);
+      var steps = order.filter(function (n) { return n.r === r && !isRef(n); });
+      steps.forEach(function (n, i) {
+        var head = done(n) ? "[x]" : "[ ]";
+        var reqTxt = n.deps.length ? " — requiere: " + n.deps.map(function (d) { return byId[d].t; }).join(", ") : "";
+        var link = n.a ? " [guía](guia/backend-guia.html#" + n.a + ")" : "";
+        lines.push((i + 1) + ". " + head + " **" + n.t + "** (" + n.est + ")" + reqTxt + link);
+        lines.push("   - " + n.why);
+      });
+      lines.push("");
+    });
+    var nxt = nextIds();
+    lines.push("Siguiente paso: " + (nxt.length ? nxt.map(function (id) { return byId[id].t; }).join(", ") : "ruta completada"));
+    lines.push("");
+    lines.push("---");
+    lines.push("Los nodos de referencia (currículo, recursos, tipos de software) no cuentan para el avance; se consultan sobre la marcha.");
+    var blob = new Blob([lines.join("\n")], { type: "text/markdown;charset=utf-8" });
+    var a = document.createElement("a");
+    a.href = URL.createObjectURL(blob);
+    a.download = "atlas-mapa-estudio.md";
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(function () { URL.revokeObjectURL(a.href); a.remove(); }, 80);
+  }
+
+  function loadState() {
+    try {
+      var raw = localStorage.getItem(LS_KEY);
+      return raw ? JSON.parse(raw) : { done: {} };
+    } catch (e) { return { done: {} }; }
+  }
+  function saveState() {
+    try { localStorage.setItem(LS_KEY, JSON.stringify({ done: stateDone })); } catch (e) {}
+  }
+
+  function initTheme() {
+    var t = "";
+    try { t = localStorage.getItem(LS_THEME) || ""; } catch (e) {}
+    if (!t) {
+      var dark = window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches;
+      if (dark) { cssV.setAttribute("data-theme", "dark"); return "dark"; }
+      return "light";
+    }
+    if (t === "dark") cssV.setAttribute("data-theme", "dark");
+    updateThemeBtn(t === "dark");
+    return t;
+  }
+  function toggleTheme() {
+    var isDark = cssV.getAttribute("data-theme") === "dark";
+    var nv = isDark ? "" : "dark";
+    if (nv === "dark") cssV.setAttribute("data-theme", "dark"); else cssV.removeAttribute("data-theme");
+    try { if (nv) localStorage.setItem(LS_THEME, nv); else localStorage.removeItem(LS_THEME); } catch (e) {}
+    updateThemeBtn(!!nv);
+    renderGraph();
+  }
+  function updateThemeBtn(isDark) {
+    var b = document.getElementById("themeBtn");
+    b.textContent = isDark ? "Tema claro" : "Tema oscuro";
+    b.setAttribute("aria-pressed", String(!!isDark));
+  }
+
+  document.getElementById("themeBtn").addEventListener("click", toggleTheme);
+  document.querySelectorAll(".seg button").forEach(function (b) {
+    b.addEventListener("click", function () {
+      focus = b.getAttribute("data-focus");
+      document.querySelectorAll(".seg button").forEach(function (x) {
+        x.setAttribute("aria-pressed", String(x === b));
+      });
+      selId = null;
+      renderGraph();
+      renderOrder();
+      renderProgress();
+    });
+  });
+  document.getElementById("showRef").addEventListener("change", function (e) {
+    showRef = e.target.checked;
+    renderGraph();
+    renderOrder();
+  });
+  document.getElementById("q").addEventListener("input", function (e) {
+    q = e.target.value.trim().toLowerCase();
+    applyFilter();
+  });
+  document.getElementById("exportBtn").addEventListener("click", exportMd);
+  document.getElementById("resetBtn").addEventListener("click", function () {
+    if (window.confirm("¿Borrar todo el progreso guardado de este mapa?")) {
+      stateDone = {};
+      saveState();
+      selId = null;
+      renderGraph(); renderOrder(); renderProgress();
+      renderPanel(null);
+    }
+  });
+  panel.addEventListener("click", function (e) {
+    var c = e.target.closest(".chip");
+    if (c && c.getAttribute("data-id")) select(byId[c.getAttribute("data-id")]);
+  });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") { select(null); }
+  });
+
+  computeLevels();
+  NODES.forEach(function (n) { countDown(n); });
+  order = topo();
+  layout();
+  renderGraph();
+  renderOrder();
+  renderProgress();
+})();
+</script>
