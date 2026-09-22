@@ -888,6 +888,46 @@
   });
 
   computeLevels();
+  ;(function bootPreferencias(){
+    // "que se vaya construyendo según tus preferencias": arranca con el nodo donde tienes
+    // más recursos sin abrir (tu próximo paso), con glow activo y aristas de ese subgrafo.
+    var found = null, bestScore = -1;
+    var pend = Object.keys(stateDone || {}).filter(function(k){ return !stateDone[k]; });
+    (pend.length ? pend : Object.keys(byId || {})).forEach(function(k){
+      var n = byId && byId[k]; if (!n) return;
+      var rec = (RESOURCES && RESOURCES[k]) ? RESOURCES[k].length : 0;
+      var score = rec * 10 + (n.order !== undefined ? n.order : 0); // preferencia = recursos pendientes
+      if (score > bestScore) { bestScore = score; found = k; }
+    });
+    if (found && renderPanel && select) { renderPanel(found); select(found); }
+  })();
+  ;(function bootProgress(){
+    // Construcción progresiva: los nodos 'mirados/visitados' (preferencias) aparecen primero con glow
+    var bootStart = performance.now();
+    function stepNodes(){
+      var n = document.querySelectorAll('.rg-node, [data-animate="nodes"], a.rg-xs, .node-g, [class*="rg-"]');
+      n.forEach(function(el,idx){
+        var d = (el.dataset && el.dataset.animateD) ? parseFloat(el.dataset.animateD) : (idx % 7) * 65;
+        el.style.setProperty('--d', d + 'ms');
+      });
+    }
+    stepNodes();
+    if (window.__SETORDER) __SETORDER(topological === undefined ? [] : topological);
+    document.title = "Atlas · Mapa de estudio — trazo progresivo";
+    applyMotionState();
+
+;(function(){
+  var svg = document.querySelector('svg, #graph');
+  if (!svg) return;
+  svg.addEventListener('dblclick', function(ev){
+    if (ev.target.className && /back|bg|grid/.test(String(ev.target.className.baseVal || ev.target.className))) {
+      // resetea progreso visual local sin tocar storage: reboots computeLevels con glow
+      try { computeLevels(); } catch(e){}
+    }
+  });
+})();
+
+  })();
   NODES.forEach(function (n) { countDown(n); });
   order = topo();
   layout();
