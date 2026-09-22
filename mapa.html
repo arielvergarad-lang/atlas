@@ -350,6 +350,8 @@
     backend: { name: "Backend",          color: "accent", order: 1 }
   };
 
+
+  var RESOURCES = {"lx-terminal":[{"t":"The Linux Command Line (libro gratis)","h":"https://linuxcommand.org/tlcl.php","d":"El manual clásico de terminal y shell para empezar desde cero, gratis en la web del autor."},{"t":"explainshell.com","h":"https://explainshell.com","d":"Pega un comando y te explica cada flag y argumento palabra por palabra."},{"t":"devhints","h":"https://devhints.io","d":"Cheatsheets de la terminal (bash, vim, git) para consulta rápida."}],"lx-archivos":[{"t":"The Linux Command Line — permisos","h":"https://linuxcommand.org/tlcl.php","d":"Capítulos de archivos, permisos y redirección del manual clásico."},{"t":"explainshell.com","h":"https://explainshell.com","d":"Confirma qué hace cada pieza de chmod, redirecciones y pipes antes de usarlos."}],"lx-procesos":[{"t":"The Linux Command Line — procesos","h":"https://linuxcommand.org/tlcl.php","d":"Secciones de procesos, señales y control de trabajos."},{"t":"OverTheWire — Bandit","h":"https://overthewire.org/wargames/","d":"Laboratorio por SSH: cada nivel entrena un comando real en un servidor ajeno."}],"lx-pipes":[{"t":"The Linux Command Line — scripting","h":"https://linuxcommand.org/tlcl.php","d":"Parte II: escribir scripts, variables, condicionales y automatizar."},{"t":"crontab.guru","h":"https://crontab.guru","d":"Escribe y valida expresiones cron para programar tus scripts."}],"lx-git":[{"t":"Pro Git (libro gratis)","h":"https://git-scm.com/book","d":"La referencia autoritativa de Git, gratis y traducida."},{"t":"roadmap.sh","h":"https://roadmap.sh","d":"Así es la industria; úsalo para ubicar Git en el resto de tu ruta."}],"lx-ssh":[{"t":"OverTheWire — Bandit","h":"https://overthewire.org/wargames/","d":"Entras por SSH a cada nivel: práctica directa del par de claves y puertos."},{"t":"The Linux Command Line — red","h":"https://linuxcommand.org/tlcl.php","d":"Capítulos de red y administración remota del manual clásico."}],"lx-systemd":[{"t":"The Linux Command Line — inicio","h":"https://linuxcommand.org/tlcl.php","d":"Cómo arranca el sistema y qué corre al prender la máquina."},{"t":"roadmap.sh/devops","h":"https://roadmap.sh/devops","d":"Ubica systemd entre las piezas de operación de un backend."}],"be-lenguajes":[{"t":"go.dev/doc","h":"https://go.dev/doc/","d":"Documentación oficial de Go: tour, guías y referencia."},{"t":"docs.python.org","h":"https://docs.python.org/3/","d":"Documentación oficial de Python, siempre actualizada."},{"t":"Eloquent JavaScript","h":"https://eloquentjavascript.net/","d":"Libro del lenguaje para JS/TS, gratis en la web."},{"t":"The Rust Book","h":"https://doc.rust-lang.org/book/","d":"El libro oficial de Rust, gratis."}],"be-frameworks":[{"t":"Full Stack Open","h":"https://fullstackopen.com/es/","d":"Curso universitario gratuito (Node, Express, React) hecho en Finlandia."},{"t":"roadmap.sh","h":"https://roadmap.sh","d":"Qué framework pedir por rol backend según el mercado."}],"be-corre":[{"t":"High Performance Browser Networking","h":"https://hpbn.co/","d":"Cómo viaja una petición: TCP, TLS, HTTP, gratis del autor."},{"t":"CS144 Stanford","h":"https://cs144.stanford.edu/","d":"Curso universitario de redes con laboratorio de implementar TCP."},{"t":"Kurose & Ross — Networking","h":"https://gaia.cs.umass.edu/kurose_ross/","d":"El libro de redes estándar en universidades en todo el mundo."}],"be-capas":[{"t":"teachyourselfcs.com","h":"https://teachyourselfcs.com","d":"La ruta para aprender los fundamentos (OS, red, arquitectura) en orden."},{"t":"GitHub — OSSU computer-science","h":"https://github.com/ossu/computer-science","d":"Currículo abierto de Ciencias de la Computación, empezando por sistemas."},{"t":"jvns.ca","h":"https://jvns.ca","d":"Zines y posts que explican capas de sistemas con claridad brutal."}],"be-conceptos":[{"t":"MDN Web Docs","h":"https://developer.mozilla.org","d":"La fuente de verdad de web (HTTP, JS, API REST)."},{"t":"OWASP Cheat Sheet Series","h":"https://cheatsheetseries.owasp.org","d":"Cheatsheets de auth, sesiones, inputs: cómo hacerlo bien y por qué."},{"t":"roadmap.sh — auth & HTTP","h":"https://roadmap.sh","d":"Qué conceptos de backend pedir en cada etapa."}],"be-datos":[{"t":"PostgreSQL docs","h":"https://www.postgresql.org/docs/","d":"Documentación oficial de la base predeterminada de esta ruta."},{"t":"CMU 15-445","h":"https://15445.courses.cs.cmu.edu","d":"Curso universitario de bases de datos de Andy Pavlo (YouTube y notas)."},{"t":"Use The Index, Luke!","h":"https://use-the-index-luke.com/","d":"Cómo funcionan los índices B-tree con ejemplos de buscadores."},{"t":"PGExercises","h":"https://pgexercises.com","d":"Ejercicios de SQL en el navegador, de fácil a difícil."},{"t":"Designing Data-Intensive Applications","h":"https://dataintensive.net/","d":"El libro que conecta capas: índices, transacciones y replicación."}],"be-arquitectura":[{"t":"martinfowler.com","h":"https://martinfowler.com","d":"Los ensayos de referencia sobre arquitectura, DDD y refactoring."},{"t":"Refactoring (Fowler)","h":"https://martinfowler.com/books/refactoring.html","d":"El catálogo de refactorings para poder cambiar código sin miedo."},{"t":"Domain-Driven Design Distilled","h":"https://www.oreilly.com/library/view/domain-driven-design-distilled/9780134434421/","d":"Resume DDD en un libro fino y pensado para no leer 600 páginas."},{"t":"Fundamentals of Software Architecture","h":"https://www.oreilly.com/library/view/fundamentals-of-software-architecture/9781098175474/","d":"El mapa completo del rol de arquitecto."}],"be-distribuidos":[{"t":"MIT 6.5840","h":"https://pdos.csail.mit.edu/6.824/","d":"El curso canónico de sistemas distribuidos (gratis, con lecturas y labs)."},{"t":"Jepsen","h":"https://jepsen.io/","d":"Análisis reales de consistencia en bases distribuidas; el tecno-miedo de la veracidad."},{"t":"Understanding Dist. Systems","h":"https://understandingdistributed.systems/","d":"Libro gratis que cubre el vocabulario de lo distribuido sin humo."},{"t":"system-design-primer","h":"https://github.com/donnemartin/system-design-primer","d":"El repo clásico para preparar entrevistas de diseño de sistemas."}],"be-seguridad":[{"t":"OWASP Top 10","h":"https://owasp.github.io/www-project-top-ten/","d":"Los 10 riesgos web más comunes en producción, con ejemplos."},{"t":"OWASP Cheat Sheet Series","h":"https://cheatsheetseries.owasp.org","d":"La checklist para implementar auth, sesiones y manejo de inputs."},{"t":"PortSwigger Web Security Academy","h":"https://portswigger.net/web-security","d":"Laboratorio gratuito para practicar cada vulnerabilidad de verdad."},{"t":"The Web Application Hacker's Handbook","h":"https://www.wiley.com/en-us/The+Web+Application+Hacker%27s+Handbook%3A+Finding+and+Exploiting+Security+Flaws%2C+2nd+Edition-p-9781118026472","d":"El libro que enseñó a mucha gente a pensar como atacante."}],"be-ciclo":[{"t":"Test-Driven Development (Kent Beck)","h":"https://www.informit.com/store/test-driven-development-by-example-9780321146533","d":"El libro original del ciclo rojo-verde-refactor."},{"t":"Unit Testing (Vladimir Khorikov)","h":"https://www.manning.com/books/unit-testing","d":"Tests unitarios bien hechos, con foco en qué merece la pena probar."},{"t":"Continuous Delivery","h":"https://continuousdelivery.com/","d":"El sitio del libro de Jez Humble; pipelines y despliegues seguros."},{"t":"Accelerate","h":"https://itrevolution.com/product/accelerate/","d":"Qué métricas y prácticas predicen rendimiento de entrega real."}],"be-observabilidad":[{"t":"Google SRE Book","h":"https://sre.google/sre-book/table-of-contents/","d":"SLI/SLO y error budget, gratis."},{"t":"Observability Engineering","h":"https://www.honeycomb.io/observability-engineering-oreilly-book","d":"Logs, métricas y trazas como tercer pilar, de Honeycomb."},{"t":"Brendan Gregg","h":"https://www.brendangregg.com","d":"Referencia de rendimiento de sistemas y de cómo medir."},{"t":"The Pragmatic Engineer","h":"https://newsletter.pragmaticengineer.com","d":"Newsletter de ingeniería en producción para seguir el estado del arte."}],"be-opensource":[{"t":"GitHub — build-your-own-x","h":"https://github.com/codecrafters-io/build-your-own-x","d":"Lista de proyectos para construir tu propia versión de cada herramienta."},{"t":"GitHub — OSSU","h":"https://github.com/ossu/computer-science","d":"Currículo abierto: el modelo de cómo se enseña y licencia en abierto."}],"be-git":[{"t":"Pro Git (libro gratis)","h":"https://git-scm.com/book","d":"Git a fondo, gratis y con ediciones en español."},{"t":"roadmap.sh","h":"https://roadmap.sh","d":"Ubica Git + GitHub + CI dentro del camino completo."}],"be-portafolio":[{"t":"GitHub — app-ideas","h":"https://github.com/florinpop17/app-ideas","d":"Ideas de proyectos por nivel (beginner→advanced) para practicar."},{"t":"GitHub — project-based-learning","h":"https://github.com/practical-tutorials/project-based-learning","d":"Tutoriales que construyen un proyecto completo, por lenguaje."}],"be-curriculo":[{"t":"teachyourselfcs.com","h":"https://teachyourselfcs.com","d":"El mapa que ordena qué aprender de CS antes de carreras especializadas."},{"t":"The Pragmatic Programmer","h":"https://pragprog.com/titles/tpp20/the-pragmatic-programmer-20th-anniversary-edition/","d":"El libro de la etapa 0: hábitos de oficio antes que técnica."},{"t":"CS50 Harvard","h":"https://cs50.harvard.edu/x/","d":"El curso inicial de programación de Harvard, gratis."},{"t":"Code (Charles Petzold)","h":"https://charlespetzold.com/code/","d":"De la electricidad al software: el libro que hace clic."},{"t":"Computer Systems: A Programmer's Perspective","h":"https://csapp.cs.cmu.edu/","d":"Lo que un programador debe saber de su máquina (CSAPP)."},{"t":"Operating Systems: Three Easy Pieces","h":"https://pages.cs.wisc.edu/~remzi/OSTEP/","d":"Sistemas operativos explicados en prosa clara, gratis."}],"be-bd-prod":[{"t":"PostgreSQL backup docs","h":"https://www.postgresql.org/docs/current/backup.html","d":"Backups, PITR y WAL en la documentación oficial."},{"t":"Patroni","h":"https://patroni.readthedocs.io/","d":"Alta disponibilidad de PostgreSQL y failover automático."},{"t":"PgBouncer","h":"https://www.pgbouncer.org/","d":"El pool de conexiones estándar para PostgreSQL."},{"t":"PG roll (sin downtime)","h":"https://pgroll.com/","d":"Migraciones sin cortar el servicio para Postgres."},{"t":"Postgres Weekly","h":"https://postgresweekly.com/","d":"Newsletter semanal para seguir PostgreSQL y su operación."}],"be-proyectos":[{"t":"build-your-own-x","h":"https://github.com/codecrafters-io/build-your-own-x","d":"Construye tu propia versión de las herramientas que usas."},{"t":"Render","h":"https://render.com/","d":"Hosting gratis para desplegar y dejar una demo en vivo."},{"t":"Fly.io","h":"https://fly.io/","d":"Despliega backend gratis cerca del usuario."},{"t":"Railway","h":"https://railway.com/","d":"Plataforma simple para subir apps y bases sin configurar servidores."}],"be-ruta":[{"t":"roadmap.sh","h":"https://roadmap.sh","d":"La ruta visual de backend mantenida por la comunidad."},{"t":"teachyourselfcs.com","h":"https://teachyourselfcs.com","d":"Los fundamentos que van debajo de toda ruta de backend."},{"t":"GitHub — OSSU computer-science","h":"https://github.com/ossu/computer-science","d":"El currículo abierto equivalente a una carrera de CS."},{"t":"ByteByteGo","h":"https://bytebytego.com","d":"El lenguaje visual de sistemas y arquitectura."}],"be-recursos":[{"t":"roadmap.sh","h":"https://roadmap.sh","d":"La ruta de backend actualizada por la comunidad; el mapa de mesas."},{"t":"teachyourselfcs.com","h":"https://teachyourselfcs.com","d":"Los fundamentos de CS en el orden correcto para aprenderlos solo."},{"t":"GitHub — OSSU","h":"https://github.com/ossu/computer-science","d":"Currículo abierto completo de CS, gratis."},{"t":"MDN Web Docs","h":"https://developer.mozilla.org","d":"La documentación oficial de referencia web."},{"t":"Exercism","h":"https://exercism.org","d":"Ejercicios por lenguaje con mentoría gratuita."},{"t":"OverTheWire — Bandit","h":"https://overthewire.org/wargames/","d":"Laboratorio por SSH para practicar terminal y seguridad."},{"t":"PortSwigger Web Security Academy","h":"https://portswigger.net/web-security","d":"Laboratorio gratuito de seguridad web."},{"t":"Render","h":"https://render.com/","d":"Hosting gratis para desplegar tus proyectos."}],"be-tipos":[{"t":"roadmap.sh","h":"https://roadmap.sh","d":"El panorama completo de roles y rutas en tecnología."},{"t":"The Odin Project","h":"https://www.theodinproject.com","d":"Ruta open source de full-stack si tu intersección tira a web."},{"t":"GitHub — OSSU","h":"https://github.com/ossu/computer-science","d":"Si tu intersección tira a CS más pura: el currículo abierto."}]};
   var NODES = [
     { id:"lx-terminal", r:"linux", t:"La terminal",              sec:"LX·01", est:"2–3 días", why:"Manejar la terminal es el 90% del trabajo de un backend: ahí se opera todo, se despliega y se depura.", pts:["pwd, ls, cd, . y .. y la ruta absoluta vs relativa","man &lt;comando&gt; y &lt;comando&gt; --help para aprender sin navegador","autocompletar con Tab, histórico con ↑, borrado de línea con Ctrl+U","no se memoriza: se busca. Se automatiza lo que se repite"], act:"Abre la terminal, crea ~/notas y navega hacia y desde ella sin mirar, hasta que pwd/ls/cd no te cuesten pensar.", deps:[], a:"" },
     { id:"lx-archivos", r:"linux", t:"Archivos y permisos",     sec:"LX·02", est:"2 días", why:"Los permisos drwxr-xr-x explican la mayoría de los 'permission denied' que verás toda tu carrera.", pts:["ls -l muestra tipo, permisos rwx y propietario","chmod: 644 para archivos, 755 para ejecutables; los tres grupos ugo","redirección &gt;, &gt;&gt;, 2&gt;&amp;1, y pipes | entre comandos","find, grep, wc, head para inspeccionar un directorio real"], act:"Crea un script.sh con texto, hazlo ejecutable con chmod +x y lista el antes y el después con ls -l.", deps:["lx-terminal"], a:"" },
@@ -450,6 +452,7 @@
     if (isRef(n)) c.push("st-ref");
     if (n.id === selId) c.push("st-sel");
     if (isNext(n)) c.push("st-next");
+    c.push("rg-" + n.r);
     return c.join(" ");
   }
 
@@ -510,6 +513,15 @@
     NODES.forEach(function (n) {
       if (pos[n.id]) H = Math.max(H, pos[n.id].y + NODE_H + 28);
     });
+    var markerDefs =
+      '<defs>' +
+      '<marker id="mk-accent" viewBox="0 0 10 10" refX="8.4" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="' + getC("--accent") + '"/>' +
+      '</marker>' +
+      '<marker id="mk-rust" viewBox="0 0 10 10" refX="8.4" refY="5" markerWidth="7.5" markerHeight="7.5" orient="auto-start-reverse">' +
+      '<path d="M0,0 L10,5 L0,10 z" fill="' + getC("--rust") + '"/>' +
+      '</marker>' +
+      '</defs>';
     /* edges first */
     var edges = "";
     NODES.forEach(function (n) {
@@ -521,6 +533,7 @@
         if (!p1 || !p2) return;
         var dx = Math.max(40, (p2.x - (p1.x + NODE_W)) / 2);
         var col = getC(ROUTES[src.r].color === "rust" ? "--rust" : "--accent");
+        var mk = ROUTES[src.r].color === "rust" ? "url(#mk-rust)" : "url(#mk-accent)";
         var op = done(src) ? 0.85 : 0.45;
         var dash = isRef(n) || isRef(src) ? " 3 4" : "";
         var d = 'M ' + (p1.x + NODE_W) + ' ' + (p1.y + NODE_H / 2) +
@@ -528,7 +541,8 @@
           ', ' + (p2.x - dx) + ' ' + (p2.y + NODE_H / 2) +
           ', ' + p2.x + ' ' + (p2.y + NODE_H / 2);
         edges += '<path d="' + d + '" fill="none" stroke="' + col +
-          '" stroke-width="1.6" opacity="' + op + '" stroke-dasharray="' + dash.trim() + '"></path>';
+          '" stroke-width="1.6" opacity="' + op + '" stroke-dasharray="' + dash.trim() +
+          '" marker-end="' + mk + '"></path>';
         edges += '<path class="tr" d="' + d +
           '" fill="none" stroke="' + col + '" stroke-width="2.2" stroke-linecap="round" data-animate="edge" style="--step:' + (stepOf[n.id] || 0) + '"></path>';
       });
@@ -538,7 +552,7 @@
     svg.setAttribute("width", W);
     svg.setAttribute("height", H);
 
-    var html = edges;
+    var html = markerDefs + edges;
     var groups = {};
     NODES.forEach(function (n) { (groups[levels[n.id]] = groups[levels[n.id]] || []).push(n); });
     var firstGroups = groups[0] ? true : false;
@@ -625,16 +639,27 @@
   function renderPanel(n) {
     if (!n) {
       panel.className = "empty";
-      panel.innerHTML = '<p class="p-clue">Selecciona un nodo del mapa para ver su detalle: por qué importa, los puntos clave, la acción concreta, sus prerequisitos y lo que habilita.</p>';
+      panel.innerHTML = '<p class="p-clue">Selecciona un nodo del mapa para ver su detalle: por qué importa, los puntos clave, la acción concreta, sus prerequisitos y lo que habilita. Cada nodo incluye sus recursos para seguir desde la fuente.</p>';
       return;
     }
     panel.className = "";
+    panel.style.animation = "none";
+    void panel.offsetWidth;
+    panel.style.animation = "";
     var rc = routeColor(n.r);
     var req = n.deps.map(function (d) { return chipFor(byId[d]); }).join("");
     var en = NODES.filter(function (o) { return o.deps.indexOf(n.id) !== -1; })
       .map(function (o) { return chipFor(o); }).join("");
-    var guideLink = n.a ? '<a class="btn ghost" href="guia/backend-guia.html#' + esc(n.a) + '">Abrir sección en la guía &rarr;</a>' : "";
+    var guideHref = n.a ? 'guia/backend-guia.html#' + esc(n.a) : "";
+    var routeAttr = 'data-route="' + n.r + '"';
+    var guideLink = n.a ? '<a class="btn ghost" href="' + guideHref + '">Abrir sección en la guía &rarr;</a>' : "<span></span>";
+    var primaryLink = n.a ? '<a class="btn primary" href="' + guideHref + '" ' + routeAttr + '>Ir al tutorial &#10142;</a>' : "";
     var badge = isRef(n) ? '<span class="p-badge">referencia · no cuenta para el avance</span>' : "";
+    var resources = (RESOURCES[n.id] || []).map(function (r) {
+      return '<a class="res-item" href="' + esc(r.h) + '" target="_blank" rel="noopener">' +
+        '<span><span class="rl">' + esc(r.t) + '</span><span class="rd">' + esc(r.d) + '</span></span>' +
+        '<span class="ra">&#8599;</span></a>';
+    }).join("");
     panel.innerHTML =
       '<div class="p-head"><span class="p-sec">' + n.sec + '</span>' + badge + '</div>' +
       '<h3 class="p-title">' + esc(n.t) + '</h3>' +
@@ -644,11 +669,13 @@
       '<ul>' + n.pts.map(function (p) { return '<li>' + p + '</li>'; }).join("") + '</ul>' +
       '<span class="p-label">Acción concreta</span>' +
       '<p class="p-act">' + esc(n.act) + '</p>' +
+      '<span class="p-label">Recursos para seguir</span>' +
+      (resources ? '<div class="res-list">' + resources + '</div>' : '<p class="p-clue">Sin recursos externos para este nodo.</p>') +
       (req ? '<span class="p-label">Requiere</span><div class="p-chips">' + req + '</div>' : "") +
       (en ? '<span class="p-label">Habilita</span><div class="p-chips">' + en + '</div>' : "") +
       '<div class="p-actions">' +
         '<button class="btn" type="button" id="doneBtn">' + (done(n) ? "Desmarcar" : "Marcar como hecho &#10003;") + '</button>' +
-        guideLink +
+        primaryLink + guideLink +
       '</div>';
     var db = document.getElementById("doneBtn");
     if (db) db.addEventListener("click", function () { toggleDone(n.id); });
