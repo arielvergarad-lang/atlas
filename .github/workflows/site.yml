@@ -23,9 +23,9 @@ jobs:
           node-version: 24
           cache: npm
           cache-dependency-path: site/package-lock.json
-      - name: Build
+      - name: Pruebas y build
         working-directory: site
-        run: npm ci && npm run build
+        run: npm ci && npm test && npm run build
 
   links:
     if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'

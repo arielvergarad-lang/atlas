@@ -1,0 +1,343 @@
+---
+// Simulador: reparto de claves entre servidores con hash % N frente a consistent hashing.
+const lang = Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es';
+const t = {
+	es: {
+		modo: 'Método de reparto',
+		anillo: 'Anillo (consistent hashing)',
+		mas: '+ servidor',
+		menos: '− servidor',
+		virtuales: 'Nodos virtuales por servidor',
+		carga: 'Claves por servidor',
+		inicio: 'Agrega un servidor en cada modo y compara cuántas claves se mueven.',
+		movidas: 'Se movieron {x} de {n} claves ({p}%).',
+		ideal: 'Lo justo sería ~{i}%: la parte que le corresponde al servidor nuevo.',
+		azar: 'Con tan pocos nodos virtuales, el servidor nuevo cayó en un arco de tamaño azaroso: sube el control.',
+		cambioModo: 'Cambiaste de método: cada clave se reasignó con la nueva regla.',
+		puntos: '{s} servidores × {v} = {p} puntos',
+	},
+	en: {
+		modo: 'Distribution method',
+		anillo: 'Ring (consistent hashing)',
+		mas: '+ server',
+		menos: '− server',
+		virtuales: 'Virtual nodes per server',
+		carga: 'Keys per server',
+		inicio: 'Add a server in each mode and compare how many keys move.',
+		movidas: '{x} of {n} keys moved ({p}%).',
+		ideal: 'The fair share would be ~{i}%: the part that belongs to the new server.',
+		azar: 'With so few virtual nodes, the new server landed on an arc of random size: raise the slider.',
+		cambioModo: 'You switched method: every key was reassigned with the new rule.',
+		puntos: '{s} servers × {v} = {p} points',
+	},
+}[lang];
+---
+
+<anillo-hash data-ui={JSON.stringify(t)}>
+	<div class="sim not-content">
+		<svg viewBox="0 0 360 360" aria-hidden="true">
+			<circle class="aro" cx="180" cy="180" r="118"></circle>
+			<g class="marcas"></g>
+			<g class="claves"></g>
+			<text class="centro" x="180" y="185"></text>
+		</svg>
+		<div class="panel">
+			<fieldset class="modo">
+				<legend>{t.modo}</legend>
+				<button type="button" data-modo="mod" aria-pressed="true"><code>hash % N</code></button>
+				<button type="button" data-modo="anillo" aria-pressed="false">{t.anillo}</button>
+			</fieldset>
+			<div class="botones">
+				<button type="button" data-accion="mas">{t.mas}</button>
+				<button type="button" data-accion="menos">{t.menos}</button>
+			</div>
+			<label class="virtuales">
+				<span>{t.virtuales}: <output>1</output></span>
+				<input type="range" min="1" max="40" value="1" disabled />
+			</label>
+			<p class="resultado" aria-live="polite">{t.inicio}</p>
+			<p class="titulo-carga">{t.carga}</p>
+			<ul class="carga"></ul>
+		</div>
+	</div>
+</anillo-hash>
+
+<script>
+	import { gsap } from 'gsap';
+	import { anillo, asignarAnillo, asignarModulo, movidas, posicion } from './hashing';
+
+	const NS = 'http://www.w3.org/2000/svg';
+	const TODOS = ['A', 'B', 'C', 'D', 'E', 'F'];
+	const COLOR: Record<string, string> = {
+		A: 'var(--sl-color-blue)',
+		B: 'var(--sl-color-orange)',
+		C: 'var(--sl-color-green)',
+		D: 'var(--sl-color-purple)',
+		E: 'var(--sl-color-red)',
+		F: 'var(--sl-color-gray-2)',
+	};
+	const CLAVES = Array.from({ length: 48 }, (_, i) => `usuario:${i + 1}`);
+	const R = 118; // anillo de claves
+	const RA = 144; // arcos de cada servidor
+	const xy = (pos: number, r: number) => {
+		const a = pos * 2 * Math.PI - Math.PI / 2;
+		return [180 + r * Math.cos(a), 180 + r * Math.sin(a)];
+	};
+	const fmt = (s: string, v: Record<string, string | number>) => s.replace(/\{(\w)\}/g, (_, k) => String(v[k]));
+
+	class AnilloHash extends HTMLElement {
+		connectedCallback() {
+			const ui = JSON.parse(this.dataset.ui!);
+			const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const $ = <T extends Element>(s: string) => this.querySelector<T>(s)!;
+			const rango = $<HTMLInputElement>('input[type=range]');
+			const resultado = $('.resultado');
+
+			let modo: 'mod' | 'anillo' = 'mod';
+			let n = 3;
+			let virtuales = 1;
+			let asignacion: string[] = [];
+
+			const puntos = CLAVES.map((k) => {
+				const [x, y] = xy(posicion(k), R);
+				const c = document.createElementNS(NS, 'circle');
+				Object.entries({ cx: x, cy: y, r: 5.5, class: 'clave' }).forEach(([a, v]) => c.setAttribute(a, String(v)));
+				$('.claves').appendChild(c);
+				return c;
+			});
+
+			const calcular = () => {
+				const servidores = TODOS.slice(0, n);
+				return modo === 'mod' ? asignarModulo(CLAVES, servidores) : asignarAnillo(CLAVES, anillo(servidores, virtuales));
+			};
+
+			const dibujarMarcas = () => {
+				const g = $('.marcas');
+				g.replaceChildren();
+				$('.centro').textContent = modo === 'mod' ? `hash(k) % ${n}` : fmt(ui.puntos, { s: n, v: virtuales, p: n * virtuales });
+				if (modo === 'mod') return;
+				// cada tramo del anillo pertenece al punto donde termina (sentido horario)
+				const pts = anillo(TODOS.slice(0, n), virtuales);
+				pts.forEach((p, i) => {
+					const desde = i ? pts[i - 1].pos : pts[pts.length - 1].pos - 1;
+					const [x0, y0] = xy(desde, RA);
+					const [x1, y1] = xy(p.pos, RA);
+					const arco = document.createElementNS(NS, 'path');
+					arco.setAttribute('d', `M${x0} ${y0} A${RA} ${RA} 0 ${p.pos - desde > 0.5 ? 1 : 0} 1 ${x1} ${y1}`);
+					arco.setAttribute('class', 'arco');
+					arco.style.stroke = COLOR[p.servidor];
+					g.appendChild(arco);
+					if (virtuales <= 2) {
+						const [tx, ty] = xy(p.pos, RA + 20);
+						const t = document.createElementNS(NS, 'text');
+						Object.entries({ x: tx, y: ty + 4, class: 'letra' }).forEach(([a, v]) => t.setAttribute(a, String(v)));
+						t.textContent = p.servidor;
+						t.style.fill = COLOR[p.servidor];
+						g.appendChild(t);
+					}
+				});
+				if (!reduce) gsap.from(g.children, { opacity: 0, duration: 0.4, stagger: Math.min(0.02, 0.6 / g.children.length) });
+			};
+
+			const dibujarCarga = () => {
+				const cuenta = Object.fromEntries(TODOS.slice(0, n).map((s) => [s, 0]));
+				asignacion.forEach((s) => cuenta[s]++);
+				const max = Math.max(...Object.values(cuenta), 1);
+				$('.carga').innerHTML = Object.entries(cuenta)
+					.map(([s, c]) => `<li><b style="color:${COLOR[s]}">${s}</b><span class="barra"><i style="width:${(c / max) * 100}%;background:${COLOR[s]}"></i></span><span class="num">${c}</span></li>`)
+					.join('');
+			};
+
+			const actualizar = (motivo: 'inicio' | 'modo' | 'cambio', ideal?: number) => {
+				const nueva = calcular();
+				const cambiadas = asignacion.length ? nueva.map((s, i) => s !== asignacion[i]) : nueva.map(() => false);
+				puntos.forEach((c, i) => {
+					c.style.fill = COLOR[nueva[i]];
+					if (cambiadas[i] && !reduce) {
+						gsap.fromTo(c, { attr: { r: 12 } }, { attr: { r: 5.5 }, duration: 0.9, ease: 'elastic.out(1, 0.45)', delay: (i % 12) * 0.015 });
+					}
+				});
+				if (motivo === 'cambio') {
+					const x = movidas(asignacion, nueva);
+					let msg = fmt(ui.movidas, { x, n: CLAVES.length, p: Math.round((x / CLAVES.length) * 100) });
+					if (ideal) msg += ' ' + fmt(ui.ideal, { i: Math.round(ideal * 100) });
+					if (ideal && modo === 'anillo' && virtuales < 5 && Math.abs(x / CLAVES.length - ideal) > 0.1) msg += ' ' + ui.azar;
+					resultado.textContent = msg;
+				} else if (motivo === 'modo') resultado.textContent = ui.cambioModo;
+				asignacion = nueva;
+				dibujarMarcas();
+				dibujarCarga();
+				$<HTMLButtonElement>('[data-accion=mas]').disabled = n >= TODOS.length;
+				$<HTMLButtonElement>('[data-accion=menos]').disabled = n <= 2;
+			};
+
+			this.querySelectorAll<HTMLButtonElement>('[data-modo]').forEach((b) =>
+				b.addEventListener('click', () => {
+					if (b.dataset.modo === modo) return;
+					modo = b.dataset.modo as typeof modo;
+					this.querySelectorAll('[data-modo]').forEach((x) => x.setAttribute('aria-pressed', String(x === b)));
+					rango.disabled = modo === 'mod';
+					actualizar('modo');
+				}),
+			);
+			$('[data-accion=mas]').addEventListener('click', () => {
+				n++;
+				actualizar('cambio', 1 / n);
+			});
+			$('[data-accion=menos]').addEventListener('click', () => {
+				n--;
+				actualizar('cambio');
+			});
+			rango.addEventListener('input', () => {
+				virtuales = Number(rango.value);
+				$('.virtuales output').textContent = String(virtuales);
+				actualizar('cambio');
+			});
+			actualizar('inicio');
+		}
+	}
+	customElements.define('anillo-hash', AnilloHash);
+</script>
+
+<style>
+	.sim {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem 2rem;
+		align-items: flex-start;
+		margin: 1.5rem 0;
+		padding: 1rem;
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.75rem;
+	}
+	svg {
+		flex: 1 1 16rem;
+		max-width: 22rem;
+		margin: 0 auto;
+	}
+	.panel {
+		flex: 1 1 15rem;
+		display: grid;
+		gap: 0.9rem;
+		font-size: var(--sl-text-sm);
+	}
+	.aro {
+		fill: none;
+		stroke: var(--sl-color-gray-5);
+		stroke-width: 2;
+	}
+	svg :global(.clave) {
+		stroke: var(--sl-color-bg);
+		stroke-width: 1.5;
+		transition: fill 0.5s ease;
+	}
+	svg :global(.arco) {
+		fill: none;
+		stroke-width: 10;
+	}
+	svg :global(.letra) {
+		font-size: 13px;
+		font-weight: 700;
+		text-anchor: middle;
+	}
+	.centro {
+		text-anchor: middle;
+		fill: var(--sl-color-gray-2);
+		font-size: 13px;
+		font-family: var(--sl-font-mono);
+	}
+	fieldset {
+		border: 0;
+		padding: 0;
+		margin: 0;
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.4rem;
+	}
+	legend {
+		color: var(--sl-color-gray-3);
+		margin-bottom: 0.35rem;
+	}
+	button {
+		border: 1px solid var(--sl-color-gray-4);
+		background: none;
+		color: var(--sl-color-white);
+		border-radius: 0.4rem;
+		padding: 0.4rem 0.8rem;
+		cursor: pointer;
+		font: inherit;
+	}
+	button[aria-pressed='true'] {
+		background: var(--sl-color-accent);
+		border-color: var(--sl-color-accent);
+		color: var(--sl-color-black);
+	}
+	button[aria-pressed='true'] code {
+		color: inherit;
+		background: none;
+	}
+	button:disabled,
+	input:disabled {
+		opacity: 0.4;
+		cursor: not-allowed;
+	}
+	.botones {
+		display: flex;
+		gap: 0.5rem;
+	}
+	.botones button {
+		font-weight: 600;
+	}
+	.virtuales {
+		display: grid;
+		gap: 0.3rem;
+	}
+	input[type='range'] {
+		accent-color: var(--sl-color-accent);
+	}
+	.resultado {
+		margin: 0;
+		min-height: 3em;
+		color: var(--sl-color-white);
+		font-weight: 600;
+	}
+	.titulo-carga {
+		margin: 0;
+		color: var(--sl-color-gray-3);
+	}
+	.carga {
+		list-style: none;
+		padding: 0;
+		margin: 0;
+		display: grid;
+		gap: 0.3rem;
+	}
+	.carga :global(li) {
+		display: grid;
+		grid-template-columns: 1.2rem 1fr 2rem;
+		gap: 0.5rem;
+		align-items: center;
+	}
+	.carga :global(.barra) {
+		height: 0.55rem;
+		background: var(--sl-color-gray-6);
+		border-radius: 1rem;
+		overflow: hidden;
+	}
+	.carga :global(.barra i) {
+		display: block;
+		height: 100%;
+		border-radius: 1rem;
+		transition: width 0.5s ease;
+	}
+	.carga :global(.num) {
+		text-align: end;
+		font-variant-numeric: tabular-nums;
+	}
+	@media (prefers-reduced-motion: reduce) {
+		svg :global(.clave),
+		.carga :global(.barra i) {
+			transition: none;
+		}
+	}
+</style>

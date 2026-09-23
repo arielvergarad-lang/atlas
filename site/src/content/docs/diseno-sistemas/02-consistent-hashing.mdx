@@ -1,0 +1,94 @@
+---
+title: Repartir datos entre servidores
+description: Por qué hash % N falla cuando cambia el número de servidores, y cómo lo resuelve consistent hashing.
+sidebar:
+  order: 2
+lesson:
+  id: diseno-sistemas-consistent-hashing
+  guide: diseno-sistemas
+  order: 2
+quiz:
+  - q: "Tienes 10 servidores de caché repartidos con `hash(clave) % 10` y agregas uno. ¿Qué fracción de las claves cambia de servidor, aproximadamente?"
+    options:
+      - "Cerca de 1/11"
+      - "Cerca de la mitad"
+      - "Cerca de 10/11"
+      - "Ninguna"
+    answer: 2
+    why: "Una clave solo se queda si `h % 10` y `h % 11` coinciden, y eso pasa con muy pocas. Casi toda la caché queda inválida de golpe."
+  - q: "Con consistent hashing, se cae el servidor B. ¿Qué claves cambian de servidor?"
+    options:
+      - "Todas"
+      - "Solo las que estaban en B, que pasan al siguiente punto del anillo"
+      - "Las de B y las del servidor anterior en el anillo"
+      - "Ninguna: las claves de B se pierden"
+    answer: 1
+    why: "El resto del anillo no cambia: cada clave sigue encontrando el mismo punto en sentido horario, salvo las que apuntaban a B."
+  - q: "¿Para qué sirven los nodos virtuales?"
+    options:
+      - "Para que cada servidor ocupe muchos puntos del anillo y la carga quede pareja"
+      - "Para cifrar las claves"
+      - "Para reemplazar la replicación"
+      - "Para que el anillo gire más rápido"
+    answer: 0
+    why: "Con un solo punto por servidor, los arcos del anillo son de tamaños muy distintos y un servidor puede recibir el doble que otro."
+---
+
+import AnilloHash from '../../../components/simuladores/AnilloHash.astro';
+
+En la [lección anterior](/diseno-sistemas/01-de-uno-a-millones/), el último paso fue repartir los datos entre varios servidores: *sharding*, o un clúster de caché con varios nodos. Eso deja una pregunta que parece trivial: **¿en qué servidor está `usuario:42`?** La respuesta tiene que calcularse igual desde cualquier servidor de aplicación, sin consultar a nadie.
+
+### La idea obvia: `hash(clave) % N`
+
+Se calcula un hash de la clave (un número que parece aleatorio pero es siempre el mismo para la misma clave) y se toma el resto de dividir por el número de servidores. Con 3 servidores, el resultado es 0, 1 o 2. Reparte parejo, es rápido y no necesita guardar ninguna tabla.
+
+El problema aparece **cuando N cambia**: agregas un servidor porque creció el tráfico, o se cae uno. Pruébalo tú:
+
+<AnilloHash />
+
+Con `hash % N`, pasar de 3 a 4 servidores mueve **cerca de 3 de cada 4 claves**, aunque el servidor nuevo solo debería recibir 1 de cada 4. Cambia a **Anillo**, vuelve a agregar un servidor y compara.
+
+:::tip[Por qué importa]
+Si esos servidores son una caché, mover el 75% de las claves significa que el 75% de las lecturas falla de golpe y cae **toda junta sobre la base de datos**: justo el cuello de botella que la caché venía a resolver en la lección anterior. Si son servidores de datos, significa migrar el 75% de los datos cada vez que el clúster cambia de tamaño.
+:::
+
+### El anillo: consistent hashing
+
+Imagina el rango de valores del hash doblado en un círculo. Cada **servidor** se ubica en el anillo según el hash de su nombre, y cada **clave** también. La regla: una clave pertenece al **primer servidor que encuentra avanzando en sentido horario**.
+
+Cuando agregas un servidor, este se instala en un punto del anillo y solo toma las claves del arco que queda justo antes de él. Todo lo demás queda donde estaba. Cuando uno se cae, solo sus claves pasan al siguiente. En promedio se mueve **1/N** de las claves, que es el mínimo posible.
+
+### Nodos virtuales
+
+Con un solo punto por servidor, el azar deja arcos de tamaños muy distintos: en el simulador, con 1 nodo virtual, mira las barras de carga. Un servidor puede recibir el doble que otro. La solución: que cada servidor ocupe **muchos puntos** del anillo (`A#0`, `A#1`, `A#2`…). Sube el control y mira cómo las marcas se mezclan y las barras se emparejan.
+
+Los nodos virtuales tienen otra ventaja: cuando un servidor se cae, su carga no va toda al vecino, sino que se reparte entre muchos servidores. Y si tienes máquinas de distinto tamaño, a la más grande le das más puntos.
+
+:::note[Dónde lo vas a encontrar]
+El paper original es de Karger y otros (1997). Bases de datos distribuidas como Amazon Dynamo y Apache Cassandra reparten sus datos con un anillo y nodos virtuales, y muchos clientes de Memcached usan la misma idea para elegir el nodo de caché.
+:::
+
+### Lo que no resuelve
+
+Consistent hashing reparte **claves**, no **tráfico**. Si una sola clave recibe una avalancha de lecturas (el perfil de una celebridad, el producto en oferta), cae entera en un servidor, con anillo o sin él. Para esas *hot keys* se usan otras herramientas: réplicas de esa clave en varios servidores o una caché local en cada servidor de aplicación.
+
+## Práctica
+
+**1. Predice y comprueba.** Antes de tocar el simulador, calcula qué porcentaje de claves debería moverse al pasar de 4 a 5 servidores con `hash % N` y con el anillo. Después compruébalo. Con solo 48 claves, el resultado va a variar un poco respecto de tu cálculo: ¿por qué?
+
+**2. Quita un servidor.** En modo **Anillo** con 10 nodos virtuales, quita un servidor. Fíjate en los colores: ¿qué claves cambiaron y a qué servidores se fueron?
+
+**3. Escala real.** Un clúster de caché tiene 20 nodos y cada uno recibe 5.000 lecturas por segundo, con un 95% de aciertos. Se agrega un nodo. Estima cuántas lecturas por segundo extra llegan a la base de datos en los primeros minutos con `hash % N` y con el anillo.
+
+<details>
+<summary>Ver soluciones</summary>
+
+1. Con `hash % N`: 4/5 = 80%. Con el anillo: ~1/5 = 20%. Con 48 claves hay mucha varianza (es como tirar una moneda 48 veces), y con pocos nodos virtuales el servidor nuevo puede quedar con un arco más grande o más chico que 1/5. Por eso, para medir en serio, se usan miles de claves.
+
+2. Solo cambian las claves que eran del servidor que quitaste, y se reparten entre varios servidores (los que siguen a cada uno de sus puntos en el anillo). Con 1 nodo virtual, en cambio, se irían todas al mismo vecino.
+
+3. Tráfico total: 20 × 5.000 = 100.000 lecturas/s. Hoy falla el 5%: llegan 5.000/s a la base.
+   - Con `hash % N` (20→21) se mueven ~20/21 ≈ 95% de las claves. Esas claves reciben ~95.000 lecturas/s que antes acertaban en un 95% y ahora fallan todas: **~90.000 lecturas/s extra**: la base pasa de 5.000 a ~95.000 lecturas/s, unas 19 veces lo normal. Probablemente la tumbe.
+   - Con el anillo se mueve ~1/21 ≈ 5%: ~4.760 lecturas/s que ahora fallan, **~4.500/s extra**. La base recibe casi el doble de lo normal durante unos minutos, hasta que la caché del nodo nuevo se llena. Manejable.
+
+</details>
