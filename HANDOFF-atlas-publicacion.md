@@ -43,7 +43,7 @@ git log --oneline -3
 ## Siguiente paso (publicación)
 Decidido 2026-09-23: el sitio nuevo REEMPLAZA la raíz de Pages (`https://arielvergarad-lang.github.io/atlas/`).
 - Hecho: `site`+`base: '/atlas'` en `astro.config.mjs`; links internos relativos / con `BASE_URL`; `pages.yml` reescrito (validar + test + build `site/dist`, copia `guia/` y `mapa.html` viejos para no romper URLs, deploy con configure-pages@v6, upload-pages-artifact@v5, deploy-pages@v5). Verificado sirviendo `dist` bajo `/atlas/`: todas las rutas 200.
-- Falta: OK de Ariel para `git push` y merge `starlight` → `main` (el push a main dispara el deploy).
+- PUBLICADO 2026-09-23: `starlight` pusheada y fast-forward a `main` (`bc42fd1`), deploy success, sitio en vivo verificado (200 en es/en/lecciones/progreso/guías viejas). Fix en el camino: `setup-uv@v10` no existe como tag mayor → fijado a `v10.2.0`.
 - Pendiente derivado: los links a `index.html` desde `guia/*.html` y `mapa.html` ahora caen en la portada nueva.
 
 ## Pendiente / abierto
