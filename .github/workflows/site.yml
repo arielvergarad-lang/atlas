@@ -1,0 +1,37 @@
+name: Sitio interactivo (site/)
+
+on:
+  push:
+    paths: ['site/**', 'tools/**', '.github/workflows/site.yml']
+  pull_request:
+    paths: ['site/**', 'tools/**', '.github/workflows/site.yml']
+  schedule:
+    - cron: '0 12 * * 1' # lunes: revisa links externos
+  workflow_dispatch:
+
+jobs:
+  check:
+    if: github.event_name != 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - name: Validar lecciones (quiz, práctica, traducciones)
+        run: uv run tools/validate_content.py
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Build
+        working-directory: site
+        run: npm ci && npm run build
+
+  links:
+    if: github.event_name == 'schedule' || github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - name: Links externos rotos
+        run: uv run tools/check_links.py

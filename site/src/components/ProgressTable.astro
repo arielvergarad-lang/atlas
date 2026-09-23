@@ -1,0 +1,112 @@
+---
+// Lista todas las lecciones con su estado (leído del navegador en el cliente).
+import { getCollection } from 'astro:content';
+import { t } from '../i18n';
+
+const { lang, locale } = Astro.locals.starlightRoute;
+const s = t(lang);
+const prefix = locale ? `/${locale}/` : '/';
+
+const docs = await getCollection('docs', (e) => e.data.lesson);
+// Una fila por lección (id común entre idiomas); título en el idioma actual si existe.
+const byId = new Map<string, (typeof docs)[number]>();
+for (const e of docs) {
+	const inLocale = locale ? e.id.startsWith(`${locale}/`) : !e.id.startsWith('en/');
+	if (!byId.has(e.data.lesson!.id) || inLocale) byId.set(e.data.lesson!.id, e);
+}
+const rows = [...byId.values()]
+	.sort((a, b) => a.data.lesson!.guide.localeCompare(b.data.lesson!.guide) || a.data.lesson!.order - b.data.lesson!.order)
+	.map((e) => ({
+		id: e.data.lesson!.id,
+		title: e.data.title,
+		href: prefix + e.id.replace(/^en\//, '') + '/',
+		hasQuiz: Boolean(e.data.quiz?.length),
+	}));
+---
+
+<atlas-progress class="not-content" data-ui={JSON.stringify(s)}>
+	<p class="summary" aria-live="polite"></p>
+	<table>
+		<thead><tr><th>{s.lesson}</th><th>{s.status}</th></tr></thead>
+		<tbody>
+			{
+				rows.map((r) => (
+					<tr data-id={r.id} data-has-quiz={r.hasQuiz ? '1' : ''}>
+						<td><a href={r.href}>{r.title}</a></td>
+						<td class="st">{s.todo}</td>
+					</tr>
+				))
+			}
+		</tbody>
+	</table>
+	<button type="button">{s.reset}</button>
+</atlas-progress>
+
+<script>
+	import { clear, load, status } from '../scripts/progress';
+
+	class AtlasProgress extends HTMLElement {
+		connectedCallback() {
+			const ui = JSON.parse(this.dataset.ui!);
+			const render = () => {
+				const all = load();
+				const rows = [...this.querySelectorAll<HTMLTableRowElement>('tbody tr')];
+				let done = 0;
+				for (const row of rows) {
+					const st = status(all[row.dataset.id!], Boolean(row.dataset.hasQuiz));
+					done += Number(st === 'done');
+					const cell = row.querySelector('.st')!;
+					cell.textContent = ui[st];
+					cell.className = `st ${st}`;
+				}
+				this.querySelector('.summary')!.textContent = ui.summary
+					.replace('{done}', String(done))
+					.replace('{total}', String(rows.length));
+			};
+			render();
+			this.querySelector('button')!.addEventListener('click', () => {
+				if (confirm(ui.resetConfirm)) {
+					clear();
+					render();
+				}
+			});
+		}
+	}
+	customElements.define('atlas-progress', AtlasProgress);
+</script>
+
+<style>
+	table {
+		width: 100%;
+		border-collapse: collapse;
+		margin: 1rem 0 1.5rem;
+	}
+	th,
+	td {
+		text-align: start;
+		padding: 0.5rem 0.75rem;
+		border-bottom: 1px solid var(--sl-color-gray-5);
+	}
+	.st {
+		white-space: nowrap;
+		color: var(--sl-color-gray-3);
+	}
+	.st.done {
+		color: var(--sl-color-green);
+		font-weight: 600;
+	}
+	.st.inProgress {
+		color: var(--sl-color-orange);
+	}
+	.summary {
+		font-weight: 600;
+	}
+	button {
+		background: none;
+		border: 1px solid var(--sl-color-gray-4);
+		color: var(--sl-color-gray-2);
+		border-radius: 0.35rem;
+		padding: 0.4rem 0.9rem;
+		cursor: pointer;
+	}
+</style>

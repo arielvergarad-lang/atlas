@@ -1,0 +1,198 @@
+---
+import { t } from '../i18n';
+
+interface Props {
+	id: string;
+	lang: string;
+	quiz: { q: string; options: string[]; answer: number; why?: string }[];
+}
+const { id, lang, quiz } = Astro.props;
+const s = t(lang);
+
+// El quiz admite `código` en línea; el resto se escapa.
+const inline = (text: string) =>
+	text
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/`([^`]+)`/g, '<code>$1</code>');
+
+---
+
+<atlas-lesson class="not-content" data-id={id} data-has-quiz={quiz.length > 0 ? '1' : ''} data-ui={JSON.stringify(s)}>
+	{
+		quiz.length > 0 && (
+			<section class="quiz" aria-labelledby={`${id}-quiz`}>
+				<h2 id={`${id}-quiz`}>{s.quiz}</h2>
+				<form>
+					{quiz.map((item, qi) => (
+						<fieldset data-answer={item.answer}>
+							<legend set:html={`${qi + 1}. ${inline(item.q)}`} />
+							{item.options.map((opt, oi) => (
+								<label>
+									<input type="radio" name={`q${qi}`} value={oi} />
+									<span set:html={inline(opt)} />
+								</label>
+							))}
+							{item.why && <p class="why" hidden set:html={inline(item.why)} />}
+							<p class="verdict" aria-live="polite" />
+						</fieldset>
+					))}
+					<div class="actions">
+						<button type="submit">{s.check}</button>
+						<p class="result" aria-live="polite" />
+					</div>
+				</form>
+			</section>
+		)
+	}
+
+	<section class="checkpoints" aria-label={s.checkpoints}>
+		<h2>{s.checkpoints}</h2>
+		<label><input type="checkbox" data-key="read" /> {s.read}</label>
+		<label><input type="checkbox" data-key="practiced" /> {s.practiced}</label>
+		{quiz.length > 0 && <label><input type="checkbox" data-key="quiz" disabled /> {s.quizPassed}</label>}
+	</section>
+</atlas-lesson>
+
+<script>
+	import { load, update } from '../scripts/progress';
+
+	class AtlasLesson extends HTMLElement {
+		connectedCallback() {
+			const id = this.dataset.id!;
+			const ui = JSON.parse(this.dataset.ui!);
+			const boxes = [...this.querySelectorAll<HTMLInputElement>('.checkpoints input')];
+			const sync = () => {
+				const p = load()[id] || {};
+				for (const b of boxes) b.checked = Boolean(p[b.dataset.key as keyof typeof p]);
+			};
+			sync();
+			for (const b of boxes) {
+				b.addEventListener('change', () => update(id, { [b.dataset.key!]: b.checked ? Date.now() : undefined }));
+			}
+
+			const form = this.querySelector('form');
+			if (!form) return;
+			const button = form.querySelector('button')!;
+			const result = form.querySelector('.result')!;
+			const sets = [...form.querySelectorAll('fieldset')];
+
+			form.addEventListener('submit', (e) => {
+				e.preventDefault();
+				if (button.dataset.state === 'retry') {
+					form.reset();
+					for (const fs of sets) {
+						fs.classList.remove('ok', 'ko');
+						fs.querySelector('.why')?.setAttribute('hidden', '');
+						fs.querySelector('.verdict')!.textContent = '';
+					}
+					result.textContent = '';
+					button.textContent = ui.check;
+					delete button.dataset.state;
+					return;
+				}
+				const picked = sets.map((fs) => fs.querySelector<HTMLInputElement>('input:checked'));
+				if (picked.some((x) => !x)) {
+					result.textContent = ui.unanswered;
+					return;
+				}
+				let ok = 0;
+				sets.forEach((fs, i) => {
+					const right = picked[i]!.value === fs.dataset.answer;
+					ok += Number(right);
+					fs.classList.toggle('ok', right);
+					fs.classList.toggle('ko', !right);
+					fs.querySelector('.verdict')!.textContent = right ? `✓ ${ui.correct}` : `✗ ${ui.wrong}`;
+					fs.querySelector('.why')?.removeAttribute('hidden');
+				});
+				const passed = ok === sets.length;
+				if (passed) update(id, { quiz: Date.now() });
+				sync();
+				result.textContent =
+					ui.score.replace('{ok}', String(ok)).replace('{total}', String(sets.length)) + ' — ' + (passed ? ui.passed : ui.notPassed);
+				button.textContent = ui.retry;
+				button.dataset.state = 'retry';
+			});
+		}
+	}
+	customElements.define('atlas-lesson', AtlasLesson);
+</script>
+
+<style>
+	atlas-lesson {
+		display: block;
+		margin-top: 3rem;
+	}
+	section {
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.5rem;
+		padding: 1.25rem;
+		margin-top: 1.5rem;
+	}
+	h2 {
+		font-size: var(--sl-text-h4);
+		margin: 0 0 1rem;
+		color: var(--sl-color-white);
+	}
+	fieldset {
+		border: 0;
+		padding: 0;
+		margin: 0 0 1.25rem;
+	}
+	legend {
+		font-weight: 600;
+		margin-bottom: 0.5rem;
+		color: var(--sl-color-white);
+	}
+	label {
+		display: flex;
+		gap: 0.6rem;
+		align-items: baseline;
+		padding: 0.35rem 0.5rem;
+		border-radius: 0.35rem;
+		cursor: pointer;
+	}
+	label:hover {
+		background: var(--sl-color-gray-6);
+	}
+	input {
+		accent-color: var(--sl-color-accent);
+	}
+	fieldset.ok .verdict {
+		color: var(--sl-color-green);
+	}
+	fieldset.ko .verdict {
+		color: var(--sl-color-red);
+	}
+	.verdict,
+	.why,
+	.result {
+		margin: 0.35rem 0 0 0.5rem;
+		font-size: var(--sl-text-sm);
+	}
+	.why {
+		color: var(--sl-color-gray-2);
+	}
+	.actions {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 1rem;
+		align-items: center;
+	}
+	button {
+		background: var(--sl-color-accent);
+		color: var(--sl-color-black);
+		border: 0;
+		border-radius: 0.35rem;
+		padding: 0.5rem 1.1rem;
+		font-weight: 600;
+		cursor: pointer;
+	}
+	.checkpoints label {
+		padding-left: 0;
+	}
+	.checkpoints input:disabled + * {
+		opacity: 0.7;
+	}
+</style>

@@ -1,0 +1,158 @@
+---
+title: De 1 usuario a millones
+description: Cómo crece un sistema real, pieza por pieza, y por qué cada pieza aparece justo cuando aparece.
+tableOfContents: false
+sidebar:
+  order: 1
+lesson:
+  id: diseno-sistemas-de-uno-a-millones
+  guide: diseno-sistemas
+  order: 1
+quiz:
+  - q: "Tu base de datos recibe 100 lecturas por cada escritura y se está saturando. ¿Qué atacas primero?"
+    options:
+      - "Más servidores web detrás del balanceador"
+      - "Caché en memoria y réplicas de lectura"
+      - "Una cola con workers"
+      - "Un CDN"
+    answer: 1
+    why: "El problema son las lecturas: la caché evita ir a la base y las réplicas reparten las que sí llegan. Los servidores web no son el cuello de botella."
+  - q: "¿Qué condición tienen que cumplir los servidores web para poder autoescalarlos?"
+    options:
+      - "Usar el mismo lenguaje de programación"
+      - "Estar en la misma zona de disponibilidad"
+      - "No guardar estado propio: sesiones y datos viven fuera, por ejemplo en la caché"
+      - "Tener IP pública cada uno"
+    answer: 2
+    why: "Si un servidor guarda la sesión del usuario, apagarlo lo desconecta. Sin estado, cualquier servidor atiende cualquier petición y se pueden crear y apagar libremente."
+  - q: "1.000 millones de escrituras al mes son, en promedio, unas…"
+    options:
+      - "40 por segundo"
+      - "400 por segundo"
+      - "4.000 por segundo"
+      - "40.000 por segundo"
+    answer: 1
+    why: "Un mes tiene unos 2,5 millones de segundos: 1.000.000.000 / 2.500.000 = 400. Y los picos serán bastante más altos que el promedio."
+---
+
+import ScrollDiagram from '../../../components/diagramas/ScrollDiagram.astro';
+import Paso from '../../../components/diagramas/Paso.astro';
+
+Ningún sistema grande nació grande. Todos empezaron como un servidor, y cada pieza que ves en un diagrama de arquitectura apareció **para resolver un cuello de botella concreto**, medido, en un momento concreto. Baja con calma: el diagrama se va construyendo a medida que lees, y las bolitas son peticiones reales moviéndose por el sistema.
+
+<ScrollDiagram escenario="escalar">
+<Paso>
+
+### 1 · Una sola caja
+
+Al principio todo vive en un servidor: el servidor web, la aplicación y la base de datos. El usuario escribe tu dominio, el **DNS** lo traduce a la IP del servidor, y listo.
+
+Es la decisión correcta para empezar: barato, simple y fácil de entender. Cuando la carga crece, lo primero es **escalar verticalmente**: una máquina más grande.
+
+El problema llega cuando la base de datos empieza a comerse la memoria y la CPU que necesita la aplicación, y cada salto de tamaño de máquina cuesta más que el anterior.
+
+</Paso>
+<Paso>
+
+### 2 · Separar lo que crece distinto
+
+La base de datos se va a su **propia máquina**, idealmente un servicio gestionado (en AWS, RDS). Los archivos estáticos —imágenes, JS, CSS, lo que suben los usuarios— se van a un **almacén de objetos** (S3 o equivalente).
+
+Ahora cada pieza escala por su lado. El costo: más componentes que asegurar. Lo que no necesita recibir tráfico de internet va a una **subred privada**.
+
+Pero sigue habiendo un solo servidor web: en horas pico se vuelve lento, y si se cae, se cae todo.
+
+</Paso>
+<Paso>
+
+### 3 · Varios servidores y un balanceador
+
+**Escalado horizontal**: varios servidores iguales, repartidos en distintas zonas de disponibilidad, y un **balanceador de carga** delante que reparte las peticiones y termina el TLS. Si un servidor muere, el balanceador deja de enviarle tráfico.
+
+La base de datos gana una **réplica en espera** para hacer *failover* si la principal falla. Los estáticos pasan a servirse desde un **CDN**, cerca del usuario.
+
+Nuevo cuello de botella: el servicio lee muchísimo más de lo que escribe (100 a 1), y todas esas lecturas terminan en la misma base de datos.
+
+</Paso>
+<Paso>
+
+### 4 · Caché y réplicas de lectura
+
+Una **caché en memoria** (Redis, Memcached) guarda los datos más pedidos: leer de memoria es mucho más rápido que de disco, y la mayoría de las lecturas ya no llega a la base. Las sesiones también se van a la caché, y así los servidores quedan **sin estado**.
+
+Las lecturas que sí fallan en la caché van a **réplicas de lectura**. La principal queda solo para escrituras. Fíjate en el diagrama: la mayoría de las bolitas azules se quedan en la caché.
+
+Ahora el tráfico tiene picos de día y valles de noche, y de noche pagas servidores que no hacen nada.
+
+</Paso>
+<Paso>
+
+### 5 · Autoescalado
+
+Como los servidores ya no guardan estado, se pueden **crear y apagar solos** según una métrica: CPU, latencia o simplemente la hora del día. Mira cómo los dos servidores de abajo aparecen y desaparecen.
+
+Con esto el sistema sigue los picos y reduce costos en los valles. Lo que no escala así: la base de datos principal. Todas las escrituras siguen yendo a un único lugar, y el volumen de datos no para de crecer.
+
+</Paso>
+<Paso>
+
+### 6 · Millones: repartir los datos y diferir el trabajo
+
+Con 10 millones de usuarios, 40.000 lecturas y 400 escrituras por segundo en promedio, la base principal necesita otras técnicas: **sharding** (repartir los datos entre varias bases), **federación**, **desnormalizar**, o mover parte de los datos a una base **NoSQL**. Los datos históricos pueden irse a un **warehouse** (ver la guía de Datos).
+
+Lo que no hace falta responder al momento se saca del camino: la aplicación deja un mensaje en una **cola** y unos **workers** lo procesan después. Por ejemplo, subir una foto responde de inmediato y la miniatura se genera en segundo plano (las bolitas moradas).
+
+</Paso>
+</ScrollDiagram>
+
+## El método detrás del dibujo
+
+El diagrama no se armó adivinando. Cada paso siguió el mismo ciclo:
+
+1. **Medir**: pruebas de carga y métricas reales, no intuición.
+2. **Perfilar**: encontrar qué pieza se satura primero.
+3. **Resolver ese cuello de botella**, comparando alternativas y su costo.
+4. **Repetir**.
+
+:::tip[Por qué importa]
+Muchos proyectos arrancan con el diagrama del paso 6 "por si acaso": colas, réplicas y microservicios para cien usuarios. Cada pieza agrega costo, puntos de falla y trabajo de operación. La pieza correcta es la que resuelve **el cuello de botella que ya mediste**.
+:::
+
+## Cálculos de servilleta
+
+Antes de diseñar, se estima el tamaño del problema con cuentas rápidas. La conversión que más se usa:
+
+| Al mes | Por segundo (promedio) |
+|---|---|
+| 2,5 millones de peticiones | 1 |
+| 100 millones | 40 |
+| 1.000 millones | 400 |
+
+Un mes tiene unos 2,5 millones de segundos. Así, los números del paso 6 salen de suponer 1.000 millones de escrituras y 100.000 millones de lecturas al mes. Con 1 KB por escritura son unos **1 TB de datos nuevos al mes**, 36 TB en tres años. Y recuerda: el tráfico **no es uniforme**, los picos pueden ser varias veces el promedio.
+
+:::note[Fuente]
+Esta lección adapta la solución *"Design a system that scales to millions of users on AWS"* del [System Design Primer](https://github.com/donnemartin/system-design-primer) de Donne Martin ([CC BY 4.0](https://creativecommons.org/licenses/by/4.0/)). Los principios aplican fuera de AWS.
+:::
+
+## Práctica
+
+**1. Estima.** Una app de reservas espera 50 millones de visitas de página al mes, con 5 lecturas a la base por visita y 1 reserva (escritura) por cada 200 visitas. Calcula lecturas y escrituras por segundo promedio. ¿Qué etapa del diagrama necesitarías, más o menos?
+
+**2. Diagnostica.** Para cada síntoma, di qué pieza del diagrama agregarías:
+- (a) La página carga lento para usuarios en otro continente, sobre todo las imágenes.
+- (b) Al desplegar una versión nueva, se cierra la sesión de todos los usuarios.
+- (c) Exportar un reporte en PDF tarda 40 segundos y bloquea la petición.
+- (d) Si se cae la máquina de la base de datos, el servicio queda caído hasta que alguien la levanta a mano.
+
+**3. Critica.** Un equipo de 3 personas con 200 usuarios activos propone Kubernetes, 4 microservicios, Kafka y sharding desde el día uno. Escribe tres preguntas que les harías antes de aprobarlo.
+
+<details>
+<summary>Ver soluciones</summary>
+
+1. Lecturas: 50 M × 5 = 250 M/mes ≈ 100 por segundo. Escrituras: 50 M / 200 = 250.000/mes ≈ 0,1 por segundo. Es muy poco: una sola base bien indexada, con un par de servidores detrás de un balanceador para tener disponibilidad (paso 3), sobra. Si hay picos fuertes, por ejemplo al abrir la venta de un evento, la caché del paso 4.
+
+2. (a) CDN. (b) Servidores sin estado: sesiones en la caché o en una base, no en la memoria del servidor. (c) Cola y workers: responder "tu reporte está en proceso" y avisar cuando termine. (d) Réplica en espera con failover automático (una base gestionada multi-zona).
+
+3. Ejemplos: ¿qué cuello de botella **medido** resuelve cada pieza? ¿Quién la opera de madrugada cuando falle? ¿Cuánto cuesta al mes frente a una sola base y dos servidores? ¿Qué métrica les diría que ya es hora de agregarla?
+
+</details>

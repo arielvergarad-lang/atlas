@@ -1,0 +1,30 @@
+---
+// Un paso del texto de un ScrollDiagram: cuando llega al centro de la pantalla, el diagrama cambia a su etapa.
+---
+
+<section class="paso"><slot /></section>
+
+<style>
+	.paso {
+		min-height: 75vh;
+		padding: 1.25rem 0 2rem;
+		opacity: 0.35;
+		transition: opacity 0.4s ease;
+	}
+	.paso:global(.activo) {
+		opacity: 1;
+	}
+	.paso:last-child {
+		min-height: 55vh;
+	}
+	@media (max-width: 71.99rem) {
+		.paso {
+			min-height: 55vh;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		.paso {
+			transition: none;
+		}
+	}
+</style>

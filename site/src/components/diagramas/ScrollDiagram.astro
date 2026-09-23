@@ -1,0 +1,459 @@
+---
+// Diagrama que se construye con el scroll. Uso en MDX:
+//   <ScrollDiagram escenario="escalar"> <Paso>…</Paso> <Paso>…</Paso> </ScrollDiagram>
+// Cada <Paso> activa la etapa del mismo índice del escenario.
+import { escenarios, type NombreEscenario } from './escenarios';
+import type { Texto } from './tipos';
+
+interface Props {
+	escenario: NombreEscenario;
+}
+const esc = escenarios[Astro.props.escenario];
+const lang = Astro.locals.starlightRoute.lang === 'en' ? 'en' : 'es';
+const tx = (t?: Texto) => (t ? t[lang] : '');
+
+// Se resuelven los textos al idioma de la página: el cliente recibe datos planos.
+const datos = {
+	viewBox: esc.viewBox,
+	nodos: Object.fromEntries(
+		Object.entries(esc.nodos).map(([id, n]) => [id, { label: tx(n.label), sub: tx(n.sub), kind: n.kind ?? '' }]),
+	),
+	etapas: esc.etapas.map((e) => ({
+		...e,
+		hud: tx(e.hud),
+		nodos: Object.fromEntries(Object.entries(e.nodos).map(([id, n]) => [id, { ...n, sub: n.sub ? tx(n.sub) : undefined }])),
+		cuello: e.cuello && { nodo: e.cuello.nodo, nota: tx(e.cuello.nota) },
+	})),
+};
+const ui =
+	lang === 'en'
+		? { etapa: 'Stage', de: 'of', cuello: 'bottleneck' }
+		: { etapa: 'Etapa', de: 'de', cuello: 'cuello de botella' };
+---
+
+<scroll-diagram data-esc={JSON.stringify(datos)} data-ui={JSON.stringify(ui)}>
+	<div class="grafico not-content">
+		<p class="hud" aria-live="polite">
+			<span class="n"></span>
+			<strong class="t"></strong>
+		</p>
+		<div class="lienzo">
+			<svg viewBox={`0 0 ${esc.viewBox[0]} ${esc.viewBox[1]}`} role="img" aria-label="">
+				<g class="aristas"></g>
+				<g class="paquetes"></g>
+				<g class="nodos"></g>
+			</svg>
+		</div>
+		<ul class="leyenda">
+			{
+				Object.entries(esc.leyenda).map(([tipo, t]) => (
+					<li>
+						<i class={`p-${tipo}`} />
+						{tx(t)}
+					</li>
+				))
+			}
+		</ul>
+	</div>
+	<div class="pasos"><slot /></div>
+</scroll-diagram>
+
+<script>
+	import { gsap } from 'gsap';
+	import { ScrollTrigger } from 'gsap/ScrollTrigger';
+	gsap.registerPlugin(ScrollTrigger);
+
+	const NS = 'http://www.w3.org/2000/svg';
+	const W = 128;
+	const H = 46;
+	const VEL = 280; // px del viewBox por segundo
+
+	type EtapaDatos = {
+		hud: string;
+		nodos: Record<string, { x: number; y: number; from?: string; sub?: string; dashed?: boolean }>;
+		aristas: string[];
+		rutas: { camino: string[]; peso: number; tipo: string }[];
+		cada: number;
+		cuello?: { nodo: string; nota: string };
+		respiran?: string[];
+	};
+	type Datos = { viewBox: [number, number]; nodos: Record<string, { label: string; sub: string; kind: string }>; etapas: EtapaDatos[] };
+
+	const el = (tag: string, attrs: Record<string, string | number> = {}, parent?: Element) => {
+		const e = document.createElementNS(NS, tag);
+		for (const [k, v] of Object.entries(attrs)) e.setAttribute(k, String(v));
+		parent?.appendChild(e);
+		return e;
+	};
+
+	class ScrollDiagram extends HTMLElement {
+		connectedCallback() {
+			const d: Datos = JSON.parse(this.dataset.esc!);
+			const ui = JSON.parse(this.dataset.ui!);
+			const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+			const DUR = reduce ? 0 : 0.9;
+			const svg = this.querySelector('svg')!;
+			const [gA, gP, gN] = ['.aristas', '.paquetes', '.nodos'].map((s) => svg.querySelector(s)!);
+
+			// --- nodos: estado animable + elementos SVG
+			const nodos: Record<string, { x: number; y: number; o: number; s: number; resp: number; g: SVGGElement; sub: SVGTextElement; nota: SVGTextElement }> = {};
+			for (const [id, n] of Object.entries(d.nodos)) {
+				const g = el('g', { class: `nodo ${n.kind}` }, gN) as SVGGElement;
+				if (n.kind === 'punto') el('circle', { class: 'caja', r: 5 }, g);
+				else {
+					el('rect', { class: 'halo', x: -W / 2 - 6, y: -H / 2 - 6, width: W + 12, height: H + 12, rx: 14 }, g);
+					el('rect', { class: 'caja', x: -W / 2, y: -H / 2, width: W, height: H, rx: n.kind === 'user' ? H / 2 : n.kind === 'store' ? 4 : 10 }, g);
+					el('text', { class: 'label', y: n.sub || id.startsWith('s') ? -3 : 5 }, g).textContent = n.label;
+				}
+				const sub = el('text', { class: 'sub', y: 13 }, g) as SVGTextElement;
+				sub.textContent = n.sub;
+				const nota = el('text', { class: 'nota', y: H / 2 + 17 }, g) as SVGTextElement;
+				const first = d.etapas.find((e) => e.nodos[id])?.nodos[id] ?? { x: 0, y: 0 };
+				nodos[id] = { x: first.x, y: first.y, o: 0, s: 0.6, resp: 1, g, sub, nota };
+			}
+
+			// --- aristas: la unión de todas las etapas, cada una con su opacidad animable
+			const aristas: Record<string, { a: string; b: string; o: number; line: SVGLineElement }> = {};
+			for (const key of new Set(d.etapas.flatMap((e) => e.aristas))) {
+				const [a, b] = key.replace('~', '').split('>');
+				const line = el('line', { class: key.endsWith('~') ? 'arista punteada' : 'arista' }, gA) as SVGLineElement;
+				aristas[key] = { a, b, o: 0, line };
+			}
+
+			// --- peticiones que viajan por las aristas
+			type Paquete = { camino: string[]; i: number; t: number; c: SVGCircleElement };
+			let paquetes: Paquete[] = [];
+			let actual = -1;
+			let respira: gsap.core.Timeline | null = null;
+			let cuelloTimer: gsap.core.Tween | null = null;
+
+			const elegir = (id: string) => {
+				if (id !== 'S' && id !== 'R') return id;
+				const pool = Object.keys(d.etapas[actual].nodos).filter((n) => (id === 'S' ? /^s\d/.test(n) : /^r\d/.test(n)));
+				const vivos = pool.filter((n) => nodos[n].o * nodos[n].resp > 0.6);
+				const lista = vivos.length ? vivos : pool;
+				return lista[Math.floor(Math.random() * lista.length)];
+			};
+
+			const lanzar = () => {
+				const rutas = d.etapas[actual].rutas;
+				let r = Math.random() * rutas.reduce((s, x) => s + x.peso, 0);
+				const ruta = rutas.find((x) => (r -= x.peso) <= 0) ?? rutas[0];
+				const c = el('circle', { r: 4.5, class: `p-${ruta.tipo}` }, gP) as SVGCircleElement;
+				paquetes.push({ camino: ruta.camino.map(elegir), i: 0, t: 0, c });
+			};
+
+			// En pantallas angostas el SVG es más ancho que su caja: la "cámara" se mueve hacia lo que cambió.
+			const lienzo = this.querySelector<HTMLElement>('.lienzo')!;
+			const enfocar = (x: number) => {
+				if (lienzo.scrollWidth <= lienzo.clientWidth) return;
+				const left = (x / d.viewBox[0]) * lienzo.scrollWidth - lienzo.clientWidth / 2;
+				lienzo.scrollTo({ left, behavior: reduce ? 'auto' : 'smooth' });
+			};
+
+			const irA = (i: number) => {
+				if (i === actual || !d.etapas[i]) return;
+				actual = i;
+				const e = d.etapas[i];
+				this.querySelector('.hud .n')!.textContent = `${ui.etapa} ${i + 1} ${ui.de} ${d.etapas.length}`;
+				this.querySelector('.hud .t')!.textContent = e.hud;
+				svg.setAttribute('aria-label', `${e.hud}: ${Object.keys(e.nodos).map((id) => d.nodos[id].label).join(', ')}`);
+				this.querySelectorAll('.paso').forEach((p, k) => p.classList.toggle('activo', k === i));
+
+				const nuevos = Object.keys(e.nodos).filter((id) => nodos[id].o < 0.05);
+				if (nuevos.length) enfocar(nuevos.reduce((sx, id) => sx + e.nodos[id].x, 0) / nuevos.length);
+
+				for (const [id, n] of Object.entries(nodos)) {
+					const destino = e.nodos[id];
+					gsap.killTweensOf(n, 'x,y,o,s');
+					if (destino) {
+						if (n.o < 0.05 && destino.from && nodos[destino.from]) Object.assign(n, { x: nodos[destino.from].x, y: nodos[destino.from].y });
+						gsap.to(n, { x: destino.x, y: destino.y, o: 1, s: 1, duration: DUR, ease: 'power3.out' });
+						n.sub.textContent = destino.sub ?? d.nodos[id].sub;
+						n.g.classList.toggle('punteado', Boolean(destino.dashed));
+					} else {
+						gsap.to(n, { o: 0, s: 0.6, duration: DUR * 0.6, ease: 'power2.in' });
+					}
+					n.g.classList.remove('caliente');
+					n.nota.textContent = '';
+				}
+				for (const [key, a] of Object.entries(aristas)) {
+					gsap.to(a, { o: e.aristas.includes(key) ? 1 : 0, duration: DUR * 0.8, delay: e.aristas.includes(key) ? DUR * 0.4 : 0 });
+				}
+
+				// cuello de botella: aparece después de construir la etapa, para leerlo como "lo que viene"
+				cuelloTimer?.kill();
+				if (e.cuello) {
+					const { nodo, nota } = e.cuello;
+					cuelloTimer = gsap.delayedCall(reduce ? 0 : 1.6, () => {
+						const n = nodos[nodo];
+						n.g.classList.add('caliente');
+						n.nota.textContent = `⚠ ${ui.cuello}: ${nota}`;
+						const x = e.nodos[nodo].x;
+						// style y no atributo: el CSS de `text` pisa el atributo text-anchor
+						n.nota.style.textAnchor = x > d.viewBox[0] - 220 ? 'end' : x < 220 ? 'start' : 'middle';
+						n.nota.setAttribute('x', String(x > d.viewBox[0] - 220 ? W / 2 : x < 220 ? -W / 2 : 0));
+						enfocar(x);
+					});
+				}
+
+				// autoescalado: esos nodos aparecen y se apagan solos
+				respira?.kill();
+				Object.values(nodos).forEach((n) => (n.resp = 1));
+				if (e.respiran && !reduce) {
+					respira = gsap.timeline({ repeat: -1, repeatDelay: 0.8, delay: 1.5 });
+					respira.to(e.respiran.map((id) => nodos[id]), { resp: 0.15, duration: 1.2, stagger: 0.4, ease: 'sine.inOut' }, '+=1.8');
+					respira.to(e.respiran.map((id) => nodos[id]), { resp: 1, duration: 1.2, stagger: 0.4, ease: 'sine.inOut' }, '+=2');
+				}
+			};
+
+			// --- un solo bucle de dibujo para nodos, aristas y peticiones
+			let visible = false;
+			let acumulado = 0;
+			const dibujar = (_t: number, dt: number) => {
+				for (const n of Object.values(nodos)) {
+					n.g.setAttribute('transform', `translate(${n.x} ${n.y}) scale(${n.s})`);
+					n.g.style.opacity = String(n.o * n.resp);
+				}
+				for (const a of Object.values(aristas)) {
+					const [A, B] = [nodos[a.a], nodos[a.b]];
+					a.line.setAttribute('x1', String(A.x));
+					a.line.setAttribute('y1', String(A.y));
+					a.line.setAttribute('x2', String(B.x));
+					a.line.setAttribute('y2', String(B.y));
+					a.line.style.opacity = String(a.o * Math.min(A.o * A.resp, B.o * B.resp));
+				}
+				if (reduce || !visible || actual < 0) return;
+				acumulado += dt;
+				if (acumulado > d.etapas[actual].cada && paquetes.length < 60) {
+					acumulado = 0;
+					lanzar();
+				}
+				paquetes = paquetes.filter((p) => {
+					const [A, B] = [nodos[p.camino[p.i]], nodos[p.camino[p.i + 1]]];
+					if (!A || !B || B.o < 0.3) return p.c.remove(), false;
+					const largo = Math.hypot(B.x - A.x, B.y - A.y) || 1;
+					p.t += (VEL * dt) / 1000 / largo;
+					if (p.t >= 1) {
+						p.i++;
+						p.t = 0;
+						if (p.i >= p.camino.length - 1) return p.c.remove(), false;
+						return true;
+					}
+					p.c.setAttribute('cx', String(A.x + (B.x - A.x) * p.t));
+					p.c.setAttribute('cy', String(A.y + (B.y - A.y) * p.t));
+					return true;
+				});
+			};
+			gsap.ticker.add(dibujar);
+
+			// solo se animan peticiones cuando el diagrama está en pantalla
+			new IntersectionObserver(([en]) => (visible = en.isIntersecting)).observe(svg);
+
+			const pasos = [...this.querySelectorAll('.paso')];
+			pasos.forEach((paso, i) =>
+				ScrollTrigger.create({
+					trigger: paso,
+					start: 'top 60%',
+					end: 'bottom 60%',
+					onToggle: (st) => st.isActive && irA(i),
+				}),
+			);
+			irA(0);
+		}
+	}
+	customElements.define('scroll-diagram', ScrollDiagram);
+</script>
+
+<style>
+	:global(:root:has(scroll-diagram)) {
+		--sl-content-width: 66rem;
+	}
+	scroll-diagram {
+		display: grid;
+		grid-template-columns: minmax(0, 1fr);
+		gap: 0 2.5rem;
+		margin: 2rem 0;
+	}
+	.grafico {
+		position: sticky;
+		top: calc(var(--sl-nav-height) + 0.5rem);
+		z-index: 2;
+		align-self: start;
+		background: var(--sl-color-bg);
+		border: 1px solid var(--sl-color-gray-5);
+		border-radius: 0.75rem;
+		padding: 0.75rem 0.75rem 0.5rem;
+	}
+	@media (min-width: 72rem) {
+		scroll-diagram {
+			grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr);
+		}
+		.grafico {
+			top: calc(var(--sl-nav-height) + 2rem);
+		}
+	}
+	@media (max-width: 71.99rem) {
+		svg {
+			max-height: 44vh;
+		}
+	}
+	/* móvil: tamaño mínimo legible; se desliza a los lados y la cámara sigue la acción */
+	@media (max-width: 40rem) {
+		.lienzo {
+			overflow-x: auto;
+			scrollbar-width: thin;
+			margin: 0 -0.75rem;
+			padding: 0 0.75rem;
+		}
+		.lienzo svg {
+			width: 620px;
+			max-width: none;
+			max-height: none;
+		}
+		.leyenda {
+			font-size: 0.7rem;
+		}
+	}
+	svg {
+		display: block;
+		width: 100%;
+		height: auto;
+		overflow: visible;
+	}
+	.hud {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 0.75rem;
+		align-items: baseline;
+		margin: 0 0 0.25rem;
+		font-size: var(--sl-text-sm);
+	}
+	.hud .n {
+		color: var(--sl-color-gray-3);
+		font-variant-numeric: tabular-nums;
+	}
+	.hud .t {
+		color: var(--sl-color-white);
+	}
+	.leyenda {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 0.25rem 1rem;
+		list-style: none;
+		padding: 0;
+		margin: 0.25rem 0 0;
+		font-size: var(--sl-text-xs);
+		color: var(--sl-color-gray-3);
+	}
+	.leyenda i {
+		display: inline-block;
+		width: 0.6rem;
+		height: 0.6rem;
+		border-radius: 50%;
+		margin-inline-end: 0.35rem;
+		vertical-align: -0.05rem;
+	}
+
+	/* SVG: los elementos se crean en el cliente, por eso :global */
+	svg :global(.arista) {
+		stroke: var(--sl-color-gray-4);
+		stroke-width: 1.4;
+		opacity: 0;
+	}
+	svg :global(.arista.punteada) {
+		stroke-dasharray: 4 5;
+	}
+	svg :global(.nodo) {
+		opacity: 0;
+	}
+	svg :global(.caja) {
+		fill: var(--sl-color-bg);
+		stroke: var(--sl-color-gray-3);
+		stroke-width: 1.4;
+	}
+	svg :global(.nodo.store .caja) {
+		stroke: var(--sl-color-accent);
+	}
+	svg :global(.nodo.user .caja) {
+		fill: var(--sl-color-accent-low);
+		stroke: var(--sl-color-accent);
+	}
+	svg :global(.nodo.punteado .caja) {
+		stroke-dasharray: 5 4;
+	}
+	svg :global(.halo) {
+		fill: none;
+		stroke: var(--sl-color-red);
+		stroke-width: 2;
+		opacity: 0;
+	}
+	svg :global(.nodo.caliente .caja) {
+		stroke: var(--sl-color-red);
+		stroke-width: 2;
+	}
+	svg :global(.nodo.caliente .halo) {
+		animation: latido 1.3s ease-in-out infinite;
+	}
+	svg :global(text) {
+		text-anchor: middle;
+		fill: var(--sl-color-white);
+		font-family: var(--sl-font);
+	}
+	svg :global(.label) {
+		font-size: 13px;
+		font-weight: 600;
+	}
+	svg :global(.sub) {
+		font-size: 10px;
+		fill: var(--sl-color-gray-2);
+	}
+	svg :global(.nota) {
+		font-size: 11px;
+		font-weight: 600;
+		fill: var(--sl-color-red);
+		paint-order: stroke;
+		stroke: var(--sl-color-bg);
+		stroke-width: 5px;
+		stroke-linejoin: round;
+	}
+	svg :global(.nodo.punto .caja) {
+		fill: var(--sl-color-gray-4);
+		stroke: none;
+	}
+	svg :global(.p-lectura),
+	.leyenda .p-lectura {
+		fill: var(--sl-color-accent);
+		background: var(--sl-color-accent);
+	}
+	svg :global(.p-escritura),
+	.leyenda .p-escritura {
+		fill: var(--sl-color-orange);
+		background: var(--sl-color-orange);
+	}
+	svg :global(.p-estatico),
+	.leyenda .p-estatico {
+		fill: var(--sl-color-green);
+		background: var(--sl-color-green);
+	}
+	svg :global(.p-async),
+	.leyenda .p-async {
+		fill: var(--sl-color-purple);
+		background: var(--sl-color-purple);
+	}
+	@keyframes latido {
+		0%,
+		100% {
+			opacity: 0;
+		}
+		50% {
+			opacity: 0.9;
+		}
+	}
+	@media (prefers-reduced-motion: reduce) {
+		svg :global(.nodo.caliente .halo) {
+			animation: none;
+			opacity: 0.9;
+		}
+	}
+</style>

@@ -1,0 +1,41 @@
+---
+title: Atlas
+description: Guías de estudio de punta a punta para aprender desarrollo, gratis e interactivas.
+template: splash
+hero:
+  tagline: Aprende desarrollo de punta a punta. Cada lección tiene conceptos, práctica real y un quiz para comprobar lo que entendiste. Gratis, sin cuenta.
+  actions:
+    - text: Empezar con Datos y SQL
+      link: /datos/01-oltp-vs-olap/
+      icon: right-arrow
+    - text: Mi progreso
+      link: /progreso/
+      variant: minimal
+---
+
+import { Card, CardGrid } from '@astrojs/starlight/components';
+
+## Cómo funciona
+
+<CardGrid>
+	<Card title="1 · Lee" icon="open-book">
+		Conceptos explicados con el porqué, no solo el qué. Diagramas y trampas comunes.
+	</Card>
+	<Card title="2 · Practica" icon="pencil">
+		Cada lección cierra con ejercicios que corren en el navegador, sin instalar nada.
+	</Card>
+	<Card title="3 · Comprueba" icon="approve-check">
+		Un quiz corto con explicaciones. Tu avance queda guardado en este navegador.
+	</Card>
+</CardGrid>
+
+## Guías
+
+<CardGrid>
+	<Card title="Datos y SQL" icon="seti:db">
+		SQL analítico, modelado dimensional, warehouses, pipelines y calidad de datos. [Empezar →](/datos/01-oltp-vs-olap/)
+	</Card>
+	<Card title="Próximamente" icon="rocket">
+		Backend, Seguridad, DevOps, Front-end, IA aplicada, Cloud, Fundamentos de CS, Carrera y Recursos se migran a este formato una por una.
+	</Card>
+</CardGrid>

@@ -1,0 +1,11 @@
+---
+// Envuelve el contenido de Starlight: si la página es una lección, agrega quiz y checkpoints al final.
+import Default from '@astrojs/starlight/components/MarkdownContent.astro';
+import Lesson from './Lesson.astro';
+
+const { entry, lang } = Astro.locals.starlightRoute;
+const { lesson, quiz } = entry.data;
+---
+
+<Default><slot /></Default>
+{lesson && <Lesson id={lesson.id} quiz={quiz ?? []} lang={lang} />}
