@@ -50,4 +50,3 @@ Elige uno por etapa según lo que estés construyendo. *gratis* es libre online;
 | [PGExercises](https://pgexercises.com) | Ejercicios de SQL contra una base real, del básico a window functions y CTEs recursivas |
 | [DataLemur](https://datalemur.com) · [StrataScratch](https://www.stratascratch.com) | Problemas de SQL de entrevistas de data, con soluciones y explicación |
 | [SQLBolt](https://sqlbolt.com) · [Select Star SQL](https://selectstarsql.com) | Tutoriales interactivos para consolidar la base antes de lo analítico |
-| [Advent of SQL](https://adventofsql.com) | Un reto de SQL por día cada diciembre; bueno para practicar lo raro |
