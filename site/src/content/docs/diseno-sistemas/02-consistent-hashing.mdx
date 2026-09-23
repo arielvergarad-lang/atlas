@@ -36,7 +36,7 @@ quiz:
 
 import AnilloHash from '../../../components/simuladores/AnilloHash.astro';
 
-En la [lección anterior](/diseno-sistemas/01-de-uno-a-millones/), el último paso fue repartir los datos entre varios servidores: *sharding*, o un clúster de caché con varios nodos. Eso deja una pregunta que parece trivial: **¿en qué servidor está `usuario:42`?** La respuesta tiene que calcularse igual desde cualquier servidor de aplicación, sin consultar a nadie.
+En la [lección anterior](../01-de-uno-a-millones/), el último paso fue repartir los datos entre varios servidores: *sharding*, o un clúster de caché con varios nodos. Eso deja una pregunta que parece trivial: **¿en qué servidor está `usuario:42`?** La respuesta tiene que calcularse igual desde cualquier servidor de aplicación, sin consultar a nadie.
 
 ### La idea obvia: `hash(clave) % N`
 

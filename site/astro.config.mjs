@@ -3,6 +3,8 @@ import { defineConfig } from 'astro/config';
 import starlight from '@astrojs/starlight';
 
 export default defineConfig({
+	site: 'https://arielvergarad-lang.github.io',
+	base: '/atlas',
 	integrations: [
 		starlight({
 			title: 'Atlas',

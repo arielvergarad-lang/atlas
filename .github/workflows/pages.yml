@@ -15,42 +15,36 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  validate:
+  build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Check local links (no broken .html hrefs)
-        run: |
-          for html in index.html guia/*.html; do
-            grep -oE 'href="[^"#]+\.html"' "$html" | sed 's/href="//;s/"//' | while read href; do
-              case "$href" in
-                http*) ;;  # external URL, skip
-                *) test -f "$href" || { echo "broken link in $html -> $href"; exit 1; } ;;
-              esac
-            done || exit 1
-          done
-          echo "OK: all local links resolve"
+      - uses: actions/checkout@v7
+      - uses: astral-sh/setup-uv@v10
+      - name: Validar lecciones
+        run: uv run tools/validate_content.py
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+      - name: Pruebas y build
+        working-directory: site
+        run: npm ci && npm test && npm run build
+      # ponytail: guías HTML viejas siguen en /atlas/guia/ y /atlas/mapa.html hasta migrarlas
+      - name: Incluir guías antiguas
+        run: cp -r guia mapa.html site/dist/
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: site/dist
 
   deploy:
-    needs: validate
+    needs: build
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Pages
-        uses: actions/configure-pages@v5
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .
-
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v5

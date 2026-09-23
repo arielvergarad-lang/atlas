@@ -41,9 +41,10 @@ git log --oneline -3
 ```
 
 ## Siguiente paso (publicación)
-1. Decidir con Ariel cómo publicar: sitio nuevo reemplaza la raíz de GitHub Pages de `arielvergarad-lang/atlas` o convive en otra ruta. Hoy Pages sirve la versión vieja (`.github/workflows/pages.yml`).
-2. Si Pages: poner `site`/`base` en `astro.config.mjs` y crear job de deploy (`withastro/action` o build + `actions/upload-pages-artifact`), verificar versiones de actions con `gh api repos/<r>/releases/latest`.
-3. Pedir OK antes de `git push` y de mergear `starlight` a `main` (acción pública).
+Decidido 2026-09-23: el sitio nuevo REEMPLAZA la raíz de Pages (`https://arielvergarad-lang.github.io/atlas/`).
+- Hecho: `site`+`base: '/atlas'` en `astro.config.mjs`; links internos relativos / con `BASE_URL`; `pages.yml` reescrito (validar + test + build `site/dist`, copia `guia/` y `mapa.html` viejos para no romper URLs, deploy con configure-pages@v6, upload-pages-artifact@v5, deploy-pages@v5). Verificado sirviendo `dist` bajo `/atlas/`: todas las rutas 200.
+- Falta: OK de Ariel para `git push` y merge `starlight` → `main` (el push a main dispara el deploy).
+- Pendiente derivado: los links a `index.html` desde `guia/*.html` y `mapa.html` ahora caen en la portada nueva.
 
 ## Pendiente / abierto
 - Elegir siguiente pieza animada: (b) diagrama Parquet en Datos, (c) animar recorrido/mapa de progreso.
